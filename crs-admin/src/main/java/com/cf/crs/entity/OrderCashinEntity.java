@@ -20,6 +20,11 @@ public class OrderCashinEntity implements Serializable {
     private Long id;
 
     /**
+     * 用户ID
+     */
+    private Long uid;
+
+    /**
      * 支付类型 1:UPI（目前只能为1）
      */
     private Integer paymentId = 1;

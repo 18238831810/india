@@ -68,9 +68,9 @@ public class SwaggerConfig {
 
     private ApiInfo restApiInfo() {
         return new ApiInfoBuilder()
-                .title("城管系统API接口文档")
-                .description("城管系统 API文档")
-                .contact(new Contact("城管系统", "", ""))
+                .title("订单系统API接口文档")
+                .description("订单系统API文档")
+                .contact(new Contact("订单系统", "", ""))
                 .version("1.0")
                 .build();
     }

@@ -18,6 +18,12 @@ public class OrderCashinDto implements Serializable {
 
 
     /**
+     * 用户ID
+     */
+    @ApiModelProperty(value = "用户ID",required = true)
+    private Long uid;
+
+    /**
      * 支付类型 1:UPI（目前只能为1）
      */
     @ApiModelProperty(value = "支付类型 1:UPI（目前只能为1）",required = false,dataType = "1")

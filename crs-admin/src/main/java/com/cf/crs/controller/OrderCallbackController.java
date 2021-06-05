@@ -5,11 +5,13 @@ import com.cf.crs.properties.OrderCallbackParam;
 import com.cf.crs.service.OrderCashinService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 回调
+ */
 @Slf4j
 @RestController
 @RequestMapping("/orderCallback")
@@ -19,7 +21,7 @@ public class OrderCallbackController {
     OrderCashinService orderCashinService;
 
     /**
-     * 存款掉
+     * 存款回调
      * @param callbackParamm
      * @return
      */
