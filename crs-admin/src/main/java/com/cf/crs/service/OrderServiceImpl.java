@@ -8,6 +8,7 @@ import com.binance.api.client.constant.OrderErrorEnum;
 import com.binance.api.client.domain.market.Candlestick;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import com.cf.crs.common.utils.DateUtils;
+import com.cf.crs.entity.AccountBalanceEntity;
 import com.cf.crs.entity.OrderEntity;
 import com.cf.crs.entity.OrderLeverEntity;
 import com.cf.crs.mapper.OrderMapper;
@@ -33,6 +34,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     @Autowired
     OrderLeverServiceImpl orderLeverService;
 
+
+    @Autowired
+    AccountBalanceService accountBalanceService;
     /**
      * 下单的三个方向常量
      */
@@ -80,6 +84,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
      */
     public OrderErrorEnum saveOrder(OrderEntity orderEntity) {
 
+        //判断余额是否足够
+        AccountBalanceEntity accountBalanceEntity= accountBalanceService.getAccountBalanceByUId(orderEntity.getUid());
+        if(accountBalanceEntity==null || accountBalanceEntity.getAmount()<orderEntity.getPayment())
+        {
+            log.info("uid->{} payment->{} not enough",orderEntity.getUid(),orderEntity.getPayment());
+            return OrderErrorEnum.ERROR_NOT_ENOUGH;
+        }
+
         orderEntity.setNextStageTime(orderEntity.getEarlyStageTime() + 60000);
 
         orderEntity.setUid(getUidFromToken(orderEntity.getToken()));
@@ -88,6 +100,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         this.save(orderEntity);
         //TODO
         //从用户账户扣钱
+        accountBalanceEntity.setAmount((float)-orderEntity.getPayment());
+        accountBalanceEntity.setUpdateTime(System.currentTimeMillis());
+        accountBalanceService.updateBalance(accountBalanceEntity);
         return null;
     }
 
