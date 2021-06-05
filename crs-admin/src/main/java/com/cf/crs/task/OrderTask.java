@@ -28,7 +28,11 @@ public class OrderTask implements ITask {
 
     private void triggerTask(String param)
     {
-        orderService.updateOrder();
+        int total=1;
+        while(total>0)
+        {
+            total= orderService.updateOrder();
+        }
     }
 
 
