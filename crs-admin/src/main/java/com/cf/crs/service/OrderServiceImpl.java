@@ -7,6 +7,7 @@ import com.binance.api.client.CandlesticksCache;
 import com.binance.api.client.constant.OrderErrorEnum;
 import com.binance.api.client.domain.market.Candlestick;
 import com.binance.api.client.domain.market.CandlestickInterval;
+import com.cf.crs.common.utils.DateUtils;
 import com.cf.crs.entity.OrderEntity;
 import com.cf.crs.entity.OrderLeverEntity;
 import com.cf.crs.mapper.OrderMapper;
@@ -35,7 +36,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     /**
      * 下单的三个方向常量
      */
-    private final static List buyDirect = Arrays.asList("rise", "fall", "equal");
+    private final static List<String> buyDirect = Arrays.asList("rise", "fall", "equal");
     /**
      * 多久之内可以下单
      */
@@ -55,14 +56,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     private OrderErrorEnum filterParam(OrderEntity orderEntity) {
         int second = LocalDateTime.now().getSecond();
         if (second >= LIMIT_TIME) {
-            log.warn("已经过时了 second->{},token->{}", second,orderEntity.getToken());
+            log.warn("已经过时了 second->{},token->{}", second, orderEntity.getToken());
             return OrderErrorEnum.ERROR_OVER_TIME;
         }
         orderEntity.setCtime(System.currentTimeMillis());
 
         if (StringUtils.isEmpty(orderEntity.getBuyDirection())
                 || (!buyDirect.contains(orderEntity.getBuyDirection()))) {
-            log.warn("direct->{} token->{}", orderEntity.getBuyDirection(),orderEntity.getToken());
+            log.warn("direct->{} token->{}", orderEntity.getBuyDirection(), orderEntity.getToken());
             return OrderErrorEnum.ERROR_PARAM;
         }
 
@@ -81,7 +82,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
 
         Candlestick earlyStage = getCandlestick(orderEntity.getEarlyStageTime());
         if (earlyStage == null) {
-            log.warn("获取行情时获取不到->{} token->{}", orderEntity.getEarlyStageTime(),orderEntity.getToken());
+            log.warn("获取行情时获取不到->{} token->{}", orderEntity.getEarlyStageTime(), orderEntity.getToken());
             return OrderErrorEnum.ERROR_GET_CAND;
         }
 
@@ -144,7 +145,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
 
         Map<String, OrderLeverEntity> orderLeverEntityMap = orderLeverService.getBuyDirectLever();
 
-        List<OrderEntity> list = this.getBaseMapper().selectList(new QueryWrapper<OrderEntity>().le("utime", 0).last(" limit 100"));
+        long start = System.currentTimeMillis();
+        long end = start - 60 * 60000;
+        List<OrderEntity> list = this.getBaseMapper().selectList(
+                new QueryWrapper<OrderEntity>()
+                        .le("utime", 0)
+                        .ge("ctime", start)
+                        .lt("ctime", end)
+                        .last(" limit 100"));
+
         for (OrderEntity orderEntity : list) {
             OrderLeverEntity orderLeverEntity = orderLeverEntityMap.get(orderEntity.getBuyDirection());
             if (orderLeverEntity == null) {
@@ -163,7 +172,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     public void updateOrder(OrderEntity orderEntity, double lever) {
         Candlestick nextStage = getCandlestick(orderEntity.getNextStageTime());
         if (nextStage == null) {
-            log.warn("获取行情时获取不到->{},id->{}", orderEntity.getNextStageTime(),orderEntity.getId());
+            log.warn("获取行情时获取不到->{},id->{}", orderEntity.getNextStageTime(), orderEntity.getId());
             return;
         }
         orderEntity.setNextStagePrice(getPointPrize(nextStage.getOpen()));
@@ -207,6 +216,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
             default:
                 return false;
         }
+    }
+
+    public List<Map<String, Object>> getTotalPaymentYestoday() {
+        long now = System.currentTimeMillis();
+        long start = DateUtils.getBeforeZeroHourSecondMils(now, -1);
+        long end = DateUtils.getBeforeZeroHourSecondMils(now, 0);
+        return getTotalPaymentBetweenTime(start, end);
+    }
+
+    public List<Map<String, Object>> getTotalPaymentBetweenTime(long start, long end) {
+        return this.getBaseMapper().selectMaps(new QueryWrapper<OrderEntity>().ge("ctime", start).lt("ctime", end).select("sum(payment) as total", "room_id").groupBy("room_id"));
     }
 
 }

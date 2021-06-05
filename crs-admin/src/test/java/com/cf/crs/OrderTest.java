@@ -2,6 +2,7 @@ package com.cf.crs;
 
 import com.cf.AdminApplication;
 import com.cf.crs.entity.OrderEntity;
+import com.cf.crs.service.OrderCommissionServiceImpl;
 import com.cf.crs.service.OrderServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +16,10 @@ public class OrderTest {
 
     @Autowired
     OrderServiceImpl orderService;
+
+    @Autowired
+    OrderCommissionServiceImpl orderCommissionService;
+
 
     @Test
     public void testSave()
@@ -31,5 +36,11 @@ public class OrderTest {
     public void testUpdate()
     {
         orderService.updateOrder();
+    }
+
+    @Test
+    public void testOrderCommissionService()
+    {
+        orderCommissionService.saveOrderCommission();
     }
 }

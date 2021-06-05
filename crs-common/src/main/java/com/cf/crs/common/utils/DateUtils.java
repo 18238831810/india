@@ -16,6 +16,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -178,5 +179,30 @@ public class DateUtils {
     public static Date addDateYears(Date date, int years) {
         DateTime dateTime = new DateTime(date);
         return dateTime.plusYears(years).toDate();
+    }
+
+    public static long getZeroHourSecondMils(long time)
+    {
+        return getBeforeZeroHourSecondMils( time,0);
+    }
+
+    public static long getBeforeZeroHourSecondMils(long time,int days)
+    {
+        Calendar calendar =Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        calendar.add(Calendar.DAY_OF_MONTH,days);
+        calendar.set(Calendar.HOUR_OF_DAY,0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
+    }
+
+    public static long getZeroSecondMils(long time) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
     }
 }
