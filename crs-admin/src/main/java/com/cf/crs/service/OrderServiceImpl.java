@@ -194,7 +194,20 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         orderEntity.setUtime(System.currentTimeMillis());
         orderEntity.setLever(lever);
         setTotalProfit(orderEntity, lever);
+        updateBalance(orderEntity);
         return this.updateById(orderEntity)?1:0;
+    }
+
+    private void updateBalance(OrderEntity orderEntity)
+    {
+        //如果是盈利了，则给总账户加钱
+        if(orderEntity.getProfit()>0)
+        {
+            AccountBalanceEntity accountBalanceEntity=accountBalanceService.getAccountBalanceByUId(orderEntity.getUid());
+            accountBalanceEntity.setAmount((float) orderEntity.getProfit());
+            accountBalanceEntity.setUpdateTime(System.currentTimeMillis());
+            accountBalanceService.updateBalance(accountBalanceEntity);
+        }
     }
 
     private void setTotalProfit(OrderEntity orderEntity, double lever) {
