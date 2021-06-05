@@ -38,7 +38,7 @@ public class CandlesticksCache {
         return candlesticksCache;
     }
 
-    public void cache(){
+    public synchronized void cache(){
          cache("btcusdt", CandlestickInterval.ONE_MINUTE);
     }
 

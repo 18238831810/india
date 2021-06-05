@@ -80,16 +80,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
      */
     public OrderErrorEnum saveOrder(OrderEntity orderEntity) {
 
-        Candlestick earlyStage = getCandlestick(orderEntity.getEarlyStageTime());
-        if (earlyStage == null) {
-            log.warn("获取行情时获取不到->{} token->{}", orderEntity.getEarlyStageTime(), orderEntity.getToken());
-            return OrderErrorEnum.ERROR_GET_CAND;
-        }
-
-        orderEntity.setEarlyStagePrice(getPointPrize(earlyStage.getOpen()));
-        orderEntity.setEarlyStageTime(earlyStage.getOpenTime());
-
-
         orderEntity.setNextStageTime(orderEntity.getEarlyStageTime() + 60000);
 
         orderEntity.setUid(getUidFromToken(orderEntity.getToken()));
@@ -145,14 +135,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
 
         Map<String, OrderLeverEntity> orderLeverEntityMap = orderLeverService.getBuyDirectLever();
 
-        long start = System.currentTimeMillis();
-        long end = start - 60 * 60000;
+        long end = DateUtils.getZeroSecondMils(System.currentTimeMillis());
+        long  start= end - 60 * 60000;
         List<OrderEntity> list = this.getBaseMapper().selectList(
                 new QueryWrapper<OrderEntity>()
                         .le("utime", 0)
                         .ge("ctime", start)
                         .lt("ctime", end)
-                        .last(" limit 100"));
+                        .last(" limit 50"));
 
         for (OrderEntity orderEntity : list) {
             OrderLeverEntity orderLeverEntity = orderLeverEntityMap.get(orderEntity.getBuyDirection());
@@ -170,9 +160,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     }
 
     public void updateOrder(OrderEntity orderEntity, double lever) {
+         Candlestick earlyStage = getCandlestick(orderEntity.getEarlyStageTime());
+        if (earlyStage == null) {
+            log.warn("获取earlyStage行情时获取不到->{} id->{}", orderEntity.getEarlyStageTime(), orderEntity.getId());
+            return ;
+        }
+        orderEntity.setEarlyStagePrice(getPointPrize(earlyStage.getOpen()));
+        orderEntity.setEarlyStageTime(earlyStage.getOpenTime());
+
         Candlestick nextStage = getCandlestick(orderEntity.getNextStageTime());
         if (nextStage == null) {
-            log.warn("获取行情时获取不到->{},id->{}", orderEntity.getNextStageTime(), orderEntity.getId());
+            log.warn("获取nextStage行情时获取不到->{},id->{}", orderEntity.getNextStageTime(), orderEntity.getId());
             return;
         }
         orderEntity.setNextStagePrice(getPointPrize(nextStage.getOpen()));
