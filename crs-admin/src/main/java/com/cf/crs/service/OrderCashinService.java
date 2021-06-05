@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.cf.crs.common.exception.RenException;
+import com.cf.crs.entity.AccountBalanceEntity;
 import com.cf.crs.entity.OrderCashinDto;
 import com.cf.crs.entity.OrderCashinEntity;
 import com.cf.crs.mapper.OrderCashinMapper;
@@ -39,6 +40,9 @@ public class OrderCashinService {
 
     @Autowired
     RestTemplate restTemplate;
+
+    @Autowired
+    AccountBalanceService accountBalanceService;
 
 
     /**
@@ -116,6 +120,7 @@ public class OrderCashinService {
      */
     private OrderCashinEntity getOrderCashinEntity(OrderCashinDto orderCashinDto, long now) {
         OrderCashinEntity orderCashinEntity = new OrderCashinEntity();
+        orderCashinEntity.setUid(orderCashinDto.getUid());
         orderCashinEntity.setAmount(orderCashinDto.getAmount());
         orderCashinEntity.setGoodsInfo(orderCashinDto.getGoodsInfo());
         orderCashinEntity.setPaymentId(orderCashinDto.getPaymentId());
@@ -136,12 +141,36 @@ public class OrderCashinService {
         if (callbackParamm.getStatus() == 1){
             //支付成功
             String order_sn = callbackParamm.getOrder_sn();
-            String[] order = order_sn.split("G");
-            //更新存款订单数据
-            orderCashinMapper.update(null,new UpdateWrapper<OrderCashinEntity>().eq("id",order[1]).set("order_sn",callbackParamm.getOrder_sn()).set("pt_irder_sn",callbackParamm.getPt_order_sn()).
-                    set("real_amount",callbackParamm.getAmount()).set("deal_time",callbackParamm.getTime()*1000).set("status",2));
+            //解析出存款记录id
+            String id = order_sn.split("G")[1];
+            OrderCashinEntity orderCashinEntity = orderCashinMapper.selectById(id);
+            if (orderCashinEntity == null) {
+                log.info("order cashin id error:{}",id);
+                return "success";
+            }
+            //更新存款记录
+            updateOrderCashin(callbackParamm, orderCashinEntity);
+            //更新用余额
+            updateAccountBalance(orderCashinEntity);
         }
         return "success";
+    }
+
+    private void updateAccountBalance(OrderCashinEntity orderCashinEntity) {
+        AccountBalanceEntity accountBalanceEntity = new AccountBalanceEntity();
+        accountBalanceEntity.setAmount(orderCashinEntity.getRealAmount());
+        accountBalanceEntity.setUid(orderCashinEntity.getUid());
+        accountBalanceEntity.setUpdateTime(System.currentTimeMillis());
+        accountBalanceService.updateBalance(accountBalanceEntity);
+    }
+
+    private void updateOrderCashin(OrderCallbackParam callbackParamm, OrderCashinEntity orderCashinEntity) {
+        orderCashinEntity.setOrderSn(callbackParamm.getOrder_sn());
+        orderCashinEntity.setPtOrderSn(callbackParamm.getPt_order_sn());
+        orderCashinEntity.setRealAmount(callbackParamm.getAmount());
+        orderCashinEntity.setDealTime(callbackParamm.getTime()*1000);
+        orderCashinEntity.setStatus(2);
+        orderCashinMapper.updateById(orderCashinEntity);
     }
 
 
