@@ -46,7 +46,7 @@ public class CandlesticksCache {
     public void cache(String symbol, CandlestickInterval interval)
     {
         initializeCandlestickCache(symbol, interval);
-        startCandlestickEventStreaming(symbol, interval);
+        //startCandlestickEventStreaming(symbol, interval);
     }
 
     /**
@@ -72,8 +72,10 @@ public class CandlesticksCache {
 
         client.onCandlestickEvent(symbol.toLowerCase(), interval, response -> {
             Long openTime = response.getOpenTime();
-            Candlestick updateCandlestick =    new Candlestick();;
-            // update candlestick with the stream data
+            Candlestick updateCandlestick = cachLinkMap.get(openTime);
+            if (updateCandlestick == null) {
+               return;
+            }
             updateCandlestick.setOpenTime(response.getOpenTime());
             updateCandlestick.setOpen(response.getOpen());
             updateCandlestick.setLow(response.getLow());

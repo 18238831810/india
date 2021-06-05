@@ -121,12 +121,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
      * @return
      */
     private Candlestick getCandlestick(Long timeKey) {
-        Candlestick candlestick = CandlesticksCache.getInstance().getCandlesticksCache().get(timeKey);
-        if (candlestick == null) {
-            CandlesticksCache candlesticksCache = CandlesticksCache.getInstance();
-            candlesticksCache.cache();
-            return candlesticksCache.getCandlesticksCache().get(timeKey);
-        } else return candlestick;
+       return  CandlesticksCache.getInstance().getCandlesticksCache().get(timeKey);
+//        Candlestick candlestick =
+//        if (candlestick == null) {
+//            CandlesticksCache candlesticksCache = CandlesticksCache.getInstance();
+//            candlesticksCache.cache();
+//            return candlesticksCache.getCandlesticksCache().get(timeKey);
+//        } else return candlestick;
     }
 
 
