@@ -204,8 +204,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         if(orderEntity.getProfit()>0)
         {
             AccountBalanceEntity accountBalanceEntity=accountBalanceService.getAccountBalanceByUId(orderEntity.getUid());
-            accountBalanceEntity.setAmount((float) orderEntity.getProfit());
+            accountBalanceEntity.setAmount((float) (orderEntity.getProfit()+orderEntity.getPayment()));
             accountBalanceEntity.setUpdateTime(System.currentTimeMillis());
+            log.info("uid->{} profit->{}",orderEntity.getUid(),orderEntity.getProfit());
             accountBalanceService.updateBalance(accountBalanceEntity);
         }
     }
