@@ -55,6 +55,15 @@ mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     map-underscore-to-camel-case: true
+#存取款配制
+order:
+  config:
+    merchId: 8
+    apiToken: f42c97ef4333eb9676b6b3b3c57dd2e7c27dcad5
+    orderUrl: http://47.241.170.206/api/payTest/order
+    orderCallbackUrl: http://frank.cn.utools.club/orderCallback/order
+    collectionUrl: http://47.241.170.206/api/payTest/collection
+    collectionCallbackUrl: http://frank.cn.utools.club
 
 
 
