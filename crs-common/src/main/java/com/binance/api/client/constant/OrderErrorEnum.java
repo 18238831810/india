@@ -2,9 +2,9 @@ package com.binance.api.client.constant;
 
 public enum OrderErrorEnum {
     ERROR_OVER_TIME(100, "超过时间，不能下单"),
-    ERROR_NOT_BETWEEN(100, "下单区间值应该为[%s,%s]"),
-    ERROR_PARAM(100, "参数有问题"),
-    ERROR_GET_CAND(100, "已过下单时间，请稍后再试");
+    ERROR_NOT_BETWEEN(101, "下单区间值应该为[%s,%s]"),
+    ERROR_PARAM(102, "参数有问题"),
+    ERROR_NOT_ENOUGH(103, "余额不足");
     private int code;
 
     public int getCode() {

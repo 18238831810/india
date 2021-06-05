@@ -38,21 +38,21 @@ public class CandlesticksCache {
         return candlesticksCache;
     }
 
-    public synchronized void cache(){
-         cache("btcusdt", CandlestickInterval.ONE_MINUTE);
+    public synchronized int cache(){
+       return  cache("btcusdt", CandlestickInterval.ONE_MINUTE);
     }
 
 
-    public void cache(String symbol, CandlestickInterval interval)
+    public int  cache(String symbol, CandlestickInterval interval)
     {
-        initializeCandlestickCache(symbol, interval);
+      return  initializeCandlestickCache(symbol, interval);
         //startCandlestickEventStreaming(symbol, interval);
     }
 
     /**
      * Initializes the candlestick cache by using the REST API.
      */
-    private void initializeCandlestickCache(String symbol, CandlestickInterval interval) {
+    private int initializeCandlestickCache(String symbol, CandlestickInterval interval) {
         BinanceApiClientFactory factory = BinanceApiClientFactory.newInstance();
         BinanceApiRestClient client = factory.newRestClient();
         List<Candlestick> candlestickBars = client.getCandlestickBars(symbol.toUpperCase(), interval);
@@ -61,6 +61,7 @@ public class CandlesticksCache {
             Candlestick candlestickBar=candlestickBars.get(i);
             cachLinkMap.put(candlestickBar.getOpenTime(), candlestickBar);
         }
+        return size;
     }
 
     /**

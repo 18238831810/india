@@ -5,6 +5,8 @@ import com.cf.crs.job.task.ITask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @Component("cacheCandleTask")
 public class CacheCandleTask  implements ITask {
@@ -24,6 +26,11 @@ public class CacheCandleTask  implements ITask {
      * @param params
      */
     private void cacheCandlesticks(String params) {
-        CandlesticksCache.getInstance().cache();
+        int second = LocalDateTime.now().getSecond();
+        if(second<=30)
+        {
+            int total = CandlesticksCache.getInstance().cache();
+            log.info("cacheCandleTask.size->{},second->{}", total,second);
+        }
     }
 }
