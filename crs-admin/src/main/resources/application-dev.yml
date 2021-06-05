@@ -2,9 +2,9 @@ spring:
   #redis配置
   redis:
     database: 2
-    host: 47.106.199.193
-    port: 1371
-    password: '*&(*%QWaf4534!123dsg'
+    host: 127.0.0.1
+    port: 6379
+    password: 'hsM8NK8b71vFQKFOS55jbWJrA1TYgI4e'
     timeout: 20000ms  # 连接超时时长（毫秒）
     jedis:
       pool:
@@ -54,6 +54,7 @@ spring:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
 
 
 
