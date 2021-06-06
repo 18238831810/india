@@ -85,7 +85,7 @@ public class OrderController extends  BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "symbol", value = "交易对", required = true, dataType = "String",defaultValue = "btcusdt"),
             @ApiImplicitParam(name = "interval",  allowableValues ="1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d", value = "行情周期", required = true, dataType = "String",defaultValue = "1d"),
-            @ApiImplicitParam(name = "size",   value = "行情周期", dataType = "int",defaultValue = "240"),
+            @ApiImplicitParam(name = "size",   value = "行情条数", dataType = "int",defaultValue = "240"),
     })
     public Result getCandlestick(String symbol ,String interval,Integer size)
     {
