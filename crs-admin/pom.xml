@@ -140,7 +140,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>city-api</finalName>
+		<finalName>india</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
