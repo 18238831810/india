@@ -55,8 +55,10 @@ public class OrderController extends BaseController {
             @ApiImplicitParam(name = "id", value = "订单ID", required = true, dataType = "long"),
             @ApiImplicitParam(name = "token", value = "下单人的token", required = true, dataType = "String")
     })
-    public Result delOrder(OrderEntity orderEntity) {
-        orderEntity.setUid(getUidFromToken(orderEntity.getToken()));
+    public Result delOrder(int id,String token) {
+        OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setUid(getUidFromToken(token));
+        orderEntity.setId(id);
         OrderErrorEnum orderErrorEnum = orderService.updateOrderToDelStatus(orderEntity);
         return orderErrorEnum == null ? new Result<>() : new Result<>().error(orderErrorEnum.getCode(), orderErrorEnum.getError());
     }
