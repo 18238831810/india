@@ -14,6 +14,7 @@ import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.common.entity.QueryPage;
 import com.cf.crs.common.utils.DateUtils;
 import com.cf.crs.entity.AccountBalanceEntity;
+import com.cf.crs.entity.CandlestickDto;
 import com.cf.crs.entity.OrderEntity;
 import com.cf.crs.entity.OrderLeverEntity;
 import com.cf.crs.mapper.OrderMapper;
@@ -274,8 +275,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
             log.info("uid->{} id->{} token->{} status->{}", orderEntity.getUid(), order.getId(), orderEntity.getToken(), order == null ? null : order.getStatus());
             return OrderErrorEnum.ERROR_NOT_FOUND;
         }
-        if(System.currentTimeMillis()-order.getCtime()<10*60000)
-        {
+        if (System.currentTimeMillis() - order.getCtime() < 10 * 60000) {
             log.info("uid->{} id->{} token->{} status->{} ", orderEntity.getUid(), order.getId(), orderEntity.getToken(), order == null ? null : order.getStatus());
             return OrderErrorEnum.ERROR_NOT_MATCH;
         }
@@ -297,25 +297,24 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
 
     /**
      * 从币安拉取行情
+     *
      * @return
      */
-    public List<CandlesticksCache.MyCandlestick>  getCandlestickList(String symbol,String interval,int size) {
-        List<Candlestick> list=   CandlesticksCache.getInstance().getCandlestickBars( symbol,  interval,size);
-        List<CandlesticksCache.MyCandlestick> result= new ArrayList<>();
-        for (Candlestick candlestick: list) {
-            CandlesticksCache.MyCandlestick myCandlestick = new CandlesticksCache.MyCandlestick();
-            myCandlestick.setClose(candlestick.getClose());
-            myCandlestick.setCloseTime(candlestick.getCloseTime());
-            myCandlestick.setHigh(candlestick.getHigh());
-            myCandlestick.setLow(candlestick.getLow());
-            myCandlestick.setNumberOfTrades(candlestick.getNumberOfTrades());
-            myCandlestick.setOpen(candlestick.getOpen());
-            myCandlestick.setOpenTime(candlestick.getOpenTime());
-            myCandlestick.setQuoteAssetVolume(candlestick.getQuoteAssetVolume());
-            myCandlestick.setTakerBuyBaseAssetVolume(candlestick.getTakerBuyBaseAssetVolume());
-            myCandlestick.setTakerBuyQuoteAssetVolume(candlestick.getTakerBuyQuoteAssetVolume());
-            myCandlestick.setVolume(candlestick.getVolume());
-            result.add(myCandlestick);
+    public List<CandlestickDto> getCandlestickList(String symbol, String interval, int size) {
+        List<Candlestick> list = CandlesticksCache.getInstance().getCandlestickBars(symbol, interval, size);
+        List<CandlestickDto> result = new ArrayList<>();
+        for (Candlestick candlestick : list) {
+            result.add(CandlestickDto.builder().close(candlestick.getClose())
+                    .closeTime(candlestick.getCloseTime())
+                    .high(candlestick.getHigh())
+                    .low(candlestick.getLow())
+                    .numberOfTrades(candlestick.getNumberOfTrades())
+                    .open(candlestick.getOpen())
+                    .openTime(candlestick.getOpenTime())
+                    .quoteAssetVolume(candlestick.getQuoteAssetVolume())
+                    .takerBuyBaseAssetVolume(candlestick.getTakerBuyBaseAssetVolume())
+                    .takerBuyQuoteAssetVolume(candlestick.getTakerBuyQuoteAssetVolume())
+                    .volume(candlestick.getVolume()).build());
         }
         return result;
     }

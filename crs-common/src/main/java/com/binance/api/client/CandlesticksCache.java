@@ -149,11 +149,4 @@ public class CandlesticksCache {
         CandlesticksCache.getInstance().getCandlestickBars(null);
     }
 
-    @Data
-    @Builder
-    @AllArgsConstructor
-    public static class MyCandlestick extends  Candlestick
-    {
-
-    }
 }
