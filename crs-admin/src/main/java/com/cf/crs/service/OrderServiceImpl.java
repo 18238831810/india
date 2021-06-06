@@ -66,14 +66,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     private OrderErrorEnum filterParam(OrderEntity orderEntity) {
         int second = LocalDateTime.now().getSecond();
         if (second >= LIMIT_TIME) {
-            log.warn("已经过时了 second->{},id->{}", second, orderEntity.getId());
+            log.warn("已经过时了 second->{},uid->{}", second, orderEntity.getUid());
             return OrderErrorEnum.ERROR_OVER_TIME;
         }
         orderEntity.setCtime(System.currentTimeMillis());
 
         if (StringUtils.isEmpty(orderEntity.getBuyDirection())
                 || (!buyDirect.contains(orderEntity.getBuyDirection()))) {
-            log.warn("direct->{} id->{}", orderEntity.getBuyDirection(), orderEntity.getId());
+            log.warn("direct->{} uid->{}", orderEntity.getBuyDirection(), orderEntity.getUid());
             return OrderErrorEnum.ERROR_PARAM;
         }
 
