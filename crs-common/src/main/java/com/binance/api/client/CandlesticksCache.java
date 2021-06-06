@@ -152,7 +152,6 @@ public class CandlesticksCache {
     @Data
     @Builder
     @AllArgsConstructor
-    @NoArgsConstructor
     public static class MyCandlestick extends  Candlestick
     {
 
