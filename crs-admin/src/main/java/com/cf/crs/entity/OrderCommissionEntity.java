@@ -25,4 +25,9 @@ public class OrderCommissionEntity {
      * 返利时间
      */
     private long ctime;
+    /**
+     * 是否已经提案，比如已提现，或已经可以提现.
+     * 0:刚生成  1：提案  2：提现
+     */
+    private int status;
 }

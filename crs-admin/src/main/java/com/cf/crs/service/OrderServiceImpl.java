@@ -85,10 +85,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     public OrderErrorEnum saveOrder(OrderEntity orderEntity) {
 
         //判断余额是否足够
-        AccountBalanceEntity accountBalanceEntity= accountBalanceService.getAccountBalanceByUId(orderEntity.getUid());
-        if(accountBalanceEntity==null || accountBalanceEntity.getAmount()<orderEntity.getPayment())
-        {
-            log.info("uid->{} payment->{} not enough",orderEntity.getUid(),orderEntity.getPayment());
+        AccountBalanceEntity accountBalanceEntity = accountBalanceService.getAccountBalanceByUId(orderEntity.getUid());
+        if (accountBalanceEntity == null || accountBalanceEntity.getAmount() < orderEntity.getPayment()) {
+            log.info("uid->{} payment->{} not enough", orderEntity.getUid(), orderEntity.getPayment());
             return OrderErrorEnum.ERROR_NOT_ENOUGH;
         }
 
@@ -100,7 +99,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         this.save(orderEntity);
         //TODO
         //从用户账户扣钱
-        accountBalanceEntity.setAmount((float)-orderEntity.getPayment());
+        accountBalanceEntity.setAmount((float) -orderEntity.getPayment());
         accountBalanceEntity.setUpdateTime(System.currentTimeMillis());
         accountBalanceService.updateBalance(accountBalanceEntity);
         return null;
@@ -136,7 +135,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
      * @return
      */
     private Candlestick getCandlestick(Long timeKey) {
-       return  CandlesticksCache.getInstance().getCandlesticksCache().get(timeKey);
+        return CandlesticksCache.getInstance().getCandlesticksCache().get(timeKey);
 //        Candlestick candlestick =
 //        if (candlestick == null) {
 //            CandlesticksCache candlesticksCache = CandlesticksCache.getInstance();
@@ -152,32 +151,32 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         Map<String, OrderLeverEntity> orderLeverEntityMap = orderLeverService.getBuyDirectLever();
 
         long end = DateUtils.getZeroSecondMils(System.currentTimeMillis());
-        long  start= end - 60 * 60000;
+        long start = end - 60 * 60000;
         List<OrderEntity> list = this.getBaseMapper().selectList(
                 new QueryWrapper<OrderEntity>()
                         .le("utime", 0)
                         .ge("ctime", start)
                         .lt("ctime", end)
                         .last(" limit 50"));
-        int total=0;
+        int total = 0;
         for (OrderEntity orderEntity : list) {
             OrderLeverEntity orderLeverEntity = orderLeverEntityMap.get(orderEntity.getBuyDirection());
             if (orderLeverEntity == null) {
                 log.warn("ID->{} 对应的方向->{} 没有找到", orderEntity.getId(), orderEntity.getBuyDirection());
                 continue;
             }
-            total+= updateOrder(orderEntity, orderLeverEntity);
+            total += updateOrder(orderEntity, orderLeverEntity);
         }
         return total;
     }
 
 
     public int updateOrder(OrderEntity orderEntity, OrderLeverEntity orderLeverEntity) {
-       return updateOrder(orderEntity, orderLeverEntity.getLever());
+        return updateOrder(orderEntity, orderLeverEntity.getLever());
     }
 
     public int updateOrder(OrderEntity orderEntity, double lever) {
-         Candlestick earlyStage = getCandlestick(orderEntity.getEarlyStageTime());
+        Candlestick earlyStage = getCandlestick(orderEntity.getEarlyStageTime());
         if (earlyStage == null) {
             log.warn("获取earlyStage行情时获取不到->{} id->{}", orderEntity.getEarlyStageTime(), orderEntity.getId());
             return 0;
@@ -195,18 +194,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         orderEntity.setLever(lever);
         setTotalProfit(orderEntity, lever);
         updateBalance(orderEntity);
-        return this.updateById(orderEntity)?1:0;
+        return this.updateById(orderEntity) ? 1 : 0;
     }
 
-    private void updateBalance(OrderEntity orderEntity)
-    {
+    private void updateBalance(OrderEntity orderEntity) {
         //如果是盈利了，则给总账户加钱
-        if(orderEntity.getProfit()>0)
-        {
-            AccountBalanceEntity accountBalanceEntity=accountBalanceService.getAccountBalanceByUId(orderEntity.getUid());
-            accountBalanceEntity.setAmount((float) (orderEntity.getProfit()+orderEntity.getPayment()));
+        if (orderEntity.getProfit() > 0) {
+            AccountBalanceEntity accountBalanceEntity = accountBalanceService.getAccountBalanceByUId(orderEntity.getUid());
+            accountBalanceEntity.setAmount((float) (orderEntity.getProfit() + orderEntity.getPayment()));
             accountBalanceEntity.setUpdateTime(System.currentTimeMillis());
-            log.info("uid->{} profit->{}",orderEntity.getUid(),orderEntity.getProfit());
+            log.info("uid->{} profit->{}", orderEntity.getUid(), orderEntity.getProfit());
             accountBalanceService.updateBalance(accountBalanceEntity);
         }
     }
@@ -245,13 +242,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
             default:
                 return false;
         }
-    }
-
-    public List<Map<String, Object>> getTotalPaymentYestoday() {
-        long now = System.currentTimeMillis();
-        long start = DateUtils.getBeforeZeroHourSecondMils(now, -1);
-        long end = DateUtils.getBeforeZeroHourSecondMils(now, 0);
-        return getTotalPaymentBetweenTime(start, end);
     }
 
     public List<Map<String, Object>> getTotalPaymentBetweenTime(long start, long end) {
