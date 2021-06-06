@@ -35,16 +35,15 @@ public class OrderCommissionServiceImpl extends ServiceImpl<OrderCommissionMappe
      */
     @Transactional
     public int saveOrderCommission() {
-        return saveOrderCommission(-1);
+        return saveOrderCommission(0);
     }
 
     @Transactional
     public int saveOrderCommission(Integer day) {
         day=day==null?0:day;
         int total = 0;
-        long now = System.currentTimeMillis();
-        long start = DateUtils.getBeforeZeroHourSecondMils(now, day);
-        long end = DateUtils.getBeforeZeroHourSecondMils(now, day - 1);
+        long  end= DateUtils.getBeforeZeroHourSecondMils(System.currentTimeMillis(), day);
+        long start = DateUtils.getBeforeZeroHourSecondMils(end,  -1);
 
         List<Map<String, Object>> list = orderService.getTotalPaymentBetweenTime(start, end);
         if (CollectionUtils.isEmpty(list)) {
@@ -52,28 +51,38 @@ public class OrderCommissionServiceImpl extends ServiceImpl<OrderCommissionMappe
             return 0;
         } else log.info("saveOrderCommission->[{},{}] size->{}", start, end, list.size());
         for (Map<String, Object> map : list) {
-            total += saveEntity(map) ? 1 : 0;
+            total += saveEntity(map,start) ? 1 : 0;
         }
         return total;
     }
 
-    private boolean saveEntity(Map<String, Object> map) {
+    private boolean saveEntity(Map<String, Object> map,long time) {
         String roomId = map.get("room_id").toString();
         double total = Double.parseDouble(map.get("total").toString());
         OrderCommissionEntity orderCommissionEntity = OrderCommissionEntity.builder()
-                .ctime(DateUtils.getBeforeZeroHourSecondMils(System.currentTimeMillis(), -1))
-                .roomId(roomId).status(0)
+                .ctime(time) .roomId(roomId).status(0)
                 .profit(orderLeverService.getOrderCommission().get("commission").getLever() * total).build();
 
-        int result = this.getBaseMapper().delete(
+        OrderCommissionEntity orderC= this.getBaseMapper().selectOne(
                 new QueryWrapper<OrderCommissionEntity>()
                         .eq("ctime", orderCommissionEntity.getCtime())
-                        .eq("room_id", roomId)
-                        .eq("status", 0));
-        if (result > 0)
+                        .eq("room_id", roomId));
+        //如果没有记录则插入
+        if(orderC==null)
+        {
             return this.save(orderCommissionEntity);
-        return false;
-
+        }
+        else
+        {
+            //如果状态已经更新则不操作
+            if(orderC.getStatus()>0) return false;
+            else
+            { //如果状态还是未处理，则更新
+                orderCommissionEntity.setId(orderC.getId());
+                orderCommissionEntity.setCtime(orderC.getCtime());
+                return this.updateById(orderCommissionEntity);
+            }
+        }
     }
 
 

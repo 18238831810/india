@@ -17,7 +17,7 @@ public class CandlesticksCache {
      */
 
     private static CandlesticksCache candlesticksCache = null;
-    private static int maximumSize = 20;
+    private static int maximumSize = 100;
     /**
      * 限制Map大小为maximumSize
      */

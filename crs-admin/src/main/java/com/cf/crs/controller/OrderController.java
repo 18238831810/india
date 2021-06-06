@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Api(tags = "下单操作")
+@Api(tags = "订单操作")
 @RestController
 @RequestMapping("/order")
 public class OrderController extends  BaseController{
@@ -32,7 +32,7 @@ public class OrderController extends  BaseController{
     OrderCommissionServiceImpl orderCommissionService;
 
     @PostMapping("/save")
-    @ApiOperation("保存下单")
+    @ApiOperation("保存订单")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "roomId", value = "房间号ID", required = true, dataType = "String"),
             @ApiImplicitParam(name = "token", value = "下单人的token", required = true, dataType = "String"),
@@ -46,7 +46,7 @@ public class OrderController extends  BaseController{
     }
 
     @PostMapping("/cancel")
-    @ApiOperation("撤单")
+    @ApiOperation("撤单订单")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "订单ID", required = true, dataType = "long"),
             @ApiImplicitParam(name = "token", value = "下单人的token", required = true, dataType = "String")
@@ -70,7 +70,7 @@ public class OrderController extends  BaseController{
     }
 
     @PostMapping("/saveCommission")
-    @ApiOperation("生成直播室的提成数据")
+    @ApiOperation("生成直播提成")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "day", value = "生成指定多少天前的一天数据", required = true, dataType = "Integer",defaultValue = "null"),
     })

@@ -41,6 +41,6 @@ public class OrderTest {
     @Test
     public void testOrderCommissionService()
     {
-        orderCommissionService.saveOrderCommission();
+        orderCommissionService.saveOrderCommission(1);
     }
 }
