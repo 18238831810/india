@@ -1,8 +1,11 @@
 package com.cf.crs.controller;
 
 
+import com.cf.crs.entity.AccountBalanceEntity;
 import com.cf.crs.entity.OrderCashoutDto;
+import com.cf.crs.service.AccountBalanceService;
 import com.cf.crs.service.OrderCashoutService;
+import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +23,15 @@ public class OrderCashoutController {
 
     @Autowired
     OrderCashoutService orderCashoutService;
+
+    @Autowired
+    AccountBalanceService accountBalanceService;
+
+    @PostMapping("/getAccountBalanceByUId")
+    @ApiOperation("获取用户余额")
+    public ResultJson<AccountBalanceEntity> getAccountBalanceByUId(long uid){
+        return HttpWebResult.getMonoSucResult(accountBalanceService.getAccountBalanceByUId(uid));
+    }
 
     @PostMapping("/order")
     @ApiOperation("提现下单")
