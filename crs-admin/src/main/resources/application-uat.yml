@@ -19,8 +19,8 @@ spring:
     dynamic:
       datasource:
         master:
-          username: city
-          password: '!#456QWEasd&'
+          username: binance~!
+          password: Qazwsx2021@@
           url: jdbc:mysql://47.106.199.193:3306/india?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT
           driver-class-name: com.mysql.cj.jdbc.Driver
           druid: # 以下参数针对每个库可以重新设置druid参数
