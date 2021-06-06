@@ -3,6 +3,7 @@ package com.cf.crs.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -11,6 +12,7 @@ import lombok.Data;
 @Data
 @ApiModel(value = "用户余额")
 @TableName("u_account_balance")
+@Builder
 public class AccountBalanceEntity {
 
 

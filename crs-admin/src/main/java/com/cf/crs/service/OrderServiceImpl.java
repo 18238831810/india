@@ -267,6 +267,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
      * @param orderEntity
      * @return
      */
+    @Transactional
     public OrderErrorEnum updateOrderToDelStatus(OrderEntity orderEntity) {
         OrderEntity order = this.getBaseMapper().selectOne(new QueryWrapper<OrderEntity>().eq("id", orderEntity.getId()).eq("uid", orderEntity.getUid()));
         if (order == null || order.getStatus() != 0) {
@@ -278,6 +279,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
             return OrderErrorEnum.ERROR_NOT_MATCH;
         }
         this.getBaseMapper().update(null, new UpdateWrapper<OrderEntity>().eq("id", orderEntity.getId()).set("status", -1));
+        accountBalanceService.updateBalance(AccountBalanceEntity.builder().amount((float) order.getPayment()).updateTime(System.currentTimeMillis()).build());
         return null;
     }
 
