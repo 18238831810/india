@@ -2,6 +2,7 @@ package com.cf.crs.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiParam;
 import jdk.nashorn.internal.ir.annotations.Ignore;
@@ -40,12 +41,14 @@ public class OrderEntity {
     /**
      * 下单总值
      */
+    @ApiParam(name = "payment", value = "下单总量")
     private double payment;
 
     /**
      * 买涨跌或平这三个方向
      * rise fall   equal
      */
+    @ApiParam(name = "buyDirection", allowableValues = "rise,fall,equal", value = "下单方向")
     private String buyDirection;
     /**
      * 上期价格
@@ -92,8 +95,5 @@ public class OrderEntity {
      */
     @ApiParam(hidden = true)
     private int status;
-
-    @TableField(exist = false)
-    private String token;
 
 }

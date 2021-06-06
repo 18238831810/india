@@ -66,14 +66,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     private OrderErrorEnum filterParam(OrderEntity orderEntity) {
         int second = LocalDateTime.now().getSecond();
         if (second >= LIMIT_TIME) {
-            log.warn("已经过时了 second->{},token->{}", second, orderEntity.getToken());
+            log.warn("已经过时了 second->{},id->{}", second, orderEntity.getId());
             return OrderErrorEnum.ERROR_OVER_TIME;
         }
         orderEntity.setCtime(System.currentTimeMillis());
 
         if (StringUtils.isEmpty(orderEntity.getBuyDirection())
                 || (!buyDirect.contains(orderEntity.getBuyDirection()))) {
-            log.warn("direct->{} token->{}", orderEntity.getBuyDirection(), orderEntity.getToken());
+            log.warn("direct->{} id->{}", orderEntity.getBuyDirection(), orderEntity.getId());
             return OrderErrorEnum.ERROR_PARAM;
         }
 
@@ -98,8 +98,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         }
 
         orderEntity.setNextStageTime(orderEntity.getEarlyStageTime() + 60000);
-
-        orderEntity.setUid(getUidFromToken(orderEntity.getToken()));
 
         orderEntity.setMarketCycle(CandlestickInterval.ONE_MINUTE.getIntervalId());
         this.save(orderEntity);
@@ -272,11 +270,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     public OrderErrorEnum updateOrderToDelStatus(OrderEntity orderEntity) {
         OrderEntity order = this.getBaseMapper().selectOne(new QueryWrapper<OrderEntity>().eq("id", orderEntity.getId()).eq("uid", orderEntity.getUid()));
         if (order == null || order.getStatus() != 0) {
-            log.info("uid->{} id->{} token->{} status->{}", orderEntity.getUid(), order.getId(), orderEntity.getToken(), order == null ? null : order.getStatus());
+            log.info("uid->{} id->{}  status->{}", orderEntity.getUid(), order.getId(),  order == null ? null : order.getStatus());
             return OrderErrorEnum.ERROR_NOT_FOUND;
         }
         if (System.currentTimeMillis() - order.getCtime() < 10 * 60000) {
-            log.info("uid->{} id->{} token->{} status->{} ", orderEntity.getUid(), order.getId(), orderEntity.getToken(), order == null ? null : order.getStatus());
+            log.info("uid->{} id->{}  status->{} ", orderEntity.getUid(), order.getId(), order == null ? null : order.getStatus());
             return OrderErrorEnum.ERROR_NOT_MATCH;
         }
         this.getBaseMapper().update(null, new UpdateWrapper<OrderEntity>().eq("id", orderEntity.getId()).set("status", -1));

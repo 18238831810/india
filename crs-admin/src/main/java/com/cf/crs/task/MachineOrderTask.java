@@ -38,7 +38,6 @@ public class MachineOrderTask  implements ITask {
     {
         OrderEntity o = new OrderEntity();
         o.setRoomId("000");
-        o.setToken(UUID.randomUUID().toString());
         o.setPayment(new Random().nextInt(2000) + 3000);
         o.setBuyDirection(buyDirect.get(new Random().nextInt(3))+"");
         return o;

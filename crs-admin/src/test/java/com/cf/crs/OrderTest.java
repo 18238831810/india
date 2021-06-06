@@ -31,7 +31,6 @@ public class OrderTest {
     {
         OrderEntity o = new OrderEntity();
         o.setRoomId("001");
-        o.setToken("abcd123");
         o.setPayment(3000);
         o.setBuyDirection("rise");
         orderService.saveUserOrder(o);
