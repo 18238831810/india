@@ -67,8 +67,8 @@ public class OrderController extends BaseController {
     @ApiOperation("订单列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "下单人的token", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "pageNum", value = "页码", required = true, dataType = "int", defaultValue = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "每页显示多少条", required = true, dataType = "int", defaultValue = "15")
+            @ApiImplicitParam(name = "pageNum", value = "页码,默认1",  dataType = "int", defaultValue = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "每页显示多少条,默认15", dataType = "int", defaultValue = "15")
     })
     public Result listOrder(String token, QueryPage queryPage) {
         PagingBase<OrderEntity> pagingBase = orderService.listOrder(getUidFromToken(token), queryPage);
@@ -78,7 +78,7 @@ public class OrderController extends BaseController {
     @PostMapping("/saveCommission")
     @ApiOperation("生成直播提成")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "day", value = "生成指定多少天前的一天数据", required = true, dataType = "Integer", defaultValue = "null"),
+            @ApiImplicitParam(name = "day", value = "生成指定多少天前的一天数据",  dataType = "Integer", defaultValue = "null"),
     })
     public Result saveCommission(Integer day) {
         int total = orderCommissionService.saveOrderCommission(day);
@@ -88,9 +88,9 @@ public class OrderController extends BaseController {
     @GetMapping("/candlestick")
     @ApiOperation("行情数据")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "symbol", value = "交易对", required = true, dataType = "String", defaultValue = "btcusdt"),
-            @ApiImplicitParam(name = "interval", allowableValues = "1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d", value = "行情周期", required = true, dataType = "String", defaultValue = "1m"),
-            @ApiImplicitParam(name = "size", value = "行情条数", dataType = "int", defaultValue = "240"),
+            @ApiImplicitParam(name = "symbol", value = "交易对,默认btcusdt", required = true, dataType = "String", defaultValue = "btcusdt"),
+            @ApiImplicitParam(name = "interval", allowableValues = "1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d", value = "行情周期,默认1m",  dataType = "String", defaultValue = "1m"),
+            @ApiImplicitParam(name = "size", value = "行情条数,默认240条", dataType = "int", defaultValue = "240"),
     })
     public Result<List<CandlestickDto>> getCandlestick(String symbol, String interval, Integer size) {
         List<CandlestickDto> result = orderService.getCandlestickList(StringUtil.isBlank(symbol) ? "btcusdt" : symbol, StringUtil.isBlank(interval) ? "1m" : interval, size == null ? 240 : size);
