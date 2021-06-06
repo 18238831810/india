@@ -51,7 +51,7 @@ public class CandlesticksCache {
      * Initializes the candlestick cache by using the REST API.
      */
     private int initializeCandlestickCache(String symbol, CandlestickInterval interval) {
-        List<Candlestick> candlestickBars = getCandlestickBars(symbol, interval);
+        List<Candlestick> candlestickBars = getCandlestickBars(symbol, interval,null);
         int size = candlestickBars.size();
         for (int i = (size > maximumSize ? (size - maximumSize) : 0); i < size; i++) {
             Candlestick candlestickBar = candlestickBars.get(i);
@@ -60,13 +60,18 @@ public class CandlesticksCache {
         return size;
     }
 
-    public List<Candlestick> getCandlestickBars(String symbol, CandlestickInterval interval) {
+    public List<Candlestick> getCandlestickBars(String symbol, CandlestickInterval interval,Integer size) {
         BinanceApiClientFactory factory = BinanceApiClientFactory.newInstance();
         BinanceApiRestClient client = factory.newRestClient();
-        return client.getCandlestickBars(symbol.toUpperCase(), interval);
+        List list = client.getCandlestickBars(symbol.toUpperCase(), interval);
+        if(size==null) return list;
+        return list.size()>size?list.subList(list.size()-size,list.size()):list;
     }
-    public List<Candlestick> getCandlestickBars(String symbol, String interval) {
-        return getCandlestickBars( symbol, getInterval(interval));
+    public List<Candlestick> getCandlestickBars(String symbol, String interval,int size) {
+        return getCandlestickBars( symbol, getInterval(interval),size);
+    }
+    public List<Candlestick> getCandlestickBars(Integer size) {
+        return getCandlestickBars("btcusdt", CandlestickInterval.ONE_MINUTE,size);
     }
     private CandlestickInterval getInterval(String inteval) {
         switch (inteval) {
@@ -137,7 +142,7 @@ public class CandlesticksCache {
     }
 
     public static void main(String[] args) {
-        CandlesticksCache.getInstance().cache();
+        CandlesticksCache.getInstance().getCandlestickBars(null);
     }
 
 }

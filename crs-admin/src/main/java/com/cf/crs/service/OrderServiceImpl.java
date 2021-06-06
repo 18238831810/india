@@ -299,8 +299,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
      * 从币安拉取行情
      * @return
      */
-    public List<Candlestick>  getCandlestickList(String symbol,String interval) {
+    public List<Candlestick>  getCandlestickList(String symbol,String interval,int size) {
         symbol=StringUtils.isEmpty(symbol)?"btcusdt":symbol;
-      return   CandlesticksCache.getInstance().getCandlestickBars( symbol,  interval);
+      return   CandlesticksCache.getInstance().getCandlestickBars( symbol,  interval,size);
     }
 }

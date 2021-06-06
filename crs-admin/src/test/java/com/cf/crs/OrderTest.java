@@ -1,6 +1,9 @@
 package com.cf.crs;
 
+import com.binance.api.client.CandlesticksCache;
+import com.binance.api.client.domain.market.Candlestick;
 import com.cf.AdminApplication;
+import com.cf.crs.common.utils.Result;
 import com.cf.crs.entity.OrderEntity;
 import com.cf.crs.service.OrderCommissionServiceImpl;
 import com.cf.crs.service.OrderServiceImpl;
@@ -9,6 +12,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AdminApplication.class)
@@ -43,4 +48,21 @@ public class OrderTest {
     {
         orderCommissionService.saveOrderCommission(1);
     }
+
+    @Test
+    public void testCandlestickInterval()
+    {
+        orderCommissionService.saveOrderCommission(1);
+    }
+
+    @Test
+    public void testCandlestickBars()
+    {
+
+        List<Candlestick> result=  CandlesticksCache.getInstance().getCandlestickBars(10);
+        Result result1=  new Result<>().ok(result);
+        System.out.println(result);
+    }
+
+
 }
