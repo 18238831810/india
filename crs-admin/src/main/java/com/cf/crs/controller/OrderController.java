@@ -88,8 +88,8 @@ public class OrderController extends BaseController {
             @ApiImplicitParam(name = "interval", allowableValues = "1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d", value = "行情周期", required = true, dataType = "String", defaultValue = "1m"),
             @ApiImplicitParam(name = "size", value = "行情条数", dataType = "int", defaultValue = "240"),
     })
-    public Result<List<Candlestick>> getCandlestick(String symbol, String interval, Integer size) {
-        List<Candlestick> result = orderService.getCandlestickList(StringUtil.isBlank(symbol) ? "btcusdt" : symbol, StringUtil.isBlank(interval) ? "1m" : interval, size == null ? 240 : size);
-        return new Result<List<Candlestick>>().ok(result);
+    public List<Candlestick> getCandlestick(String symbol, String interval, Integer size) {
+        return orderService.getCandlestickList(StringUtil.isBlank(symbol) ? "btcusdt" : symbol, StringUtil.isBlank(interval) ? "1m" : interval, size == null ? 240 : size);
+       // return new Result<List<Candlestick>>().ok(result);
     }
 }
