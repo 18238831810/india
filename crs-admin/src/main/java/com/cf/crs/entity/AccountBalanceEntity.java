@@ -16,6 +16,9 @@ import lombok.Data;
 public class AccountBalanceEntity {
 
 
+    public AccountBalanceEntity() {
+    }
+
     private Long id;
 
     /**
