@@ -3,6 +3,7 @@ package com.cf.crs.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,10 +16,11 @@ import lombok.NoArgsConstructor;
 @TableName("u_account_balance")
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class AccountBalanceEntity {
 
 
-   
+
 
     private Long id;
 
