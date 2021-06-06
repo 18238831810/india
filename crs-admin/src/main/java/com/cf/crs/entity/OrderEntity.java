@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @TableName("u_order")
 public class OrderEntity {
+    @ApiParam(hidden = true)
     private int id;
     /**
      * 创建时间
@@ -34,6 +35,7 @@ public class OrderEntity {
     /**
      * 下注当事人ID
      */
+    @ApiParam(hidden = true)
     private long uid;
     /**
      * 下单总值
@@ -53,6 +55,7 @@ public class OrderEntity {
     /**
      * 上期时间
      */
+    @ApiParam(hidden = true)
     private long earlyStageTime;
     /**
      * 下期价格
