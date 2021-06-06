@@ -1,12 +1,17 @@
 package com.cf.crs.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.binance.api.client.CandlesticksCache;
 import com.binance.api.client.constant.OrderErrorEnum;
 import com.binance.api.client.domain.market.Candlestick;
 import com.binance.api.client.domain.market.CandlestickInterval;
+import com.cf.crs.common.entity.PagingBase;
+import com.cf.crs.common.entity.QueryPage;
 import com.cf.crs.common.utils.DateUtils;
 import com.cf.crs.entity.AccountBalanceEntity;
 import com.cf.crs.entity.OrderEntity;
@@ -157,6 +162,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
                         .le("utime", 0)
                         .ge("ctime", start)
                         .lt("ctime", end)
+                        .eq("status", 1)
                         .last(" limit 50"));
         int total = 0;
         for (OrderEntity orderEntity : list) {
@@ -192,6 +198,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         orderEntity.setNextStagePrice(getPointPrize(nextStage.getOpen()));
         orderEntity.setUtime(System.currentTimeMillis());
         orderEntity.setLever(lever);
+        orderEntity.setStatus(1);
         setTotalProfit(orderEntity, lever);
         updateBalance(orderEntity);
         return this.updateById(orderEntity) ? 1 : 0;
@@ -244,8 +251,48 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         }
     }
 
+    /**
+     * 统计指定时间内的返利
+     *
+     * @param start
+     * @param end
+     * @return
+     */
     public List<Map<String, Object>> getTotalPaymentBetweenTime(long start, long end) {
-        return this.getBaseMapper().selectMaps(new QueryWrapper<OrderEntity>().ge("ctime", start).lt("ctime", end).select("sum(payment) as total", "room_id").groupBy("room_id"));
+        return this.getBaseMapper().selectMaps(
+                new QueryWrapper<OrderEntity>()
+                        .ge("ctime", start)
+                        .lt("ctime", end)
+                        .eq("status", 1)
+                        .select("sum(payment) as total", "room_id")
+                        .groupBy("room_id"));
     }
 
+    /**
+     * 更新订单状态为删除状态
+     *
+     * @param orderEntity
+     * @return
+     */
+    public OrderErrorEnum updateOrderToDelStatus(OrderEntity orderEntity) {
+        OrderEntity order = this.getBaseMapper().selectOne(new QueryWrapper<OrderEntity>().eq("id", orderEntity.getId()).eq("uid", orderEntity.getUid()));
+        if (order == null || order.getStatus() != 0) {
+            log.info("uid->{} id->{} token->{} status->{}", orderEntity.getUid(), order.getId(), orderEntity.getToken(), order == null ? null : order.getStatus());
+            return OrderErrorEnum.ERROR_NOT_FOUND;
+        }
+        this.getBaseMapper().update(null, new UpdateWrapper<OrderEntity>().eq("id", orderEntity.getId()).set("status", -1));
+        return null;
+    }
+
+    /**
+     * 查询用户的订单列表
+     *
+     * @param uid
+     * @return
+     */
+    public PagingBase<OrderEntity> listOrder(long uid, QueryPage queryPage) {
+        Page<OrderEntity> iPage = new Page(queryPage.getPageSize(), queryPage.getPageNum());
+        IPage<OrderEntity> pageList = this.page(iPage, new QueryWrapper<OrderEntity>().eq("uid", uid));
+        return new PagingBase<OrderEntity>(pageList.getRecords(), pageList.getTotal());
+    }
 }

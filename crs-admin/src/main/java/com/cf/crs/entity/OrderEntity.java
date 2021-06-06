@@ -72,6 +72,12 @@ public class OrderEntity {
      */
     private String marketCycle;
 
+    /**
+     * 状态
+     * 0:刚生成，1是处理 -1：为撤销订单
+     */
+    private int status;
+
     @TableField(exist = false)
     private String token;
 

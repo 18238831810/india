@@ -1,6 +1,8 @@
 package com.cf.crs.controller;
 
 import com.binance.api.client.constant.OrderErrorEnum;
+import com.cf.crs.common.entity.PagingBase;
+import com.cf.crs.common.entity.QueryPage;
 import com.cf.crs.common.utils.Result;
 import com.cf.crs.entity.OrderEntity;
 import com.cf.crs.service.OrderCommissionServiceImpl;
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "下单操作")
 @RestController
 @RequestMapping("/order")
-public class OrderController {
+public class OrderController extends  BaseController{
 
     @Autowired
     OrderServiceImpl orderService;
@@ -33,10 +35,34 @@ public class OrderController {
             @ApiImplicitParam(name = "payment", value = "下单金额", required = true, dataType = "double"),
             @ApiImplicitParam(name = "buyDirection", value = "下单方向(rise/fall/equal)", required = true, dataType = "String")
     })
-
     public Result saveOrder(OrderEntity orderEntity) {
+        orderEntity.setUid(getUidFromToken(orderEntity.getToken()));
         OrderErrorEnum orderErrorEnum = orderService.saveUserOrder(orderEntity);
         return orderErrorEnum == null ? new Result<>() : new Result<>().error(orderErrorEnum.getCode(), orderErrorEnum.getError());
+    }
+
+    @PostMapping("/del")
+    @ApiOperation("保存下单")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "订单ID", required = true, dataType = "long"),
+            @ApiImplicitParam(name = "token", value = "下单人的token", required = true, dataType = "String")
+    })
+    public Result delOrder(OrderEntity orderEntity) {
+        orderEntity.setUid(getUidFromToken(orderEntity.getToken()));
+        OrderErrorEnum orderErrorEnum = orderService.updateOrderToDelStatus(orderEntity);
+        return orderErrorEnum == null ? new Result<>() : new Result<>().error(orderErrorEnum.getCode(), orderErrorEnum.getError());
+    }
+
+    @PostMapping("/list")
+    @ApiOperation("订单列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "下单人的token", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "pageNum", value = "页码", required = true, dataType = "int" ,defaultValue = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "每页显示多少条", required = true, dataType = "int" ,defaultValue = "15")
+    })
+    public Result listOrder(String token, QueryPage queryPage) {
+        PagingBase<OrderEntity> pagingBase = orderService.listOrder(getUidFromToken(token),queryPage);
+        return new Result<PagingBase>().ok(pagingBase);
     }
 
     @PostMapping("/saveCommission")
