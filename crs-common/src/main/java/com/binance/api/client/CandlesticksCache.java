@@ -2,6 +2,10 @@ package com.binance.api.client;
 
 import com.binance.api.client.domain.market.Candlestick;
 import com.binance.api.client.domain.market.CandlestickInterval;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -145,4 +149,12 @@ public class CandlesticksCache {
         CandlesticksCache.getInstance().getCandlestickBars(null);
     }
 
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class MyCandlestick extends  Candlestick
+    {
+
+    }
 }

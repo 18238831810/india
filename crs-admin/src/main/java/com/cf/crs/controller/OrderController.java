@@ -1,5 +1,6 @@
 package com.cf.crs.controller;
 
+import com.binance.api.client.CandlesticksCache;
 import com.binance.api.client.constant.OrderErrorEnum;
 import com.binance.api.client.domain.market.Candlestick;
 import com.cf.crs.common.entity.PagingBase;
@@ -88,8 +89,8 @@ public class OrderController extends BaseController {
             @ApiImplicitParam(name = "interval", allowableValues = "1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d", value = "行情周期", required = true, dataType = "String", defaultValue = "1m"),
             @ApiImplicitParam(name = "size", value = "行情条数", dataType = "int", defaultValue = "240"),
     })
-    public Result<List<Candlestick>> getCandlestick(String symbol, String interval, Integer size) {
-        List<Candlestick> result = orderService.getCandlestickList(StringUtil.isBlank(symbol) ? "btcusdt" : symbol, StringUtil.isBlank(interval) ? "1m" : interval, size == null ? 240 : size);
-        return new Result<List<Candlestick>>().ok(result);
+    public Result<List<CandlesticksCache.MyCandlestick>> getCandlestick(String symbol, String interval, Integer size) {
+        List<CandlesticksCache.MyCandlestick> result = orderService.getCandlestickList(StringUtil.isBlank(symbol) ? "btcusdt" : symbol, StringUtil.isBlank(interval) ? "1m" : interval, size == null ? 240 : size);
+        return new Result<List<CandlesticksCache.MyCandlestick>>().ok(result);
     }
 }

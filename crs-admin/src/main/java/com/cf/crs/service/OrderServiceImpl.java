@@ -299,7 +299,24 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
      * 从币安拉取行情
      * @return
      */
-    public List<Candlestick>  getCandlestickList(String symbol,String interval,int size) {
-      return   CandlesticksCache.getInstance().getCandlestickBars( symbol,  interval,size);
+    public List<CandlesticksCache.MyCandlestick>  getCandlestickList(String symbol,String interval,int size) {
+        List<Candlestick> list=   CandlesticksCache.getInstance().getCandlestickBars( symbol,  interval,size);
+        List<CandlesticksCache.MyCandlestick> result= new ArrayList<>();
+        for (Candlestick candlestick: list) {
+            CandlesticksCache.MyCandlestick myCandlestick = new CandlesticksCache.MyCandlestick();
+            myCandlestick.setClose(candlestick.getClose());
+            myCandlestick.setCloseTime(candlestick.getCloseTime());
+            myCandlestick.setHigh(candlestick.getHigh());
+            myCandlestick.setLow(candlestick.getLow());
+            myCandlestick.setNumberOfTrades(candlestick.getNumberOfTrades());
+            myCandlestick.setOpen(candlestick.getOpen());
+            myCandlestick.setOpenTime(candlestick.getOpenTime());
+            myCandlestick.setQuoteAssetVolume(candlestick.getQuoteAssetVolume());
+            myCandlestick.setTakerBuyBaseAssetVolume(candlestick.getTakerBuyBaseAssetVolume());
+            myCandlestick.setTakerBuyQuoteAssetVolume(candlestick.getTakerBuyQuoteAssetVolume());
+            myCandlestick.setVolume(candlestick.getVolume());
+            result.add(myCandlestick);
+        }
+        return result;
     }
 }
