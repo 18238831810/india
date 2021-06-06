@@ -141,12 +141,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
      */
     private Candlestick getCandlestick(Long timeKey) {
         return CandlesticksCache.getInstance().getCandlesticksCache().get(timeKey);
-//        Candlestick candlestick =
-//        if (candlestick == null) {
-//            CandlesticksCache candlesticksCache = CandlesticksCache.getInstance();
-//            candlesticksCache.cache();
-//            return candlesticksCache.getCandlesticksCache().get(timeKey);
-//        } else return candlestick;
     }
 
 
@@ -299,5 +293,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         Page<OrderEntity> iPage = new Page(queryPage.getPageSize(), queryPage.getPageNum());
         IPage<OrderEntity> pageList = this.page(iPage, new QueryWrapper<OrderEntity>().eq("uid", uid));
         return new PagingBase<OrderEntity>(pageList.getRecords(), pageList.getTotal());
+    }
+
+    /**
+     * 从币安拉取行情
+     * @return
+     */
+    public List<Candlestick>  getCandlestickList(String symbol,String interval) {
+        symbol=StringUtils.isEmpty(symbol)?"btcusdt":symbol;
+      return   CandlesticksCache.getInstance().getCandlestickBars( symbol,  interval);
     }
 }

@@ -1,6 +1,7 @@
 package com.cf.crs.controller;
 
 import com.binance.api.client.constant.OrderErrorEnum;
+import com.binance.api.client.domain.market.Candlestick;
 import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.common.entity.QueryPage;
 import com.cf.crs.common.utils.Result;
@@ -15,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Api(tags = "下单操作")
 @RestController
@@ -74,5 +77,17 @@ public class OrderController extends  BaseController{
     {
        int total= orderCommissionService.saveOrderCommission(day);
        return new Result<>().error(200, "总条数:"+total);
+    }
+
+    @PostMapping("/candlestick")
+    @ApiOperation("行情数据")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "symbol", value = "交易对", required = true, dataType = "String",defaultValue = "btcusdt"),
+            @ApiImplicitParam(name = "interval", value = "行情周期", required = true, dataType = "String",defaultValue = "1d"),
+    })
+    public Result getCandlestick(String symbol ,String interval)
+    {
+        List<Candlestick> result= orderService.getCandlestickList(symbol,interval);
+        return new Result<>().ok(result);
     }
 }
