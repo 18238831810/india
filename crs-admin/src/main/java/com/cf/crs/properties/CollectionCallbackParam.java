@@ -47,6 +47,6 @@ public class CollectionCallbackParam implements Serializable {
     /**
      * md5签名	参照最下方加签方式
      */
-    private Integer sign;
+    private String sign;
 
 }

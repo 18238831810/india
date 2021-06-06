@@ -3,8 +3,8 @@ package com.cf.crs.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.cf.crs.common.exception.RenException;
+import com.cf.crs.common.utils.BeanMapUtils;
 import com.cf.crs.entity.AccountBalanceEntity;
 import com.cf.crs.entity.OrderCashinDto;
 import com.cf.crs.entity.OrderCashinEntity;
@@ -25,6 +25,12 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
+
+/**
+ * 存款
+ * @author frank
+ * @date 2021-06-06
+ */
 @Slf4j
 @Service
 public class OrderCashinService {
@@ -119,12 +125,7 @@ public class OrderCashinService {
      * @return
      */
     private OrderCashinEntity getOrderCashinEntity(OrderCashinDto orderCashinDto, long now) {
-        OrderCashinEntity orderCashinEntity = new OrderCashinEntity();
-        orderCashinEntity.setUid(orderCashinDto.getUid());
-        orderCashinEntity.setAmount(orderCashinDto.getAmount());
-        orderCashinEntity.setGoodsInfo(orderCashinDto.getGoodsInfo());
-        orderCashinEntity.setPaymentId(orderCashinDto.getPaymentId());
-        orderCashinEntity.setPayerAccount(orderCashinDto.getPayerAccount());
+        OrderCashinEntity orderCashinEntity = BeanMapUtils.map(orderCashinDto, OrderCashinEntity.class);
         orderCashinEntity.setOrderTime(now);
         orderCashinEntity.setStatus(0);
         orderCashinEntity.setIp(WebTools.getIpAddr(request));
@@ -137,7 +138,6 @@ public class OrderCashinService {
      * @return
      */
     public String orderCallback(OrderCallbackParam callbackParamm){
-        log.info("order cashin callback:{}",JSON.toJSONString(callbackParamm));
         if (callbackParamm.getStatus() == 1){
             //支付成功
             String order_sn = callbackParamm.getOrder_sn();
