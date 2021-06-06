@@ -91,7 +91,7 @@ public class OrderLeverServiceImpl extends ServiceImpl<OrderLeverMapper, OrderLe
         boolean ok= orderEntity.getPayment()>=minMax[0] && orderEntity.getPayment()<=minMax[1];
         if(!ok)
         {
-            log.info("token->{} 下单的值->{}不在区间内[{},{}]",orderEntity.getToken(), orderEntity.getPayment(),minMax[0],minMax[1]);
+            log.info("uid->{} 下单的值->{}不在区间内[{},{}]",orderEntity.getUid(), orderEntity.getPayment(),minMax[0],minMax[1]);
             OrderErrorEnum orderErrorEnum =OrderErrorEnum.ERROR_NOT_BETWEEN;
             orderErrorEnum.setError(String.format(OrderErrorEnum.ERROR_NOT_BETWEEN.getError(),minMax[0],minMax[1]));
             return orderErrorEnum;
