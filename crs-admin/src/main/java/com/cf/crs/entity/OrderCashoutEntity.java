@@ -90,6 +90,15 @@ public class OrderCashoutEntity implements Serializable {
      */
     private Integer status;
 
+    /**
+     * 审批状态 0：未审批，1：已审批
+     */
+    private Integer approveStatus = 0;
+
+    /**
+     * 备注
+     */
+    private String remark;
 
 
 }

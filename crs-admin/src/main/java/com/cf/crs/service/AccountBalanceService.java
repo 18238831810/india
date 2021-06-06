@@ -29,4 +29,13 @@ public class AccountBalanceService {
         return accountBalanceMapper.selectOne(new QueryWrapper<AccountBalanceEntity>().eq("uid",uid));
     }
 
+    /**
+     * 提现更新余额
+     * @param accountBalanceEntity
+     * @return
+     */
+    public int updateBalanceForCashout(AccountBalanceEntity accountBalanceEntity){
+        return accountBalanceMapper.updateForCashin(accountBalanceEntity);
+    }
+
 }

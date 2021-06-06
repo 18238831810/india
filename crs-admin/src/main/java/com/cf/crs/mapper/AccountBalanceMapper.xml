@@ -11,5 +11,8 @@
        `amount` = (`amount` + VALUES(amount))
    </select>
 
+    <update id="updateForCashin">
+       update `u_account_balance` set  `amount` = (`amount`- #{item.amount}),`update_time`= #{item.updateTime} where `uid` = #{item.uid} and `amount` >= #{item.amount}
+    </update>
 
 </mapper>
