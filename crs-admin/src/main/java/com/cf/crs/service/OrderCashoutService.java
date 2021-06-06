@@ -75,6 +75,7 @@ public class OrderCashoutService {
         //更改余额
         int i = updateAcountBalanceForCashout(orderCashoutEntity);
         if (i == 0) return HttpWebResult.getMonoError("用户提款金额不足,审批失败");
+        orderCashoutMapper.update(null,new UpdateWrapper<OrderCashoutEntity>().eq("id",id).set("approve_status",1));
         String orderSn = new StringBuilder("T").append(DateUtil.timesToDate(orderCashoutEntity.getOrderTime(),DateUtil.DEFAULT)).append("G").append(orderCashoutEntity.getId()).toString();
         orderCashoutEntity.setOrderSn(orderSn);
         CollectionParam collectionParam = getCollectionParam(orderCashoutEntity);
