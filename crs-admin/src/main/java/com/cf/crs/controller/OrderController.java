@@ -64,7 +64,7 @@ public class OrderController extends BaseController {
             @ApiImplicitParam(name = "pageNum", value = "页码,默认1", dataType = "int", defaultValue = "1"),
             @ApiImplicitParam(name = "pageSize", value = "每页显示多少条,默认15", dataType = "int", defaultValue = "15")
     })
-    public Result listOrder(String token, QueryPage queryPage) {
+    public Result listOrder(QueryPage queryPage) {
         PagingBase<OrderEntity> pagingBase = orderService.listOrder(getUid(), queryPage);
         return new Result<PagingBase>().ok(pagingBase);
     }
