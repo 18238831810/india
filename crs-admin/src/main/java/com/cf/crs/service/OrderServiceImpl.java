@@ -300,7 +300,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
      * @return
      */
     public List<Candlestick>  getCandlestickList(String symbol,String interval,int size) {
-        symbol=StringUtils.isEmpty(symbol)?"btcusdt":symbol;
       return   CandlesticksCache.getInstance().getCandlestickBars( symbol,  interval,size);
     }
 }

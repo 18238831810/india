@@ -12,7 +12,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.jsoup.helper.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -84,12 +86,12 @@ public class OrderController extends  BaseController{
     @ApiOperation("行情数据")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "symbol", value = "交易对", required = true, dataType = "String",defaultValue = "btcusdt"),
-            @ApiImplicitParam(name = "interval",  allowableValues ="1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d", value = "行情周期", required = true, dataType = "String",defaultValue = "1d"),
+            @ApiImplicitParam(name = "interval",  allowableValues ="1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d", value = "行情周期", required = true, dataType = "String",defaultValue = "1m"),
             @ApiImplicitParam(name = "size",   value = "行情条数", dataType = "int",defaultValue = "240"),
     })
-    public Result getCandlestick(String symbol ,String interval,Integer size)
+        public Result getCandlestick(String symbol ,String interval,Integer size)
     {
-        List<Candlestick> result= orderService.getCandlestickList(symbol,interval,size==null?240:size);
+        List<Candlestick> result= orderService.getCandlestickList(StringUtil.isBlank(symbol)?"btcusdt":symbol,StringUtil.isBlank(interval)?"1m":interval,size==null?240:size);
         return new Result<>().ok(result);
     }
 }
