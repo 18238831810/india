@@ -41,8 +41,8 @@ public class OrderController extends  BaseController{
         return orderErrorEnum == null ? new Result<>() : new Result<>().error(orderErrorEnum.getCode(), orderErrorEnum.getError());
     }
 
-    @PostMapping("/del")
-    @ApiOperation("保存下单")
+    @PostMapping("/cancel")
+    @ApiOperation("撤单")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "订单ID", required = true, dataType = "long"),
             @ApiImplicitParam(name = "token", value = "下单人的token", required = true, dataType = "String")

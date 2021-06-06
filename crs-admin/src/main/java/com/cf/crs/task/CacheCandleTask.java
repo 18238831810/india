@@ -26,11 +26,6 @@ public class CacheCandleTask  implements ITask {
      * @param params
      */
     private void cacheCandlesticks(String params) {
-        int second = LocalDateTime.now().getSecond();
-        if(second<=30)
-        {
-            int total = CandlesticksCache.getInstance().cache();
-            log.info("cacheCandleTask.size->{},second->{}", total,second);
-        }
+        CandlesticksCache.getInstance().cache();
     }
 }

@@ -280,6 +280,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
             log.info("uid->{} id->{} token->{} status->{}", orderEntity.getUid(), order.getId(), orderEntity.getToken(), order == null ? null : order.getStatus());
             return OrderErrorEnum.ERROR_NOT_FOUND;
         }
+        if(System.currentTimeMillis()-order.getCtime()<10*60000)
+        {
+            log.info("uid->{} id->{} token->{} status->{} ", orderEntity.getUid(), order.getId(), orderEntity.getToken(), order == null ? null : order.getStatus());
+            return OrderErrorEnum.ERROR_NOT_MATCH;
+        }
         this.getBaseMapper().update(null, new UpdateWrapper<OrderEntity>().eq("id", orderEntity.getId()).set("status", -1));
         return null;
     }
