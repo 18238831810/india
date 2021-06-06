@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,7 +57,7 @@ public class OrderController extends  BaseController{
         return orderErrorEnum == null ? new Result<>() : new Result<>().error(orderErrorEnum.getCode(), orderErrorEnum.getError());
     }
 
-    @PostMapping("/list")
+    @GetMapping("/list")
     @ApiOperation("订单列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "下单人的token", required = true, dataType = "String"),
@@ -79,7 +80,7 @@ public class OrderController extends  BaseController{
        return new Result<>().error(200, "总条数:"+total);
     }
 
-    @PostMapping("/candlestick")
+    @GetMapping("/candlestick")
     @ApiOperation("行情数据")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "symbol", value = "交易对", required = true, dataType = "String",defaultValue = "btcusdt"),
