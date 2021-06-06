@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.cf.crs.common.exception.RenException;
+import com.cf.crs.common.utils.BeanMapUtils;
 import com.cf.crs.entity.AccountBalanceEntity;
 import com.cf.crs.entity.OrderCashinDto;
 import com.cf.crs.entity.OrderCashinEntity;
@@ -25,6 +26,12 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
+
+/**
+ * 存款
+ * @author frank
+ * @date 2021-06-06
+ */
 @Slf4j
 @Service
 public class OrderCashinService {
@@ -119,12 +126,7 @@ public class OrderCashinService {
      * @return
      */
     private OrderCashinEntity getOrderCashinEntity(OrderCashinDto orderCashinDto, long now) {
-        OrderCashinEntity orderCashinEntity = new OrderCashinEntity();
-        orderCashinEntity.setUid(orderCashinDto.getUid());
-        orderCashinEntity.setAmount(orderCashinDto.getAmount());
-        orderCashinEntity.setGoodsInfo(orderCashinDto.getGoodsInfo());
-        orderCashinEntity.setPaymentId(orderCashinDto.getPaymentId());
-        orderCashinEntity.setPayerAccount(orderCashinDto.getPayerAccount());
+        OrderCashinEntity orderCashinEntity = BeanMapUtils.map(orderCashinDto, OrderCashinEntity.class);
         orderCashinEntity.setOrderTime(now);
         orderCashinEntity.setStatus(0);
         orderCashinEntity.setIp(WebTools.getIpAddr(request));
@@ -137,7 +139,6 @@ public class OrderCashinService {
      * @return
      */
     public String orderCallback(OrderCallbackParam callbackParamm){
-        log.info("order cashin callback:{}",JSON.toJSONString(callbackParamm));
         if (callbackParamm.getStatus() == 1){
             //支付成功
             String order_sn = callbackParamm.getOrder_sn();
@@ -149,7 +150,8 @@ public class OrderCashinService {
                 return "success";
             }
             //更新存款记录
-            updateOrderCashin(callbackParamm, orderCashinEntity);
+            int resutl = updateOrderCashin(callbackParamm, orderCashinEntity);
+            if (resutl == 0) return "success";
             //更新用余额
             updateAccountBalance(orderCashinEntity);
         }
@@ -164,13 +166,13 @@ public class OrderCashinService {
         accountBalanceService.updateBalance(accountBalanceEntity);
     }
 
-    private void updateOrderCashin(OrderCallbackParam callbackParamm, OrderCashinEntity orderCashinEntity) {
+    private int updateOrderCashin(OrderCallbackParam callbackParamm, OrderCashinEntity orderCashinEntity) {
         orderCashinEntity.setOrderSn(callbackParamm.getOrder_sn());
         orderCashinEntity.setPtOrderSn(callbackParamm.getPt_order_sn());
         orderCashinEntity.setRealAmount(callbackParamm.getAmount());
         orderCashinEntity.setDealTime(callbackParamm.getTime()*1000);
         orderCashinEntity.setStatus(2);
-        orderCashinMapper.updateById(orderCashinEntity);
+        return orderCashinMapper.update(orderCashinEntity,new UpdateWrapper<OrderCashinEntity>().ne("status",2));
     }
 
 

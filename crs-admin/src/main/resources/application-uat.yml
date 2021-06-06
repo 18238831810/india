@@ -19,9 +19,9 @@ spring:
     dynamic:
       datasource:
         master:
-          username: city
-          password: '!#456QWEasd&'
-          url: jdbc:mysql://47.106.199.193:3306/india?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT
+          username: binance
+          password: Qazwsx2021@@~!
+          url: jdbc:mysql://47.241.225.236:3306/india?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT
           driver-class-name: com.mysql.cj.jdbc.Driver
           druid: # 以下参数针对每个库可以重新设置druid参数
             initial-size: 10
@@ -63,7 +63,7 @@ order:
     orderUrl: http://47.241.170.206/api/payTest/order
     orderCallbackUrl: http://pay.hishow.xyz/orderCallback/order
     collectionUrl: http://47.241.170.206/api/payTest/collection
-    collectionCallbackUrl: http://pay.hishow.xyz
+    collectionCallbackUrl: http://pay.hishow.xyz/orderCallback/collection
 
 
 
