@@ -83,7 +83,7 @@ public class OrderController extends  BaseController{
     @ApiOperation("行情数据")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "symbol", value = "交易对", required = true, dataType = "String",defaultValue = "btcusdt"),
-            @ApiImplicitParam(name = "interval", value = "行情周期", required = true, dataType = "String",defaultValue = "1d"),
+            @ApiImplicitParam(name = "interval", value = "行情周期(1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d)", required = true, dataType = "String",defaultValue = "1d"),
     })
     public Result getCandlestick(String symbol ,String interval)
     {
