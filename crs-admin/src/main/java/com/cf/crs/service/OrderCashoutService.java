@@ -3,6 +3,7 @@ package com.cf.crs.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.cf.crs.common.utils.BeanMapUtils;
 import com.cf.crs.entity.AccountBalanceEntity;
 import com.cf.crs.entity.OrderCashoutDto;
@@ -141,7 +142,8 @@ public class OrderCashoutService {
                 return "success";
             }
             //更新存款记录
-            updateOrderCashin(callbackParamm, orderCashoutEntity);
+            int result = updateOrderCashin(callbackParamm, orderCashoutEntity);
+            if (result == 0) return "success";
             //更新用余额
             updateAccountBalance(orderCashoutEntity);
         }
@@ -156,13 +158,13 @@ public class OrderCashoutService {
         accountBalanceService.updateBalance(accountBalanceEntity);
     }
 
-    private void updateOrderCashin(CollectionCallbackParam callbackParamm, OrderCashoutEntity orderCashoutEntity) {
+    private int updateOrderCashin(CollectionCallbackParam callbackParamm, OrderCashoutEntity orderCashoutEntity) {
         orderCashoutEntity.setOrderSn(callbackParamm.getOrder_sn());
         orderCashoutEntity.setPtOrderSn(callbackParamm.getPt_order_sn());
         orderCashoutEntity.setRealAmount(callbackParamm.getAmount());
         orderCashoutEntity.setDealTime(callbackParamm.getTime()*1000);
         orderCashoutEntity.setStatus(2);
-        orderCashoutMapper.updateById(orderCashoutEntity);
+        return orderCashoutMapper.update(orderCashoutEntity,new UpdateWrapper<OrderCashoutEntity>().ne("status",2));
     }
 
 
