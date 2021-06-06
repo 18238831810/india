@@ -6,13 +6,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.io.Serializable;
+
 /**
  * Kline/Candlestick bars for a symbol. Klines are uniquely identified by their open time.
  */
 @JsonFormat(shape = JsonFormat.Shape.ARRAY)
 @JsonPropertyOrder()
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Candlestick {
+public class Candlestick implements Serializable {
 
   private Long openTime;
 
