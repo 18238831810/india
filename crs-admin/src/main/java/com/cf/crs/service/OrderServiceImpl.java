@@ -162,7 +162,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
                         .le("utime", 0)
                         .ge("ctime", start)
                         .lt("ctime", end)
-                        .eq("status", 1)
+                        .eq("status", 0)
                         .last(" limit 50"));
         int total = 0;
         for (OrderEntity orderEntity : list) {
