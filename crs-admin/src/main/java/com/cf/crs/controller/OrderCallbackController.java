@@ -39,7 +39,7 @@ public class OrderCallbackController {
      * @param callbackParamm
      * @return
      */
-    @PostMapping("/collction")
+    @PostMapping("/collection")
     public String collction(CollectionCallbackParam callbackParamm){
         return orderCashoutService.orderCallback(callbackParamm);
     }
