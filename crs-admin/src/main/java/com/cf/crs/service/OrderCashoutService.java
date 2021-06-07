@@ -155,11 +155,13 @@ public class OrderCashoutService {
      * @return
      */
     public String orderCallback(CollectionCallbackParam callbackParamm){
+        log.info("status:{}",callbackParamm.getStatus());
         if (callbackParamm.getStatus() == 2){
             //支付成功
             String order_sn = callbackParamm.getOrder_sn();
             //解析出存款记录id
             String id = order_sn.split("G")[1];
+            log.info("id:{}",id);
             OrderCashoutEntity orderCashoutEntity = orderCashoutMapper.selectById(id);
             if (orderCashoutEntity == null) {
                 log.info("order cashout id error:{}",id);
