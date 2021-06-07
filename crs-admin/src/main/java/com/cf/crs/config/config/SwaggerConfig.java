@@ -50,7 +50,7 @@ public class SwaggerConfig {
                 new ParameterBuilder()
                         .name(Constant.TOKEN_HEADER)
                         .defaultValue(Constant.TOKEN_TEST_VALUE)
-                        .description("访问令牌")
+                        .description("访问令牌（可以传\"20210607_binanace\"这个值做为测试）")
                         .modelRef(new ModelRef("string"))
                         .parameterType("header")
                         .build(),
