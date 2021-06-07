@@ -12,6 +12,7 @@ import com.binance.api.client.domain.market.Candlestick;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.common.entity.QueryPage;
+import com.cf.crs.common.exception.RenException;
 import com.cf.crs.common.utils.DateUtils;
 import com.cf.crs.entity.AccountBalanceEntity;
 import com.cf.crs.entity.CandlestickDto;
@@ -53,7 +54,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     private final static long LIMIT_TIME = 40;
 
     @Transactional
-    public OrderErrorEnum saveUserOrder(OrderEntity orderEntity) throws Exception {
+    public OrderErrorEnum saveUserOrder(OrderEntity orderEntity) throws RenException {
 
         OrderErrorEnum orderErrorEnum = filterParam(orderEntity);
         if (orderErrorEnum != null)
@@ -88,7 +89,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     /**
      * roomId token orderPrice
      */
-    public OrderErrorEnum saveOrder(OrderEntity orderEntity) throws Exception {
+    public OrderErrorEnum saveOrder(OrderEntity orderEntity) throws RenException {
         accountBalanceService.updateAmountFromOrder(orderEntity);
         orderEntity.setNextStageTime(orderEntity.getEarlyStageTime() + 60000);
         orderEntity.setMarketCycle(CandlestickInterval.ONE_MINUTE.getIntervalId());

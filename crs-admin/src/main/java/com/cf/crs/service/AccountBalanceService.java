@@ -39,7 +39,7 @@ public class AccountBalanceService {
      * @throws Exception
      */
     @Transactional
-    public void updateAmountFromOrder(OrderEntity orderEntity) throws Exception {
+    public void updateAmountFromOrder(OrderEntity orderEntity) throws RenException {
         Integer row = this.updateBalance(AccountBalanceEntity.builder()
                 .amount((float) -orderEntity.getPayment())
                 .updateTime(System.currentTimeMillis())
