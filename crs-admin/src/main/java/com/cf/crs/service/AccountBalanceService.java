@@ -53,4 +53,13 @@ public class AccountBalanceService {
         }
     }
 
+    /**
+     * 提现更新余额
+     * @param accountBalanceEntity
+     * @return
+     */
+    public int updateBalanceForCashout(AccountBalanceEntity accountBalanceEntity){
+        return accountBalanceMapper.updateForCashin(accountBalanceEntity);
+    }
+
 }

@@ -10,7 +10,9 @@ import com.cf.crs.entity.AccountBalanceEntity;
 import com.cf.crs.entity.OrderCashinDto;
 import com.cf.crs.entity.OrderCashinEntity;
 import com.cf.crs.mapper.OrderCashinMapper;
-import com.cf.crs.properties.*;
+import com.cf.crs.properties.OrderCallbackParam;
+import com.cf.crs.properties.OrderConfigProperties;
+import com.cf.crs.properties.OrderParam;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
 import com.cf.util.utils.DateUtil;
@@ -97,13 +99,6 @@ public class OrderCashinService {
         return orderParam;
     }
 
-    public static void main(String[] args) {
-        OrderParam orderParam = new OrderParam();
-        orderParam.setIp("dfd");
-        LinkedMultiValueMap<String,Object> linkedMultiValueMap = getLinkedMultiValueMap(orderParam);
-        System.out.println(JSON.toJSONString(linkedMultiValueMap));
-    }
-
     private static LinkedMultiValueMap getLinkedMultiValueMap(OrderParam orderParam){
         LinkedMultiValueMap linkedMultiValueMap = new LinkedMultiValueMap();
         linkedMultiValueMap.add("merch_id",orderParam.getMerch_id());
@@ -116,7 +111,6 @@ public class OrderCashinService {
         linkedMultiValueMap.add("notify_url",orderParam.getNotify_url());
         return linkedMultiValueMap;
     }
-
 
 
     /**
@@ -172,7 +166,7 @@ public class OrderCashinService {
         orderCashinEntity.setRealAmount(callbackParamm.getAmount());
         orderCashinEntity.setDealTime(callbackParamm.getTime()*1000);
         orderCashinEntity.setStatus(2);
-        return orderCashinMapper.update(orderCashinEntity,new UpdateWrapper<OrderCashinEntity>().ne("status",2));
+        return orderCashinMapper.update(orderCashinEntity,new UpdateWrapper<OrderCashinEntity>().ne("status",2).eq("id",orderCashinEntity.getId()));
     }
 
 
