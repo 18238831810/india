@@ -66,6 +66,7 @@ public class RenExceptionHandler {
 	 */
 	@ExceptionHandler(Exception.class)
 	public ResultJson handleException(Exception ex){
+		log.error(ex.getMessage(),ex);
 		return HttpWebResult.getMonoError(ex.getMessage());
 	}
 
