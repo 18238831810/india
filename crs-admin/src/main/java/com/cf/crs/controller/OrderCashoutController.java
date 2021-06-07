@@ -39,9 +39,4 @@ public class OrderCashoutController {
         return orderCashoutService.order(orderCashoutDto);
     }
 
-    @PostMapping("/approve")
-    @ApiOperation("提现审批")
-    public ResultJson<String> approve(Long id){
-        return orderCashoutService.approve(id);
-    }
 }
