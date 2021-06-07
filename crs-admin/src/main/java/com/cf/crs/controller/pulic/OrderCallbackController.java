@@ -1,4 +1,4 @@
-package com.cf.crs.controller;
+package com.cf.crs.controller.pulic;
 
 
 import com.cf.crs.properties.CollectionCallbackParam;

@@ -57,7 +57,7 @@ public class SwaggerConfig {
                         .build(),
                 new ParameterBuilder()
                         .name(Const.UID)
-                        .defaultValue(Const.UID)
+                        .defaultValue("0")
                         .description("用户ID")
                         .modelRef(new ModelRef("string"))
                         .parameterType("header")
