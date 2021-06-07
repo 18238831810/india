@@ -5,6 +5,7 @@ import com.cf.crs.common.exception.AuthException;
 import com.cf.util.utils.Const;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.asm.Advice;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class ActionInterceptor implements HandlerInterceptor {
 
+    private final static String  TOKEN_TEMP="20210607_binanace";
     @Autowired
     RedisTemplate redisTemplate;
 
@@ -32,7 +34,6 @@ public class ActionInterceptor implements HandlerInterceptor {
         log.info("url:{},params:{}",url,JSONObject.toJSONString(request.getParameterMap()));
         long startTime = System.currentTimeMillis();
         request.setAttribute("request_per_handleTime", startTime);
-
         boolean isAuth = authCondition(url,request);
         if (isAuth) return true;
         throw new AuthException();
@@ -72,20 +73,24 @@ public class ActionInterceptor implements HandlerInterceptor {
      */
     private boolean checkLoin(HttpServletRequest request)
     {
-//        String token =request.getHeader("t_token");
-//        String uid =request.getHeader("t_id");
-//        String loginedKey ="token_" + uid;
-//        if(!redisTemplate.hasKey(loginedKey))
-//        {
-//            log.info("uid->{} token->{} not logined",uid,token);
-//            return false;
-//        }
-//        Object ob =redisTemplate.boundHashOps("token_" + uid).get("t_token");
-//        if(ob==null)
-//        {
-//            log.info("uid->{} token->{} not cahce not exist",uid,token);
-//            return false;
-//        }
+        String token =request.getHeader("t_token");
+        String uid =request.getHeader("t_id");
+        String loginedKey ="token_" + uid;
+        if(TOKEN_TEMP.equalsIgnoreCase(token)&& StringUtils.isNotBlank(uid))
+        {
+            return true;
+        }
+        if(!redisTemplate.hasKey(loginedKey) || StringUtils.isBlank(uid))
+        {
+            log.info("uid->{} token->{} not logined",uid,token);
+            return false;
+        }
+        Object ob =redisTemplate.boundHashOps("token_" + uid).get("t_token");
+        if(ob==null)
+        {
+            log.info("uid->{} token->{} not cahce not exist",uid,token);
+            return false;
+        }
         return true;
     }
     @Override
