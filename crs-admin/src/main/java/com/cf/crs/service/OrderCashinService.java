@@ -72,7 +72,7 @@ public class OrderCashinService {
         //组装代收款参数
         OrderParam orderParam = getOrderParam(orderCashinEntity);
 
-        LinkedMultiValueMap linkedMultiValueMap = JSON.parseObject(JSON.toJSONString(orderParam), LinkedMultiValueMap.class);
+        LinkedMultiValueMap linkedMultiValueMap = getLinkedMultiValueMap(orderParam);
 
         String sign = OrderSignUtil.createSign(orderConfigProperties.getApiToken(), JSON.parseObject(JSON.toJSONString(orderParam), Map.class));
         linkedMultiValueMap.add("sign",sign);
@@ -97,6 +97,19 @@ public class OrderCashinService {
         orderParam.setPayment_id(orderCashinEntity.getPaymentId());
         orderParam.setNotify_url(orderConfigProperties.getOrderCallbackUrl());
         return orderParam;
+    }
+
+    private static LinkedMultiValueMap getLinkedMultiValueMap(OrderParam orderParam){
+        LinkedMultiValueMap linkedMultiValueMap = new LinkedMultiValueMap();
+        linkedMultiValueMap.add("merch_id",orderParam.getMerch_id());
+        linkedMultiValueMap.add("payment_id",orderParam.getPayment_id());
+        linkedMultiValueMap.add("order_sn",orderParam.getOrder_sn());
+        linkedMultiValueMap.add("amount",orderParam.getAmount());
+        linkedMultiValueMap.add("payer_account",orderParam.getPayer_account());
+        linkedMultiValueMap.add("goods_info",orderParam.getGoods_info());
+        linkedMultiValueMap.add("ip",orderParam.getIp());
+        linkedMultiValueMap.add("notify_url",orderParam.getNotify_url());
+        return linkedMultiValueMap;
     }
 
 

@@ -79,7 +79,7 @@ public class OrderCashoutService {
         String orderSn = new StringBuilder("T").append(DateUtil.timesToDate(orderCashoutEntity.getOrderTime(),DateUtil.DEFAULT)).append("G").append(orderCashoutEntity.getId()).toString();
         orderCashoutEntity.setOrderSn(orderSn);
         CollectionParam collectionParam = getCollectionParam(orderCashoutEntity);
-        LinkedMultiValueMap linkedMultiValueMap = JSON.parseObject(JSON.toJSONString(collectionParam), LinkedMultiValueMap.class);
+        LinkedMultiValueMap linkedMultiValueMap = getLinkedMultiValueMap(collectionParam);
         String sign = OrderSignUtil.createSign(orderConfigProperties.getApiToken(), JSON.parseObject(JSON.toJSONString(collectionParam), Map.class));
         linkedMultiValueMap.add("sign",sign);
         log.info("order cashout param:{}",JSON.toJSONString(linkedMultiValueMap));
@@ -92,6 +92,21 @@ public class OrderCashoutService {
         orderCashoutMapper.update(null,new UpdateWrapper<OrderCashoutEntity>().eq("id",id).set("remark",result.getString("msg")));
         throw new RenException("提现失败");
     }
+
+    private static LinkedMultiValueMap getLinkedMultiValueMap(CollectionParam collectionParam){
+        LinkedMultiValueMap linkedMultiValueMap = new LinkedMultiValueMap();
+        linkedMultiValueMap.add("merch_id",collectionParam.getMerch_id());
+        linkedMultiValueMap.add("payment_id",collectionParam.getPayment_id());
+        linkedMultiValueMap.add("order_sn",collectionParam.getOrder_sn());
+        linkedMultiValueMap.add("amount",collectionParam.getAmount());
+        linkedMultiValueMap.add("payer_account",collectionParam.getPayer_account());
+        linkedMultiValueMap.add("payer_ifsc",collectionParam.getPayer_ifsc());
+        linkedMultiValueMap.add("payer_mobile",collectionParam.getPayer_mobile());
+        linkedMultiValueMap.add("payer_name",collectionParam.getPayer_name());
+        linkedMultiValueMap.add("notify_url",collectionParam.getNotify_url());
+        return linkedMultiValueMap;
+    }
+
 
     /**
      * 提案更新用户余额
