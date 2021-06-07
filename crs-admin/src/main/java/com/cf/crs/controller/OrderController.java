@@ -6,7 +6,9 @@ import com.cf.crs.common.entity.QueryPage;
 import com.cf.crs.common.utils.Result;
 import com.cf.crs.entity.CandlestickDto;
 import com.cf.crs.entity.OrderEntity;
+import com.cf.crs.entity.OrderLeverEntity;
 import com.cf.crs.service.OrderCommissionServiceImpl;
+import com.cf.crs.service.OrderLeverServiceImpl;
 import com.cf.crs.service.OrderServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @Api(tags = "订单操作")
 @RestController
@@ -31,6 +34,8 @@ public class OrderController extends BaseController {
 
     @Autowired
     OrderCommissionServiceImpl orderCommissionService;
+    @Autowired
+    OrderLeverServiceImpl orderLeverService;
 
     @PostMapping("/save")
     @ApiOperation("保存订单")
@@ -77,6 +82,12 @@ public class OrderController extends BaseController {
     public Result saveCommission(Integer day) {
         int total = orderCommissionService.saveOrderCommission(day);
         return new Result<>().error(200, "总条数:" + total);
+    }
+
+    @PostMapping("/buyDirectLever")
+    @ApiOperation("赔率列表")
+    public Result getSetting() {
+        return new Result<>().ok(orderLeverService.getBuyDirectLever());
     }
 
     @GetMapping("/candlestick")
