@@ -10,7 +10,9 @@ import com.cf.crs.entity.AccountBalanceEntity;
 import com.cf.crs.entity.OrderCashinDto;
 import com.cf.crs.entity.OrderCashinEntity;
 import com.cf.crs.mapper.OrderCashinMapper;
-import com.cf.crs.properties.*;
+import com.cf.crs.properties.OrderCallbackParam;
+import com.cf.crs.properties.OrderConfigProperties;
+import com.cf.crs.properties.OrderParam;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
 import com.cf.util.utils.DateUtil;
@@ -70,7 +72,7 @@ public class OrderCashinService {
         //组装代收款参数
         OrderParam orderParam = getOrderParam(orderCashinEntity);
 
-        LinkedMultiValueMap linkedMultiValueMap = getLinkedMultiValueMap(orderParam);
+        LinkedMultiValueMap linkedMultiValueMap = JSON.parseObject(JSON.toJSONString(orderParam), LinkedMultiValueMap.class);
 
         String sign = OrderSignUtil.createSign(orderConfigProperties.getApiToken(), JSON.parseObject(JSON.toJSONString(orderParam), Map.class));
         linkedMultiValueMap.add("sign",sign);
@@ -96,27 +98,6 @@ public class OrderCashinService {
         orderParam.setNotify_url(orderConfigProperties.getOrderCallbackUrl());
         return orderParam;
     }
-
-    public static void main(String[] args) {
-        OrderParam orderParam = new OrderParam();
-        orderParam.setIp("dfd");
-        LinkedMultiValueMap<String,Object> linkedMultiValueMap = getLinkedMultiValueMap(orderParam);
-        System.out.println(JSON.toJSONString(linkedMultiValueMap));
-    }
-
-    private static LinkedMultiValueMap getLinkedMultiValueMap(OrderParam orderParam){
-        LinkedMultiValueMap linkedMultiValueMap = new LinkedMultiValueMap();
-        linkedMultiValueMap.add("merch_id",orderParam.getMerch_id());
-        linkedMultiValueMap.add("payment_id",orderParam.getPayment_id());
-        linkedMultiValueMap.add("order_sn",orderParam.getOrder_sn());
-        linkedMultiValueMap.add("amount",orderParam.getAmount());
-        linkedMultiValueMap.add("payer_account",orderParam.getPayer_account());
-        linkedMultiValueMap.add("goods_info",orderParam.getGoods_info());
-        linkedMultiValueMap.add("ip",orderParam.getIp());
-        linkedMultiValueMap.add("notify_url",orderParam.getNotify_url());
-        return linkedMultiValueMap;
-    }
-
 
 
     /**
