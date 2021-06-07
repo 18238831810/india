@@ -2,7 +2,10 @@ package com.cf.crs.config.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.asm.Advice;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -18,14 +21,41 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class ActionInterceptor implements HandlerInterceptor {
 
+    @Autowired
+    RedisTemplate redisTemplate;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         log.info("url:{},params:{}",request.getServletPath(),JSONObject.toJSONString(request.getParameterMap()));
         long startTime = System.currentTimeMillis();
         request.setAttribute("request_per_handleTime", startTime);
-        return true;
+
+        return checkLoin(request);
     }
 
+    /**
+     * 检测用户是否登录
+     * @param request
+     * @return
+     */
+    private boolean checkLoin(HttpServletRequest request)
+    {
+        String token =request.getHeader("t_token");
+        String uid =request.getHeader("t_id");
+        String loginedKey ="token_" + uid;
+        if(!redisTemplate.hasKey(loginedKey))
+        {
+            log.info("uid->{} token->{} not logined",uid,token);
+            return false;
+        }
+        Object ob =redisTemplate.boundHashOps("token_" + uid).get("t_token");
+        if(ob==null)
+        {
+            log.info("uid->{} token->{} not cahce not exist",uid,token);
+            return false;
+        }
+        return true;
+    }
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
     }

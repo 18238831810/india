@@ -53,7 +53,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     private final static long LIMIT_TIME = 40;
 
     @Transactional
-    public OrderErrorEnum saveUserOrder(OrderEntity orderEntity) {
+    public OrderErrorEnum saveUserOrder(OrderEntity orderEntity) throws Exception {
 
         OrderErrorEnum orderErrorEnum = filterParam(orderEntity);
         if (orderErrorEnum != null)
@@ -88,24 +88,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     /**
      * roomId token orderPrice
      */
-    public OrderErrorEnum saveOrder(OrderEntity orderEntity) {
-
-        //判断余额是否足够
-        AccountBalanceEntity accountBalanceEntity = accountBalanceService.getAccountBalanceByUId(orderEntity.getUid());
-        if (accountBalanceEntity == null || accountBalanceEntity.getAmount() < orderEntity.getPayment()) {
-            log.info("uid->{} payment->{} not enough", orderEntity.getUid(), orderEntity.getPayment());
-            return OrderErrorEnum.ERROR_NOT_ENOUGH;
-        }
-
+    public OrderErrorEnum saveOrder(OrderEntity orderEntity) throws Exception {
+        accountBalanceService.updateAmountFromOrder(orderEntity);
         orderEntity.setNextStageTime(orderEntity.getEarlyStageTime() + 60000);
-
         orderEntity.setMarketCycle(CandlestickInterval.ONE_MINUTE.getIntervalId());
         this.save(orderEntity);
-        //TODO
-        //从用户账户扣钱
-        accountBalanceEntity.setAmount((float) -orderEntity.getPayment());
-        accountBalanceEntity.setUpdateTime(System.currentTimeMillis());
-        accountBalanceService.updateBalance(accountBalanceEntity);
         return null;
     }
 

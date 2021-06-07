@@ -2,11 +2,15 @@ package com.cf.crs.service;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.binance.api.client.constant.OrderErrorEnum;
+import com.cf.crs.common.exception.RenException;
 import com.cf.crs.entity.AccountBalanceEntity;
+import com.cf.crs.entity.OrderEntity;
 import com.cf.crs.mapper.AccountBalanceMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -21,12 +25,32 @@ public class AccountBalanceService {
 
 
     public Integer updateBalance(AccountBalanceEntity accountBalanceEntity) {
-       return accountBalanceMapper.updateBalance(accountBalanceEntity);
+        return accountBalanceMapper.updateBalance(accountBalanceEntity);
     }
 
-    public AccountBalanceEntity getAccountBalanceByUId(long uid)
-    {
-        return accountBalanceMapper.selectOne(new QueryWrapper<AccountBalanceEntity>().eq("uid",uid));
+    public AccountBalanceEntity getAccountBalanceByUId(long uid) {
+        return accountBalanceMapper.selectOne(new QueryWrapper<AccountBalanceEntity>().eq("uid", uid));
+    }
+
+    /**
+     * 从用户账户扣钱
+     * @param orderEntity
+     * @return
+     * @throws Exception
+     */
+    @Transactional
+    public void updateAmountFromOrder(OrderEntity orderEntity) throws Exception {
+        Integer row = this.updateBalance(AccountBalanceEntity.builder()
+                .amount((float) -orderEntity.getPayment())
+                .updateTime(System.currentTimeMillis())
+                .uid(orderEntity.getUid()).build());
+        if (row == null || row <= 0)
+            throw new RenException("扣不到资金");
+        AccountBalanceEntity accountBalanceEntity = getAccountBalanceByUId(orderEntity.getUid());
+        if (accountBalanceEntity == null || accountBalanceEntity.getAmount() < 0 ) {
+            log.info("uid->{} payment->{} not enough", orderEntity.getUid(), orderEntity.getPayment());
+            throw new RenException("资金不够");
+        }
     }
 
 }

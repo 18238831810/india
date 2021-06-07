@@ -53,6 +53,13 @@ public class SwaggerConfig {
                         .description("访问令牌")
                         .modelRef(new ModelRef("string"))
                         .parameterType("header")
+                        .build(),
+                new ParameterBuilder()
+                        .name("t_id")
+                        .defaultValue("t_id")
+                        .description("用户ID")
+                        .modelRef(new ModelRef("string"))
+                        .parameterType("header")
                         .build()
         );
 
