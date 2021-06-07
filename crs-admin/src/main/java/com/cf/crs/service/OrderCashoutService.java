@@ -181,7 +181,7 @@ public class OrderCashoutService {
         orderCashoutEntity.setRealAmount(callbackParamm.getAmount());
         orderCashoutEntity.setDealTime(callbackParamm.getTime()*1000);
         orderCashoutEntity.setStatus(2);
-        return orderCashoutMapper.update(orderCashoutEntity,new UpdateWrapper<OrderCashoutEntity>().ne("status",2));
+        return orderCashoutMapper.update(orderCashoutEntity,new UpdateWrapper<OrderCashoutEntity>().ne("status",2).eq("id",orderCashoutEntity.getId());
     }
 
 

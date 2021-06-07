@@ -166,7 +166,7 @@ public class OrderCashinService {
         orderCashinEntity.setRealAmount(callbackParamm.getAmount());
         orderCashinEntity.setDealTime(callbackParamm.getTime()*1000);
         orderCashinEntity.setStatus(2);
-        return orderCashinMapper.update(orderCashinEntity,new UpdateWrapper<OrderCashinEntity>().ne("status",2));
+        return orderCashinMapper.update(orderCashinEntity,new UpdateWrapper<OrderCashinEntity>().ne("status",2).eq("id",orderCashinEntity.getId()));
     }
 
 
