@@ -1,6 +1,7 @@
 package com.cf.crs.config.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
+import com.cf.util.utils.Const;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.asm.Advice;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +27,29 @@ public class ActionInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        log.info("url:{},params:{}",request.getServletPath(),JSONObject.toJSONString(request.getParameterMap()));
+        String url = request.getServletPath();
+        log.info("url:{},params:{}",url,JSONObject.toJSONString(request.getParameterMap()));
         long startTime = System.currentTimeMillis();
         request.setAttribute("request_per_handleTime", startTime);
 
-        return checkLoin(request);
+        if (url.startsWith(Const.PUBLIC)) {
+            return true;
+        }else if (url.startsWith(Const.API)){
+            return checkLoin(request);
+        }else if(url.startsWith(Const.ADMIN)){
+            return checkLoinForAdmin(request);
+        }
+        return true;
+    }
+
+    /**
+     * 检测后台用户权限
+     * @param request
+     * @return
+     */
+    private boolean checkLoinForAdmin(HttpServletRequest request)
+    {
+        return true;
     }
 
     /**

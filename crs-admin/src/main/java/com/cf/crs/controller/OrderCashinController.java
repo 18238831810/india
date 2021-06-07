@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @Api(tags="存款")
 @RestController
-@RequestMapping("/orderCashin")
+@RequestMapping("/api/orderCashin")
 public class OrderCashinController {
 
     @Autowired

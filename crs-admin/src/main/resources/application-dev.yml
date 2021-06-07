@@ -21,7 +21,7 @@ spring:
         master:
           username: city
           password: '!#456QWEasd&'
-          url: jdbc:mysql://47.106.199.193:3306/india?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT
+          url: jdbc:mysql://47.106.199.193:3306/india?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT&useSSL=false
           driver-class-name: com.mysql.cj.jdbc.Driver
           druid: # 以下参数针对每个库可以重新设置druid参数
             initial-size: 10
@@ -61,9 +61,9 @@ order:
     merchId: 8
     apiToken: f42c97ef4333eb9676b6b3b3c57dd2e7c27dcad5
     orderUrl: http://47.241.170.206/api/payTest/order
-    orderCallbackUrl: http://frank.cn.utools.club/orderCallback/order
+    orderCallbackUrl: http://frank.cn.utools.club/public/orderCallback/order
     collectionUrl: http://47.241.170.206/api/payTest/collection
-    collectionCallbackUrl: http://frank.cn.utools.club
+    collectionCallbackUrl: http://frank.cn.utools.club/public/orderCallback/collection
 
 
 

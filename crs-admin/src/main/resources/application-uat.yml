@@ -61,9 +61,9 @@ order:
     merchId: 8
     apiToken: f42c97ef4333eb9676b6b3b3c57dd2e7c27dcad5
     orderUrl: http://47.241.170.206/api/payTest/order
-    orderCallbackUrl: http://pay.hishow.xyz/orderCallback/order
+    orderCallbackUrl: http://pay.hishow.xyz/public/orderCallback/order
     collectionUrl: http://47.241.170.206/api/payTest/collection
-    collectionCallbackUrl: http://pay.hishow.xyz/orderCallback/collection
+    collectionCallbackUrl: http://pay.hishow.xyz/public/orderCallback/collection
 
 
 
