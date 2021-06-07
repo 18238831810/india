@@ -71,7 +71,7 @@ public class OrderCashoutService {
     @Transactional(rollbackFor = Exception.class)
     public ResultJson<String> approve(Long id){
         OrderCashoutEntity orderCashoutEntity = orderCashoutMapper.selectById(id);
-        if (orderCashoutEntity.getApproveStatus() != 1) return HttpWebResult.getMonoError("此提案已审批");
+        if (orderCashoutEntity == null || orderCashoutEntity.getApproveStatus() == 1) return HttpWebResult.getMonoError("此提案不存在或者已审批");
         //更改余额
         int i = updateAcountBalanceForCashout(orderCashoutEntity);
         if (i == 0) return HttpWebResult.getMonoError("用户提款金额不足,审批失败");
