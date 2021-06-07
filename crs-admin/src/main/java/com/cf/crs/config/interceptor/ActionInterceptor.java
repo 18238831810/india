@@ -72,20 +72,20 @@ public class ActionInterceptor implements HandlerInterceptor {
      */
     private boolean checkLoin(HttpServletRequest request)
     {
-        String token =request.getHeader("t_token");
-        String uid =request.getHeader("t_id");
-        String loginedKey ="token_" + uid;
-        if(!redisTemplate.hasKey(loginedKey))
-        {
-            log.info("uid->{} token->{} not logined",uid,token);
-            return false;
-        }
-        Object ob =redisTemplate.boundHashOps("token_" + uid).get("t_token");
-        if(ob==null)
-        {
-            log.info("uid->{} token->{} not cahce not exist",uid,token);
-            return false;
-        }
+//        String token =request.getHeader("t_token");
+//        String uid =request.getHeader("t_id");
+//        String loginedKey ="token_" + uid;
+//        if(!redisTemplate.hasKey(loginedKey))
+//        {
+//            log.info("uid->{} token->{} not logined",uid,token);
+//            return false;
+//        }
+//        Object ob =redisTemplate.boundHashOps("token_" + uid).get("t_token");
+//        if(ob==null)
+//        {
+//            log.info("uid->{} token->{} not cahce not exist",uid,token);
+//            return false;
+//        }
         return true;
     }
     @Override
