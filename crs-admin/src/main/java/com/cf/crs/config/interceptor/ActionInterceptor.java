@@ -93,6 +93,8 @@ public class ActionInterceptor implements HandlerInterceptor {
             log.info("uid->{} token->{} not cahce not exist",uid,token);
             return false;
         }
+        //此处逻辑，token中获取uid，覆盖传参中的uid，前端或者app去除请求头中或者传参中的uid
+
         return true;
     }
     @Override
