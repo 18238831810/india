@@ -8,9 +8,12 @@
 
 package com.cf.crs.config.exception;
 
+import com.cf.crs.common.exception.AuthException;
 import com.cf.crs.common.exception.ErrorCode;
 import com.cf.crs.common.exception.RenException;
 import com.cf.crs.common.utils.Result;
+import com.cf.util.http.HttpWebResult;
+import com.cf.util.http.ResultJson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,15 +31,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class RenExceptionHandler {
 
 
+
+	/**
+	 * 权限异常
+	 */
+	@ExceptionHandler(AuthException.class)
+	public ResultJson handleRenException(AuthException ex){
+		return HttpWebResult.getMonoError(ErrorCode.FORBIDDEN,"权限不足");
+	}
+
+
 	/**
 	 * 处理自定义异常
 	 */
 	@ExceptionHandler(RenException.class)
-	public Result handleRenException(RenException ex){
-		Result result = new Result();
-		result.error(ex.getCode(), ex.getMsg());
-
-		return result;
+	public ResultJson handleRenException(RenException ex){
+		return HttpWebResult.getMonoError(ex.getCode(),ex.getMsg());
 	}
 
 	/**
@@ -45,10 +55,8 @@ public class RenExceptionHandler {
 	 * @return
 	 */
 	@ExceptionHandler(DuplicateKeyException.class)
-	public Result handleDuplicateKeyException(DuplicateKeyException ex){
-		Result result = new Result();
-		result.error(ErrorCode.DB_RECORD_EXISTS);
-		return result;
+	public ResultJson handleDuplicateKeyException(DuplicateKeyException ex){
+		return HttpWebResult.getMonoError(ErrorCode.DB_RECORD_EXISTS,ex.getMessage());
 	}
 
 	/**
@@ -57,9 +65,8 @@ public class RenExceptionHandler {
 	 * @return
 	 */
 	@ExceptionHandler(Exception.class)
-	public Result handleException(Exception ex){
-		log.error(ex.getMessage(), ex);
-		return new Result().error();
+	public ResultJson handleException(Exception ex){
+		return HttpWebResult.getMonoError(ex.getMessage());
 	}
 
 }

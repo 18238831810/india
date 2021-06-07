@@ -19,19 +19,25 @@ import java.io.PrintWriter;
  */
 @Slf4j
 public class HttpWebResult {
-    public static ResultJson getMonoResult(int code, String code_desc, Object ch_msg)
+    public static ResultJson getMonoResult(int code, String msg, Object data)
     {
-        return new ResultJson( code, code_desc, ch_msg);
+        return new ResultJson( code, msg, data);
     }
 
 
-    public static ResultJson getMonoSucResult(String msg, Object ch_msg) {
-        return getMonoResult(200, msg, ch_msg);
+    public static ResultJson getMonoSucResult(String msg, Object data) {
+        return getMonoResult(200, msg, data);
     }
 
-    public static ResultJson getMonoSucResult(Object ch_msg) {
-        return getMonoResult(200, "success", ch_msg);
+    public static ResultJson getMonoSucResult(Object data) {
+        return getMonoResult(200, "success", data);
     }
+
+    public static ResultJson getMonoError(int code,String errorMsg)
+    {
+        return getMonoResult(code, errorMsg, null);
+    }
+
     public static ResultJson getMonoError(String errorMsg)
     {
         return getMonoResult(500, errorMsg, null);

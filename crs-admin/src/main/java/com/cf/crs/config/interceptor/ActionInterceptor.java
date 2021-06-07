@@ -1,6 +1,7 @@
 package com.cf.crs.config.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
+import com.cf.crs.common.exception.AuthException;
 import com.cf.util.utils.Const;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.asm.Advice;
@@ -32,6 +33,18 @@ public class ActionInterceptor implements HandlerInterceptor {
         long startTime = System.currentTimeMillis();
         request.setAttribute("request_per_handleTime", startTime);
 
+        boolean isAuth = authCondition(url,request);
+        if (isAuth) return true;
+        throw new AuthException();
+    }
+
+    /**
+     * 判断权限
+     * @param url
+     * @param request
+     * @return
+     */
+    private boolean authCondition(String url,HttpServletRequest request) {
         if (url.startsWith(Const.PUBLIC)) {
             return true;
         }else if (url.startsWith(Const.API)){
