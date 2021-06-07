@@ -3,13 +3,13 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cf.crs.mapper.AccountBalanceMapper">
 
-   <select id="updateBalance" resultType="integer">
+   <insert id="updateBalance">
        INSERT INTO `u_account_balance`(`uid`,`amount`,`update_time`)
        VALUES (#{item.uid},#{item.amount},#{item.updateTime})
        ON DUPLICATE KEY UPDATE
        `update_time` = VALUES(update_time),
        `amount` = (`amount` + VALUES(amount))
-   </select>
+   </insert>
 
     <update id="updateForCashin">
        update `u_account_balance` set  `amount` = (`amount`- #{item.amount}),`update_time`= #{item.updateTime} where `uid` = #{item.uid} and `amount` >= #{item.amount}
