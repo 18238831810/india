@@ -44,7 +44,7 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
          * excludePathPatterns("/login")不用进入到InterceptorConfig拦截
          * 因为token效验已在过滤器处理此处我们不做处理
          */
-        registry.addInterceptor(getActionInterceptor())
+        registry.addInterceptor(getActionInterceptor()).addPathPatterns("/api/**","/public/**","/admin/**")
                 /*放行swagger*/
                 .excludePathPatterns("/swagger-resources/**", "/v2/**", "/swagger-ui.html/**", "/modeler.html/**");
 
