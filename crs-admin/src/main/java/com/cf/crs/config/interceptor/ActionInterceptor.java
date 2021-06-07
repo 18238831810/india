@@ -73,11 +73,12 @@ public class ActionInterceptor implements HandlerInterceptor {
      */
     private boolean checkLoin(HttpServletRequest request)
     {
+        //真实使用时  ，uid应该从token中获取，不能让从参数取，防止有人恶意盗取或者使用别人的余额
         String token =request.getHeader(Const.TOKEN);
         String uid =request.getHeader(Const.UID);
         log.info("token:{},uid:{}",token,uid);
         String loginedKey ="token_" + uid;
-        if(TOKEN_TEMP.equalsIgnoreCase(token)&& StringUtils.isNotBlank(uid))
+        if(TOKEN_TEMP.equalsIgnoreCase(token))
         {
             return true;
         }

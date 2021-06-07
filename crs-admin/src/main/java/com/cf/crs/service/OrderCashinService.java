@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.cf.crs.common.exception.RenException;
 import com.cf.crs.common.utils.BeanMapUtils;
 import com.cf.crs.entity.AccountBalanceEntity;
+import com.cf.crs.entity.FinancialDetailsEntity;
 import com.cf.crs.entity.OrderCashinDto;
 import com.cf.crs.entity.OrderCashinEntity;
 import com.cf.crs.mapper.OrderCashinMapper;
@@ -53,6 +54,9 @@ public class OrderCashinService {
     @Autowired
     AccountBalanceService accountBalanceService;
 
+    @Autowired
+    FinancialDetailsService financialDetailsService;
+
 
     /**
      * 代收款下单接口
@@ -64,26 +68,31 @@ public class OrderCashinService {
         //获取订单数据
         OrderCashinEntity orderCashinEntity = getOrderCashinEntity(orderCashinDto, now);
         orderCashinMapper.insert(orderCashinEntity);
+        //第三方存款
+        JSONObject result = goCashin(now, orderCashinEntity);
+        if (result != null && result.getInteger("code") == 1) return HttpWebResult.getMonoSucResult(result.getJSONObject("data").getString("pay_pageurl"));
+        throw new RenException(result.getString("msg"));
+    }
 
+    /**
+     * 第三方存款
+     * @param now
+     * @param orderCashinEntity
+     * @return
+     */
+    private JSONObject goCashin(long now, OrderCashinEntity orderCashinEntity) {
         //T+时间+G+id 作为存款订单唯一标识
         String orderSn = new StringBuilder("T").append(DateUtil.timesToDate(now,DateUtil.DEFAULT)).append("G").append(orderCashinEntity.getId()).toString();
         orderCashinEntity.setOrderSn(orderSn);
-
         //组装代收款参数
         OrderParam orderParam = getOrderParam(orderCashinEntity);
-
         LinkedMultiValueMap linkedMultiValueMap = getLinkedMultiValueMap(orderParam);
-
         String sign = OrderSignUtil.createSign(orderConfigProperties.getApiToken(), JSON.parseObject(JSON.toJSONString(orderParam), Map.class));
         linkedMultiValueMap.add("sign",sign);
         log.info("order cashin param:{}",JSON.toJSONString(linkedMultiValueMap));
         JSONObject result = restTemplate.postForObject(orderConfigProperties.getOrderUrl(), linkedMultiValueMap, JSONObject.class);
         log.info("order cashin result:{}",JSON.toJSONString(result));
-
-        if (result != null && result.getInteger("code") == 1) return HttpWebResult.getMonoSucResult(result.getJSONObject("data").getString("pay_pageurl"));
-
-        throw new RenException(result.getString("msg"));
-
+        return result;
     }
 
     private OrderParam getOrderParam(OrderCashinEntity orderCashinEntity) {
@@ -132,6 +141,7 @@ public class OrderCashinService {
      * @param callbackParamm
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public String orderCallback(OrderCallbackParam callbackParamm){
         if (callbackParamm.getStatus() == 1){
             //支付成功
@@ -146,12 +156,30 @@ public class OrderCashinService {
             //更新存款记录
             int resutl = updateOrderCashin(callbackParamm, orderCashinEntity);
             if (resutl == 0) return "success";
-            //更新用余额
+            //更新用户余额
             updateAccountBalance(orderCashinEntity);
+            //新增资金明细记录
+            addFinancialDetails(callbackParamm, orderCashinEntity);
         }
         return "success";
     }
 
+    /**
+     * 新增资金明细记录
+     * @param callbackParamm
+     * @param orderCashinEntity
+     */
+    private void addFinancialDetails(OrderCallbackParam callbackParamm, OrderCashinEntity orderCashinEntity) {
+        AccountBalanceEntity accountBalanceEntity = accountBalanceService.getAccountBalanceByUId(orderCashinEntity.getUid());
+        FinancialDetailsEntity financialDetailsEntity = FinancialDetailsEntity.builder().amount(callbackParamm.getAmount()).balance(accountBalanceEntity.getAmount()).
+                orderSn(callbackParamm.getOrder_sn()).type(1).uid(orderCashinEntity.getUid()).orderTime(callbackParamm.getTime() * 1000).build();
+        financialDetailsService.save(financialDetailsEntity);
+    }
+
+    /**
+     * 更新用户余额
+     * @param orderCashinEntity
+     */
     private void updateAccountBalance(OrderCashinEntity orderCashinEntity) {
         AccountBalanceEntity accountBalanceEntity = new AccountBalanceEntity();
         accountBalanceEntity.setAmount(orderCashinEntity.getRealAmount());
@@ -160,6 +188,10 @@ public class OrderCashinService {
         accountBalanceService.updateBalance(accountBalanceEntity);
     }
 
+    /**
+     * 更新存款记录
+     * @param orderCashinEntity
+     */
     private int updateOrderCashin(OrderCallbackParam callbackParamm, OrderCashinEntity orderCashinEntity) {
         orderCashinEntity.setOrderSn(callbackParamm.getOrder_sn());
         orderCashinEntity.setPtOrderSn(callbackParamm.getPt_order_sn());

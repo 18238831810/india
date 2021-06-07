@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.cf.crs.common.exception.RenException;
 import com.cf.crs.common.utils.BeanMapUtils;
 import com.cf.crs.entity.AccountBalanceEntity;
+import com.cf.crs.entity.FinancialDetailsEntity;
 import com.cf.crs.entity.OrderCashoutDto;
 import com.cf.crs.entity.OrderCashoutEntity;
 import com.cf.crs.mapper.OrderCashoutMapper;
@@ -52,6 +53,9 @@ public class OrderCashoutService {
     @Autowired
     AccountBalanceService accountBalanceService;
 
+    @Autowired
+    FinancialDetailsService financialDetailsService;
+
 
     /**
      * 代收款下单接口
@@ -70,14 +74,31 @@ public class OrderCashoutService {
      */
     @Transactional(rollbackFor = Exception.class)
     public ResultJson<String> approve(Long id){
+        //更新审批状态
+        int update = orderCashoutMapper.update(null, new UpdateWrapper<OrderCashoutEntity>().eq("id", id).eq("approve_status", 0).set("approve_status", 1));
+        if (update == 0) throw new RenException("此提案不存在或者已审批");
         OrderCashoutEntity orderCashoutEntity = orderCashoutMapper.selectById(id);
-        if (orderCashoutEntity == null || orderCashoutEntity.getApproveStatus() == 1) return HttpWebResult.getMonoError("此提案不存在或者已审批");
         //更改余额
         int i = updateAcountBalanceForCashout(orderCashoutEntity);
-        if (i == 0) return HttpWebResult.getMonoError("用户提款金额不足,审批失败");
-        orderCashoutMapper.update(null,new UpdateWrapper<OrderCashoutEntity>().eq("id",id).set("approve_status",1));
+        if (i == 0) throw new RenException("用户提款金额不足,审批失败");
+        //获取组装订单号
         String orderSn = new StringBuilder("T").append(DateUtil.timesToDate(orderCashoutEntity.getOrderTime(),DateUtil.DEFAULT)).append("G").append(orderCashoutEntity.getId()).toString();
         orderCashoutEntity.setOrderSn(orderSn);
+        //添加资金明细
+        addFinancialDetails(orderCashoutEntity);
+        //第三方提现
+        JSONObject result = goCashout(orderCashoutEntity);
+        if (result == null) throw new RenException("提现失败");
+        if (result.getInteger("code") == 1) return HttpWebResult.getMonoSucStr();
+        throw new RenException(result.getString("msg"));
+    }
+
+    /**
+     * 第三方提现
+     * @param orderCashoutEntity
+     * @return
+     */
+    private JSONObject goCashout(OrderCashoutEntity orderCashoutEntity) {
         CollectionParam collectionParam = getCollectionParam(orderCashoutEntity);
         LinkedMultiValueMap linkedMultiValueMap = getLinkedMultiValueMap(collectionParam);
         String sign = OrderSignUtil.createSign(orderConfigProperties.getApiToken(), JSON.parseObject(JSON.toJSONString(collectionParam), Map.class));
@@ -86,11 +107,18 @@ public class OrderCashoutService {
         //提现
         JSONObject result = restTemplate.postForObject(orderConfigProperties.getCollectionUrl(), linkedMultiValueMap, JSONObject.class);
         log.info("order cashout result:{}",JSON.toJSONString(result));
-        if (result == null) throw new RenException("提现失败");
-        if (result.getInteger("code") == 1) return HttpWebResult.getMonoSucStr();
-        //提现失败，更新失败原因
-        orderCashoutMapper.update(null,new UpdateWrapper<OrderCashoutEntity>().eq("id",id).set("remark",result.getString("msg")));
-        throw new RenException("提现失败");
+        return result;
+    }
+
+    /**
+     * 新增资金明细
+     * @param orderCashoutEntity
+     */
+    private void addFinancialDetails(OrderCashoutEntity orderCashoutEntity) {
+        AccountBalanceEntity accountBalanceEntity = accountBalanceService.getAccountBalanceByUId(orderCashoutEntity.getUid());
+        FinancialDetailsEntity financialDetailsEntity = FinancialDetailsEntity.builder().orderTime(System.currentTimeMillis()).orderSn(orderCashoutEntity.getOrderSn()).uid(orderCashoutEntity.getUid()).type(2).
+                balance(accountBalanceEntity.getAmount()).amount(orderCashoutEntity.getAmount()).build();
+        financialDetailsService.save(financialDetailsEntity);
     }
 
     private static LinkedMultiValueMap getLinkedMultiValueMap(CollectionParam collectionParam){
