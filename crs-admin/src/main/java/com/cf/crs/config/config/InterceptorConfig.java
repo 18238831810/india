@@ -1,6 +1,7 @@
 package com.cf.crs.config.config;
 
 import com.cf.crs.config.interceptor.ActionInterceptor;
+import com.cf.util.utils.Const;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -44,7 +45,7 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
          * excludePathPatterns("/login")不用进入到InterceptorConfig拦截
          * 因为token效验已在过滤器处理此处我们不做处理
          */
-        registry.addInterceptor(getActionInterceptor()).addPathPatterns("/api/**","/public/**","/admin/**")
+        registry.addInterceptor(getActionInterceptor()).addPathPatterns(Const.ADMIN_URL,Const.API_URL,Const.PUBLIC_URL)
                 /*放行swagger*/
                 .excludePathPatterns("/swagger-resources/**", "/v2/**", "/swagger-ui.html/**", "/modeler.html/**");
 
