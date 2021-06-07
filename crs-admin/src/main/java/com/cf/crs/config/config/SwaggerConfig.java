@@ -9,6 +9,7 @@
 package com.cf.crs.config.config;
 
 import com.cf.crs.common.constant.Constant;
+import com.cf.util.utils.Const;
 import com.github.xiaoymin.swaggerbootstrapui.annotations.EnableSwaggerBootstrapUI;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.context.annotation.Bean;
@@ -55,8 +56,8 @@ public class SwaggerConfig {
                         .parameterType("header")
                         .build(),
                 new ParameterBuilder()
-                        .name("t_id")
-                        .defaultValue("t_id")
+                        .name(Const.UID)
+                        .defaultValue(Const.UID)
                         .description("用户ID")
                         .modelRef(new ModelRef("string"))
                         .parameterType("header")

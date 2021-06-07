@@ -73,8 +73,9 @@ public class ActionInterceptor implements HandlerInterceptor {
      */
     private boolean checkLoin(HttpServletRequest request)
     {
-        String token =request.getHeader("token");
-        String uid =request.getHeader("t_id");
+        String token =request.getHeader(Const.TOKEN);
+        String uid =request.getHeader(Const.UID);
+        log.info("token:{},uid:{}",token,uid);
         String loginedKey ="token_" + uid;
         if(TOKEN_TEMP.equalsIgnoreCase(token)&& StringUtils.isNotBlank(uid))
         {

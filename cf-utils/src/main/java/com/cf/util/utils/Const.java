@@ -16,6 +16,16 @@ public class Const {
 	public static  final  String ADMIN ="/admin/";
 	public static  final  String ADMIN_URL ="/admin/**";
 
+	/**
+	 * 用户token
+	 */
+	public static  final  String TOKEN ="token";
+
+	/**
+	 * 用户id
+	 */
+	public static  final  String UID ="uid";
+
 
 
 }

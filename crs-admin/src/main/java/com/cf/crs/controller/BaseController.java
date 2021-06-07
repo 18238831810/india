@@ -1,5 +1,6 @@
 package com.cf.crs.controller;
 
+import com.cf.util.utils.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -14,7 +15,7 @@ public abstract class BaseController {
 
     public long getUid()
     {
-        long uid =Long.parseLong(getTokenFromHeader("t_id"));
+        long uid =Long.parseLong(getTokenFromHeader(Const.UID));
         return uid;
     }
 
