@@ -169,7 +169,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     public int updateOrder(OrderEntity orderEntity, double lever) {
         Candlestick earlyStage = getCandlestick(orderEntity.getEarlyStageTime());
         if (earlyStage == null) {
-            log.warn("获取earlyStage行情时获取不到->{} id->{}", orderEntity.getEarlyStageTime(), orderEntity.getId());
+            //log.warn("获取earlyStage行情时获取不到->{} id->{}", orderEntity.getEarlyStageTime(), orderEntity.getId());
             return 0;
         }
         orderEntity.setEarlyStagePrice(getPointPrize(earlyStage.getOpen()));
@@ -177,7 +177,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
 
         Candlestick nextStage = getCandlestick(orderEntity.getNextStageTime());
         if (nextStage == null) {
-            log.warn("获取nextStage行情时获取不到->{},id->{}", orderEntity.getNextStageTime(), orderEntity.getId());
+           // log.warn("获取nextStage行情时获取不到->{},id->{}", orderEntity.getNextStageTime(), orderEntity.getId());
             return 0;
         }
         orderEntity.setNextStagePrice(getPointPrize(nextStage.getOpen()));
