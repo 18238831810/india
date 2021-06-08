@@ -23,6 +23,7 @@ import com.cf.util.utils.DateUtil;
 import com.cf.util.utils.OrderSignUtil;
 import com.cf.util.utils.WebTools;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,8 +74,10 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
                 .le(dto.getEndTime() != null,"order_time",dto.getEndTime()).orderByDesc("order_time"));
         List<OrderCashoutEntity> records = pageList.getRecords();
         records.forEach(record->{
-            String orderSn = new StringBuilder("T").append(DateUtil.timesToDate(record.getOrderTime(),DateUtil.DEFAULT)).append("G").append(record.getId()).toString();
-            record.setOrderSn(orderSn);
+            if (StringUtils.isEmpty(record.getOrderSn())) {
+                String orderSn = new StringBuilder("T").append(DateUtil.timesToDate(record.getOrderTime(), DateUtil.DEFAULT)).append("G").append(record.getId()).toString();
+                record.setOrderSn(orderSn);
+            }
         });
         return new PagingBase<OrderCashoutEntity>(records, pageList.getTotal());
     }
