@@ -25,16 +25,6 @@ public class FinancialDetailsService extends ServiceImpl<FinancialDetailsMapper,
 
 
     /**
-     * 保存资金明细
-     * @param
-     * @return
-     * @throws Exception
-     */
-    public boolean saveDetail(FinancialDetailsEntity financialDetailsEntity){
-       return this.save(financialDetailsEntity);
-    }
-
-    /**
      * 查询用户的资金明细列表
      *
      * @param dto
@@ -44,7 +34,7 @@ public class FinancialDetailsService extends ServiceImpl<FinancialDetailsMapper,
         Page<FinancialDetailsEntity> iPage = new Page(dto.getPageSize(), dto.getPageNum());
         IPage<FinancialDetailsEntity> pageList = this.page(iPage, new QueryWrapper<FinancialDetailsEntity>().eq("uid", dto.getUid())
         .eq(dto.getType() != null,"type",dto.getType()).ge(dto.getStartTime() != null,"order_time",dto.getStartTime())
-        .le(dto.getEndTime() != null,"order_time",dto.getEndTime()));
+        .le(dto.getEndTime() != null,"order_time",dto.getEndTime()).orderByDesc("order_time"));
         return new PagingBase<FinancialDetailsEntity>(pageList.getRecords(), pageList.getTotal());
     }
 
