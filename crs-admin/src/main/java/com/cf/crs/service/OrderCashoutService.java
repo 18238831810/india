@@ -30,6 +30,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -70,7 +71,12 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
         IPage<OrderCashoutEntity> pageList = this.page(iPage, new QueryWrapper<OrderCashoutEntity>().eq("uid", dto.getUid())
                 .ge(dto.getStartTime() != null,"order_time",dto.getStartTime())
                 .le(dto.getEndTime() != null,"order_time",dto.getEndTime()).orderByDesc("order_time"));
-        return new PagingBase<OrderCashoutEntity>(pageList.getRecords(), pageList.getTotal());
+        List<OrderCashoutEntity> records = pageList.getRecords();
+        records.forEach(record->{
+            String orderSn = new StringBuilder("T").append(DateUtil.timesToDate(record.getOrderTime(),DateUtil.DEFAULT)).append("G").append(record.getId()).toString();
+            record.setOrderSn(orderSn);
+        });
+        return new PagingBase<OrderCashoutEntity>(records, pageList.getTotal());
     }
 
     /**

@@ -276,7 +276,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
      * @return
      */
     public PagingBase<OrderEntity> listOrder(long uid, QueryPage queryPage) {
-        Page<OrderEntity> iPage = new Page(queryPage.getPageSize(), queryPage.getPageNum());
+        Page<OrderEntity> iPage = new Page(queryPage.getPageNum(), queryPage.getPageSize());
         IPage<OrderEntity> pageList = this.page(iPage, new QueryWrapper<OrderEntity>().eq("uid", uid));
         return new PagingBase<OrderEntity>(pageList.getRecords(), pageList.getTotal());
     }
