@@ -89,8 +89,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     /**
      * roomId token orderPrice
      */
-    public OrderErrorEnum saveOrder(OrderEntity orderEntity) throws RenException {
-        accountBalanceService.updateAmountFromOrder(orderEntity);
+    public OrderErrorEnum saveOrder(OrderEntity orderEntity) {
+        OrderErrorEnum orderErrorEnum= accountBalanceService.updateAmountFromOrder(orderEntity);
+        if(orderErrorEnum!=null) return orderErrorEnum;
         orderEntity.setNextStageTime(orderEntity.getEarlyStageTime() + 60000);
         orderEntity.setMarketCycle(CandlestickInterval.ONE_MINUTE.getIntervalId());
         this.save(orderEntity);

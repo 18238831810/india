@@ -34,31 +34,29 @@ public class AccountBalanceService {
 
     /**
      * 从用户账户扣钱
+     *
      * @param orderEntity
      * @return
      * @throws Exception
      */
     @Transactional
-    public void updateAmountFromOrder(OrderEntity orderEntity) throws RenException {
-        Integer row = this.updateBalance(AccountBalanceEntity.builder()
+    public OrderErrorEnum updateAmountFromOrder(OrderEntity orderEntity) {
+        int row = this.updateBalanceForCashout(AccountBalanceEntity.builder()
                 .amount((float) -orderEntity.getPayment())
                 .updateTime(System.currentTimeMillis())
                 .uid(orderEntity.getUid()).build());
-        if (row == null || row <= 0)
-            throw new RenException("扣不到资金");
-        AccountBalanceEntity accountBalanceEntity = getAccountBalanceByUId(orderEntity.getUid());
-        if (accountBalanceEntity == null || accountBalanceEntity.getAmount() < 0 ) {
-            log.info("uid->{} payment->{} not enough", orderEntity.getUid(), orderEntity.getPayment());
-            throw new RenException("资金不够");
-        }
+        if (row <= 0)
+            return OrderErrorEnum.ERROR_NOT_ENOUGH;
+        return null;
     }
 
     /**
      * 提现更新余额
+     *
      * @param accountBalanceEntity
      * @return
      */
-    public int updateBalanceForCashout(AccountBalanceEntity accountBalanceEntity){
+    public int updateBalanceForCashout(AccountBalanceEntity accountBalanceEntity) {
         return accountBalanceMapper.updateForCashin(accountBalanceEntity);
     }
 
