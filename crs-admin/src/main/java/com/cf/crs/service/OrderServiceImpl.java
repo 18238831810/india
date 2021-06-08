@@ -98,9 +98,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         return null;
     }
 
-    private long getUidFromToken(String token) {
-        return 0l;
-    }
 
     /**
      * 以分钟为最小单位去获取时间

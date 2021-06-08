@@ -39,7 +39,6 @@ public class AccountBalanceService {
      * @return
      * @throws Exception
      */
-    @Transactional
     public OrderErrorEnum updateAmountFromOrder(OrderEntity orderEntity) {
         int row = this.updateBalanceForCashout(AccountBalanceEntity.builder()
                 .amount((float) -orderEntity.getPayment())

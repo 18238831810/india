@@ -1,6 +1,8 @@
 package com.cf.crs.controller;
 
+import com.binance.api.client.CandlesticksCache;
 import com.binance.api.client.constant.OrderErrorEnum;
+import com.binance.api.client.domain.market.Candlestick;
 import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.common.entity.QueryPage;
 import com.cf.crs.common.utils.Result;
@@ -75,7 +77,6 @@ public class OrderController extends BaseController {
     }
 
     @PostMapping("/saveCommission")
-    @ApiOperation("生成直播提成")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "day", value = "生成指定多少天前的一天数据", dataType = "Integer", defaultValue = "null"),
     })
@@ -100,5 +101,12 @@ public class OrderController extends BaseController {
     public Result<List<CandlestickDto>> getCandlestick(String symbol, String interval, Integer size) {
         List<CandlestickDto> result = orderService.getCandlestickList(StringUtil.isBlank(symbol) ? "btcusdt" : symbol, StringUtil.isBlank(interval) ? "1m" : interval, size == null ? 240 : size);
         return new Result<List<CandlestickDto>>().ok(result);
+    }
+
+    @GetMapping("/cacheCandlestick")
+    public Result<Map<Long, Candlestick>> cacheCandlestick() {
+        CandlesticksCache.getInstance().cache();
+        Map<Long, Candlestick>  map =CandlesticksCache.getInstance().getCandlesticksCache();
+        return new Result<Map<Long, Candlestick>>().ok(map);
     }
 }
