@@ -310,4 +310,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         }
         return result;
     }
+
+
+    /**
+     * 按时间 区间统计盈亏情况
+     * @param start
+     * @param end
+     */
+    public List<Map<String, Object>>  getProfitByDay(long start ,long end,long uid) {
+        return  this.getBaseMapper().selectMaps(new QueryWrapper<OrderEntity>()
+                .ge("ctime",start)
+                .lt("ctime",end).eq("uid",uid)
+        .select("sum(profit) as profit","uid","from_unixtime(ctime/1000,'%Y-%m-%d')")
+        .groupBy("uid","from_unixtime(ctime/1000,'%Y-%m-%d')"));
+    }
 }

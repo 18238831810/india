@@ -109,4 +109,16 @@ public class OrderController extends BaseController {
         Map<Long, Candlestick>  map =CandlesticksCache.getInstance().getCandlesticksCache();
         return new Result<Map<Long, Candlestick>>().ok(map);
     }
+
+    @GetMapping("/dayprofit")
+    @ApiOperation("盈亏统计")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "start", value = "开始时间(>=)", dataType = "long"),
+            @ApiImplicitParam(name = "end", value = "结束时间(<)", dataType = "long")
+    })
+    public Result dayProfit(long start ,long end ) {
+        List<Map<String, Object>> result = orderService.getProfitByDay(start,end,getUid());
+        return new Result<>().ok(result);
+    }
+
 }
