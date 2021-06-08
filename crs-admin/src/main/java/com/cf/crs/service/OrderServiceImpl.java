@@ -321,7 +321,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         return  this.getBaseMapper().selectMaps(new QueryWrapper<OrderEntity>()
                 .ge("ctime",start)
                 .lt("ctime",end).eq("uid",uid)
-        .select("sum(profit) as profit","uid","from_unixtime(ctime/1000,'%Y-%m-%d')")
+        .select("sum(profit) as profit","uid","from_unixtime(ctime/1000,'%Y-%m-%d') as time")
         .groupBy("uid","from_unixtime(ctime/1000,'%Y-%m-%d')"));
     }
 }
