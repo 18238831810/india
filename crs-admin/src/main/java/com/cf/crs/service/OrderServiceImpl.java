@@ -95,11 +95,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         orderEntity.setMarketCycle(CandlestickInterval.ONE_MINUTE.getIntervalId());
         this.save(orderEntity);
 
-        financialDetailsService.save(FinancialDetailsEntity.builder()
-                .amount((float) orderEntity.getProfit())
-                .type(3)
-                .orderTime(orderEntity.getCtime())
-                .orderSn(orderEntity.getId()+"").build());
+//        financialDetailsService.save(FinancialDetailsEntity.builder()
+//                .amount((float) orderEntity.getProfit())
+//                .type(3)
+//                .orderTime(orderEntity.getCtime())
+//                .orderSn(orderEntity.getId()+"").build());
 
         return null;
     }
