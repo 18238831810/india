@@ -2,13 +2,13 @@ package com.cf.crs.service;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.binance.api.client.constant.OrderErrorEnum;
-import com.cf.crs.common.exception.RenException;
 import com.cf.crs.entity.AccountBalanceEntity;
 import com.cf.crs.entity.OrderEntity;
 import com.cf.crs.mapper.AccountBalanceMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,18 +18,15 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Slf4j
 @Service
-public class AccountBalanceService {
-
-    @Autowired
-    AccountBalanceMapper accountBalanceMapper;
+public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, AccountBalanceEntity> implements IService<AccountBalanceEntity> {
 
 
     public Integer updateBalance(AccountBalanceEntity accountBalanceEntity) {
-        return accountBalanceMapper.updateBalance(accountBalanceEntity);
+        return baseMapper.updateBalance(accountBalanceEntity);
     }
 
     public AccountBalanceEntity getAccountBalanceByUId(long uid) {
-        return accountBalanceMapper.selectOne(new QueryWrapper<AccountBalanceEntity>().eq("uid", uid));
+        return baseMapper.selectOne(new QueryWrapper<AccountBalanceEntity>().eq("uid", uid));
     }
 
     /**
@@ -56,7 +53,7 @@ public class AccountBalanceService {
      * @return
      */
     public int updateBalanceForCashout(AccountBalanceEntity accountBalanceEntity) {
-        return accountBalanceMapper.updateForCashin(accountBalanceEntity);
+        return baseMapper.updateForCashin(accountBalanceEntity);
     }
 
 }

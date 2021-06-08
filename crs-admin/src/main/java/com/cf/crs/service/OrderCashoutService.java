@@ -3,13 +3,16 @@ package com.cf.crs.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.common.exception.RenException;
 import com.cf.crs.common.utils.BeanMapUtils;
-import com.cf.crs.entity.AccountBalanceEntity;
-import com.cf.crs.entity.FinancialDetailsEntity;
-import com.cf.crs.entity.OrderCashoutDto;
-import com.cf.crs.entity.OrderCashoutEntity;
+import com.cf.crs.entity.*;
 import com.cf.crs.mapper.OrderCashoutMapper;
 import com.cf.crs.properties.CollectionCallbackParam;
 import com.cf.crs.properties.CollectionParam;
@@ -36,10 +39,8 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-public class OrderCashoutService {
+public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCashoutEntity> implements IService<OrderCashoutEntity> {
 
-    @Autowired
-    OrderCashoutMapper orderCashoutMapper;
 
     @Autowired
     OrderConfigProperties orderConfigProperties;
@@ -57,14 +58,29 @@ public class OrderCashoutService {
     FinancialDetailsService financialDetailsService;
 
 
+
+    /**
+     * 查询用户的资金明细列表
+     *
+     * @param dto
+     * @return
+     */
+    public PagingBase<OrderCashoutEntity> list(OrderCashoutDto dto) {
+        Page<OrderCashoutEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
+        IPage<OrderCashoutEntity> pageList = this.page(iPage, new QueryWrapper<OrderCashoutEntity>().eq("uid", dto.getUid())
+                .ge(dto.getStartTime() != null,"order_time",dto.getStartTime())
+                .le(dto.getEndTime() != null,"order_time",dto.getEndTime()).orderByDesc("order_time"));
+        return new PagingBase<OrderCashoutEntity>(pageList.getRecords(), pageList.getTotal());
+    }
+
     /**
      * 代收款下单接口
      * @return
      */
-    public ResultJson<String> order(OrderCashoutDto orderCashoutDto){
-        OrderCashoutEntity orderCashoutEntity = getOrderCashinEntity(orderCashoutDto);
+    public ResultJson<String> order(OrderCashoutParam orderCashoutParam){
+        OrderCashoutEntity orderCashoutEntity = getOrderCashinEntity(orderCashoutParam);
         //保存订单数据
-        orderCashoutMapper.insert(orderCashoutEntity);
+        baseMapper.insert(orderCashoutEntity);
         return HttpWebResult.getMonoSucStr();
     }
 
@@ -75,9 +91,9 @@ public class OrderCashoutService {
     @Transactional(rollbackFor = Exception.class)
     public ResultJson<String> approve(Long id){
         //更新审批状态
-        int update = orderCashoutMapper.update(null, new UpdateWrapper<OrderCashoutEntity>().eq("id", id).eq("approve_status", 0).set("approve_status", 1));
+        int update = baseMapper.update(null, new UpdateWrapper<OrderCashoutEntity>().eq("id", id).eq("approve_status", 0).set("approve_status", 1));
         if (update == 0) throw new RenException("此提案不存在或者已审批");
-        OrderCashoutEntity orderCashoutEntity = orderCashoutMapper.selectById(id);
+        OrderCashoutEntity orderCashoutEntity = baseMapper.selectById(id);
         //更改余额
         int i = updateAcountBalanceForCashout(orderCashoutEntity);
         if (i == 0) throw new RenException("用户提款金额不足,审批失败");
@@ -166,11 +182,11 @@ public class OrderCashoutService {
 
     /**
      * 组装存款订单数据
-     * @param orderCashoutDto
+     * @param orderCashoutParam
      * @return
      */
-    private OrderCashoutEntity getOrderCashinEntity(OrderCashoutDto orderCashoutDto) {
-        OrderCashoutEntity orderCashoutEntity = BeanMapUtils.map(orderCashoutDto, OrderCashoutEntity.class);
+    private OrderCashoutEntity getOrderCashinEntity(OrderCashoutParam orderCashoutParam) {
+        OrderCashoutEntity orderCashoutEntity = BeanMapUtils.map(orderCashoutParam, OrderCashoutEntity.class);
         orderCashoutEntity.setOrderTime(System.currentTimeMillis());
         orderCashoutEntity.setStatus(0);
         orderCashoutEntity.setIp(WebTools.getIpAddr(request));
@@ -188,7 +204,7 @@ public class OrderCashoutService {
             String order_sn = callbackParamm.getOrder_sn();
             //解析出存款记录id
             String id = order_sn.split("G")[1];
-            OrderCashoutEntity orderCashoutEntity = orderCashoutMapper.selectById(id);
+            OrderCashoutEntity orderCashoutEntity = baseMapper.selectById(id);
             if (orderCashoutEntity == null) {
                 log.info("order cashout id error:{}",id);
                 return "success";
@@ -209,7 +225,7 @@ public class OrderCashoutService {
         orderCashoutEntity.setRealAmount(callbackParamm.getAmount());
         orderCashoutEntity.setDealTime(callbackParamm.getTime()*1000);
         orderCashoutEntity.setStatus(2);
-        return orderCashoutMapper.update(orderCashoutEntity,new UpdateWrapper<OrderCashoutEntity>().ne("status",2).eq("id",orderCashoutEntity.getId()));
+        return baseMapper.update(orderCashoutEntity,new UpdateWrapper<OrderCashoutEntity>().ne("status",2).eq("id",orderCashoutEntity.getId()));
     }
 
 

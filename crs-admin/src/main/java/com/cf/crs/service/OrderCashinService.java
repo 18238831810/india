@@ -3,13 +3,16 @@ package com.cf.crs.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.common.exception.RenException;
 import com.cf.crs.common.utils.BeanMapUtils;
-import com.cf.crs.entity.AccountBalanceEntity;
-import com.cf.crs.entity.FinancialDetailsEntity;
-import com.cf.crs.entity.OrderCashinDto;
-import com.cf.crs.entity.OrderCashinEntity;
+import com.cf.crs.entity.*;
 import com.cf.crs.mapper.OrderCashinMapper;
 import com.cf.crs.properties.OrderCallbackParam;
 import com.cf.crs.properties.OrderConfigProperties;
@@ -37,10 +40,8 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-public class OrderCashinService {
+public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCashinEntity> implements IService<OrderCashinEntity> {
 
-    @Autowired
-    OrderCashinMapper orderCashinMapper;
 
     @Autowired
     OrderConfigProperties orderConfigProperties;
@@ -59,15 +60,29 @@ public class OrderCashinService {
 
 
     /**
+     * 查询用户的资金明细列表
+     *
+     * @param dto
+     * @return
+     */
+    public PagingBase<OrderCashinEntity> list(OrderCashinDto dto) {
+        Page<OrderCashinEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
+        IPage<OrderCashinEntity> pageList = this.page(iPage, new QueryWrapper<OrderCashinEntity>().eq("uid", dto.getUid())
+                .ge(dto.getStartTime() != null,"order_time",dto.getStartTime())
+                .le(dto.getEndTime() != null,"order_time",dto.getEndTime()).orderByDesc("order_time"));
+        return new PagingBase<OrderCashinEntity>(pageList.getRecords(), pageList.getTotal());
+    }
+
+    /**
      * 代收款下单接口
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public ResultJson<String> order(OrderCashinDto orderCashinDto){
+    public ResultJson<String> order(OrderCashinParam orderCashinParam){
         long now = System.currentTimeMillis();
         //获取订单数据
-        OrderCashinEntity orderCashinEntity = getOrderCashinEntity(orderCashinDto, now);
-        orderCashinMapper.insert(orderCashinEntity);
+        OrderCashinEntity orderCashinEntity = getOrderCashinEntity(orderCashinParam, now);
+        baseMapper.insert(orderCashinEntity);
         //第三方存款
         JSONObject result = goCashin(now, orderCashinEntity);
         if (result != null && result.getInteger("code") == 1) return HttpWebResult.getMonoSucResult(result.getJSONObject("data").getString("pay_pageurl"));
@@ -124,12 +139,12 @@ public class OrderCashinService {
 
     /**
      * 组装存款订单数据
-     * @param orderCashinDto
+     * @param orderCashinParam
      * @param now
      * @return
      */
-    private OrderCashinEntity getOrderCashinEntity(OrderCashinDto orderCashinDto, long now) {
-        OrderCashinEntity orderCashinEntity = BeanMapUtils.map(orderCashinDto, OrderCashinEntity.class);
+    private OrderCashinEntity getOrderCashinEntity(OrderCashinParam orderCashinParam, long now) {
+        OrderCashinEntity orderCashinEntity = BeanMapUtils.map(orderCashinParam, OrderCashinEntity.class);
         orderCashinEntity.setOrderTime(now);
         orderCashinEntity.setStatus(0);
         orderCashinEntity.setIp(WebTools.getIpAddr(request));
@@ -148,7 +163,7 @@ public class OrderCashinService {
             String order_sn = callbackParamm.getOrder_sn();
             //解析出存款记录id
             String id = order_sn.split("G")[1];
-            OrderCashinEntity orderCashinEntity = orderCashinMapper.selectById(id);
+            OrderCashinEntity orderCashinEntity = baseMapper.selectById(id);
             if (orderCashinEntity == null) {
                 log.info("order cashin id error:{}",id);
                 return "success";
@@ -198,7 +213,7 @@ public class OrderCashinService {
         orderCashinEntity.setRealAmount(callbackParamm.getAmount());
         orderCashinEntity.setDealTime(callbackParamm.getTime()*1000);
         orderCashinEntity.setStatus(2);
-        return orderCashinMapper.update(orderCashinEntity,new UpdateWrapper<OrderCashinEntity>().ne("status",2).eq("id",orderCashinEntity.getId()));
+        return baseMapper.update(orderCashinEntity,new UpdateWrapper<OrderCashinEntity>().ne("status",2).eq("id",orderCashinEntity.getId()));
     }
 
 
