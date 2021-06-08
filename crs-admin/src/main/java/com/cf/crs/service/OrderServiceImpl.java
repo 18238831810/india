@@ -14,10 +14,7 @@ import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.common.entity.QueryPage;
 import com.cf.crs.common.exception.RenException;
 import com.cf.crs.common.utils.DateUtils;
-import com.cf.crs.entity.AccountBalanceEntity;
-import com.cf.crs.entity.CandlestickDto;
-import com.cf.crs.entity.OrderEntity;
-import com.cf.crs.entity.OrderLeverEntity;
+import com.cf.crs.entity.*;
 import com.cf.crs.mapper.OrderMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +38,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     @Autowired
     OrderLeverServiceImpl orderLeverService;
 
+    @Autowired
+    FinancialDetailsService financialDetailsService;
 
     @Autowired
     AccountBalanceService accountBalanceService;
@@ -95,6 +94,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         orderEntity.setNextStageTime(orderEntity.getEarlyStageTime() + 60000);
         orderEntity.setMarketCycle(CandlestickInterval.ONE_MINUTE.getIntervalId());
         this.save(orderEntity);
+
+        financialDetailsService.save(FinancialDetailsEntity.builder()
+                .amount((float) orderEntity.getProfit())
+                .type(3)
+                .orderTime(orderEntity.getCtime())
+                .orderSn(orderEntity.getId()+"").build());
+
         return null;
     }
 
