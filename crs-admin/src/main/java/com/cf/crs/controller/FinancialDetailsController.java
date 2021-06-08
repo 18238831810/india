@@ -25,9 +25,9 @@ public class FinancialDetailsController {
 
     @GetMapping("/list")
     @ApiOperation("资金明细列表查询")
-    public Result<PagingBase> list(FinancialDetailsDto dto){
+    public Result<PagingBase<FinancialDetailsEntity>> list(FinancialDetailsDto dto){
         PagingBase<FinancialDetailsEntity> pagingBase = financialDetailsService.list(dto);
-        return new Result<PagingBase>().ok(pagingBase);
+        return new Result<PagingBase<FinancialDetailsEntity>>().ok(pagingBase);
     }
 
 }

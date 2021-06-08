@@ -31,7 +31,7 @@ public class FinancialDetailsService extends ServiceImpl<FinancialDetailsMapper,
      * @return
      */
     public PagingBase<FinancialDetailsEntity> list(FinancialDetailsDto dto) {
-        Page<FinancialDetailsEntity> iPage = new Page(dto.getPageSize(), dto.getPageNum());
+        Page<FinancialDetailsEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
         IPage<FinancialDetailsEntity> pageList = this.page(iPage, new QueryWrapper<FinancialDetailsEntity>().eq("uid", dto.getUid())
         .eq(dto.getType() != null,"type",dto.getType()).ge(dto.getStartTime() != null,"order_time",dto.getStartTime())
         .le(dto.getEndTime() != null,"order_time",dto.getEndTime()).orderByDesc("order_time"));
