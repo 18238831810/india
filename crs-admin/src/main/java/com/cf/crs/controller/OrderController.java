@@ -85,7 +85,7 @@ public class OrderController extends BaseController {
         return new Result<>().error(200, "总条数:" + total);
     }
 
-    @PostMapping("/buyDirectLever")
+    @GetMapping("/buyDirectLever")
     @ApiOperation("赔率列表")
     public Result getSetting() {
         return new Result<>().ok(orderLeverService.getBuyDirectLever());
