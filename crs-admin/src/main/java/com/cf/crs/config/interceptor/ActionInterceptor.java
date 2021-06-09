@@ -1,10 +1,11 @@
 package com.cf.crs.config.interceptor;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cf.crs.common.exception.AuthException;
 import com.cf.util.utils.Const;
+import com.cf.util.utils.DataChange;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.asm.Advice;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author leek
@@ -73,7 +76,24 @@ public class ActionInterceptor implements HandlerInterceptor {
      */
     private boolean checkLoin(HttpServletRequest request)
     {
-        //真实使用时  ，uid应该从token中获取，不能让从参数取，防止有人恶意盗取或者使用别人的余额
+        String token =request.getHeader(Const.TOKEN);
+        String uid =request.getHeader(Const.UID);
+        log.info("token:{},uid:{}",token,uid);
+        //此行只做测试使用
+        if (TOKEN_TEMP.equalsIgnoreCase(token)) return true;
+        if(StringUtils.isEmpty(token) || StringUtils.isBlank(uid)) return false;
+        //获取用户缓存信息
+        Map<String,Object> userVerify = redisTemplate.opsForHash().entries("token_" + uid);
+        log.info("userVerify:{}", JSON.toJSONString(userVerify));
+        //改用用户存在缓存信息，并且请求的token匹配，则放行
+        if (userVerify != null  && !userVerify.isEmpty()) {
+            if (token.equals(DataChange.obToString(userVerify.get("t_token")))) {
+                redisTemplate.expire("token_" + uid,2, TimeUnit.HOURS);
+                return true;
+            }
+        }
+        return false;
+       /* //真实使用时  ，uid应该从token中获取，不能让从参数取，防止有人恶意盗取或者使用别人的余额
         String token =request.getHeader(Const.TOKEN);
         String uid =request.getHeader(Const.UID);
         log.info("token:{},uid:{}",token,uid);
@@ -95,7 +115,7 @@ public class ActionInterceptor implements HandlerInterceptor {
         }
         //此处逻辑，token中获取uid，覆盖传参中的uid，前端或者app去除请求头中或者传参中的uid
 
-        return true;
+        return true;*/
     }
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
