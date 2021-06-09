@@ -42,7 +42,10 @@ public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, Acc
                 .updateTime(System.currentTimeMillis())
                 .uid(orderEntity.getUid()).build());
         if (row <= 0)
+        {
+            log.info("-> uid->{},amount->{}",orderEntity.getUid(),orderEntity.getPayment());
             return OrderErrorEnum.ERROR_NOT_ENOUGH;
+        }
         return null;
     }
 
