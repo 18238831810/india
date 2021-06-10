@@ -19,9 +19,9 @@ spring:
     dynamic:
       datasource:
         master:
-          username: binance
-          password: Qazwsx2021@@~!
-          url: jdbc:mysql://127.0.0.1:3306/india?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+          username: chat_vip
+          password: 123456
+          url: jdbc:mysql://47.241.209.235:3306/chat_vip?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
           driver-class-name: com.mysql.cj.jdbc.Driver
           druid: # 以下参数针对每个库可以重新设置druid参数
             initial-size: 10
