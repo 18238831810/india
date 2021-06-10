@@ -69,10 +69,11 @@ public class OrderController extends BaseController {
     @ApiOperation("订单列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "pageNum", value = "页码,默认1", dataType = "int", defaultValue = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "每页显示多少条,默认15", dataType = "int", defaultValue = "15")
+            @ApiImplicitParam(name = "pageSize", value = "每页显示多少条,默认15", dataType = "int", defaultValue = "15"),
+            @ApiImplicitParam(name = "status", value = "类型（0：交易中 1：已成交 2：已撤销）不传，则是接取所有", dataType = "int", defaultValue = "15")
     })
-    public Result listOrder( QueryPage queryPage) {
-        PagingBase<OrderEntity> pagingBase = orderService.listOrder(getUid(), queryPage);
+    public Result listOrder( QueryPage queryPage,Integer status) {
+        PagingBase<OrderEntity> pagingBase = orderService.listOrder(getUid(), status,queryPage);
         return new Result<PagingBase>().ok(pagingBase);
     }
 

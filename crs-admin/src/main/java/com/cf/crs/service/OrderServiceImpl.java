@@ -8,21 +8,21 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.binance.api.client.CandlesticksCache;
 import com.binance.api.client.constant.CandlestickDto;
-import com.cf.crs.common.constant.OrderErrorEnum;
-import com.binance.api.client.domain.market.Candlestick;
 import com.binance.api.client.domain.market.CandlestickInterval;
+import com.cf.crs.common.constant.OrderErrorEnum;
 import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.common.entity.QueryPage;
 import com.cf.crs.common.exception.RenException;
 import com.cf.crs.common.utils.DateUtils;
-import com.cf.crs.entity.*;
+import com.cf.crs.entity.AccountBalanceEntity;
+import com.cf.crs.entity.OrderEntity;
+import com.cf.crs.entity.OrderLeverEntity;
 import com.cf.crs.mapper.OrderMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -283,10 +283,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
      * @param uid
      * @return
      */
-    public PagingBase<OrderEntity> listOrder(long uid, QueryPage queryPage) {
+    public PagingBase<OrderEntity> listOrder(long uid,Integer status, QueryPage queryPage) {
         Page<OrderEntity> iPage = new Page(queryPage.getPageNum(), queryPage.getPageSize());
-        IPage<OrderEntity> pageList = this.page(iPage, new QueryWrapper<OrderEntity>().eq("uid", uid).orderByDesc("ctime"));
-        return new PagingBase<OrderEntity>(pageList.getRecords(), pageList.getTotal());
+        QueryWrapper<OrderEntity> queryWrapper= new QueryWrapper<OrderEntity>().eq("uid", uid).orderByDesc("ctime");
+        if(status!=null)
+        {
+            queryWrapper.eq("status",status);
+        }
+        IPage<OrderEntity> pageList = this.page(iPage,queryWrapper);
+        return new PagingBase<>(pageList.getRecords(), pageList.getTotal());
     }
 
     /**
