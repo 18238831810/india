@@ -1,4 +1,4 @@
-package com.binance.api.client.constant;
+package com.cf.crs.common.constant;
 
 public enum OrderErrorEnum {
     ERROR_OVER_TIME(100, "超过时间，不能下单"),

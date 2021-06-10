@@ -1,6 +1,7 @@
 package com.cf.crs;
 
 import com.binance.api.client.CandlesticksCache;
+import com.binance.api.client.constant.CandlestickDto;
 import com.binance.api.client.domain.market.Candlestick;
 import com.cf.AdminApplication;
 import com.cf.crs.common.utils.Result;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
+import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AdminApplication.class)
@@ -58,7 +60,7 @@ public class OrderTest {
     public void testCandlestickBars()
     {
 
-        List<Candlestick> result=  CandlesticksCache.getInstance().getCandlestickBars(10);
+        Map<Long, CandlestickDto> result=  CandlesticksCache.getInstance().getBianaceBTCCandlesticksCache();
         Result result1=  new Result<>().ok(result);
         System.out.println(result);
     }

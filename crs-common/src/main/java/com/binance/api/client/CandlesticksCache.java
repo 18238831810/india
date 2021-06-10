@@ -1,5 +1,6 @@
 package com.binance.api.client;
 
+import com.binance.api.client.constant.CandlestickDto;
 import com.binance.api.client.domain.market.Candlestick;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import lombok.AllArgsConstructor;
@@ -7,9 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Illustrates how to use the klines/candlesticks event stream to create a local cache of bids/asks for a symbol.
@@ -21,14 +20,15 @@ public class CandlesticksCache {
      */
 
     private static CandlesticksCache candlesticksCache = null;
-    private static int maximumSize = 100;
+    private static final int maximumSize = 240;
+    private static final  String defaulSymbol="btcusdt";
     /**
      * 限制Map大小为maximumSize
      */
-    private static LinkedHashMap<Long, Candlestick> cachLinkMap = new LinkedHashMap<Long, Candlestick>() {
+    private static LinkedHashMap<Long, CandlestickDto> cachLinkMap = new LinkedHashMap<Long, CandlestickDto>() {
 
         @Override
-        protected boolean removeEldestEntry(Map.Entry<Long, Candlestick> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<Long, CandlestickDto> eldest) {
             return size() > maximumSize;
         }
     };
@@ -41,42 +41,52 @@ public class CandlesticksCache {
         return candlesticksCache;
     }
 
-    public synchronized int cache() {
-        return cache("btcusdt", CandlestickInterval.ONE_MINUTE);
+
+
+
+    private CandlestickDto toCandlestickDto(Candlestick candlestick )
+    {
+           return CandlestickDto.builder().close(candlestick.getClose())
+                    .closeTime(candlestick.getCloseTime())
+                    .high(candlestick.getHigh())
+                    .low(candlestick.getLow())
+                    .numberOfTrades(candlestick.getNumberOfTrades())
+                    .open(candlestick.getOpen())
+                    .openTime(candlestick.getOpenTime())
+                    .quoteAssetVolume(candlestick.getQuoteAssetVolume())
+                    .takerBuyBaseAssetVolume(candlestick.getTakerBuyBaseAssetVolume())
+                    .takerBuyQuoteAssetVolume(candlestick.getTakerBuyQuoteAssetVolume())
+                    .volume(candlestick.getVolume()).build();
     }
 
-
-    public int cache(String symbol, CandlestickInterval interval) {
-        return initializeCandlestickCache(symbol, interval);
-        //startCandlestickEventStreaming(symbol, interval);
-    }
-
-    /**
-     * Initializes the candlestick cache by using the REST API.
-     */
-    private int initializeCandlestickCache(String symbol, CandlestickInterval interval) {
-        List<Candlestick> candlestickBars = getCandlestickBars(symbol, interval,null);
-        int size = candlestickBars.size();
-        for (int i = (size > maximumSize ? (size - maximumSize) : 0); i < size; i++) {
-            Candlestick candlestickBar = candlestickBars.get(i);
-            cachLinkMap.put(candlestickBar.getOpenTime(), candlestickBar);
-        }
-        return size;
-    }
-
-    public List<Candlestick> getCandlestickBars(String symbol, CandlestickInterval interval,Integer size) {
+    private List<CandlestickDto> getCandlestickDtoFromBinance(String symbol, CandlestickInterval interval,Integer size) {
         BinanceApiClientFactory factory = BinanceApiClientFactory.newInstance();
         BinanceApiRestClient client = factory.newRestClient();
-        List list = client.getCandlestickBars(symbol.toUpperCase(), interval);
-        if(size==null) return list;
-        return list.size()>size?list.subList(list.size()-size,list.size()):list;
+        List<Candlestick> list = client.getCandlestickBars(symbol.toUpperCase(), interval);
+        if(size==null) return null;
+        List<CandlestickDto> result = new ArrayList<>();
+        for (int i=0;i< list.size();i++) {
+            if(i==maximumSize) break;
+            CandlestickDto candlestickDto = toCandlestickDto(list.get(i));
+            result.add(candlestickDto);
+        }
+        return result;
     }
-    public List<Candlestick> getCandlestickBars(String symbol, String interval,int size) {
-        return getCandlestickBars( symbol, getInterval(interval),size);
+
+
+    public Collection<CandlestickDto> getCandlestickDto(String symbol, CandlestickInterval interval, Integer size) {
+        if(defaulSymbol.equalsIgnoreCase(symbol) && "1m".equalsIgnoreCase(interval.getIntervalId()))
+        {
+             getBianaceBTCCandlesticksCache().values();
+        }
+        return   getCandlestickDtoFromBinance( symbol,  interval, size);
     }
-    public List<Candlestick> getCandlestickBars(Integer size) {
-        return getCandlestickBars("btcusdt", CandlestickInterval.ONE_MINUTE,size);
+
+    public Collection<CandlestickDto> getCandlestickDto(String symbol, String interval, Integer size) {
+        return getCandlestickDto( symbol,  getInterval(interval), size);
     }
+
+
     private CandlestickInterval getInterval(String inteval) {
         switch (inteval) {
             case "1m":
@@ -107,46 +117,29 @@ public class CandlesticksCache {
 
     }
 
-    /**
-     * Begins streaming of depth events.
-     */
-    private void startCandlestickEventStreaming(String symbol, CandlestickInterval interval) {
-        BinanceApiClientFactory factory = BinanceApiClientFactory.newInstance();
-        BinanceApiWebSocketClient client = factory.newWebSocketClient();
-
-        client.onCandlestickEvent(symbol.toLowerCase(), interval, response -> {
-            Long openTime = response.getOpenTime();
-            Candlestick updateCandlestick = cachLinkMap.get(openTime);
-            if (updateCandlestick == null) {
-                return;
-            }
-            updateCandlestick.setOpenTime(response.getOpenTime());
-            updateCandlestick.setOpen(response.getOpen());
-            updateCandlestick.setLow(response.getLow());
-            updateCandlestick.setHigh(response.getHigh());
-            updateCandlestick.setClose(response.getClose());
-            updateCandlestick.setCloseTime(response.getCloseTime());
-            updateCandlestick.setVolume(response.getVolume());
-            updateCandlestick.setNumberOfTrades(response.getNumberOfTrades());
-            updateCandlestick.setQuoteAssetVolume(response.getQuoteAssetVolume());
-            updateCandlestick.setTakerBuyQuoteAssetVolume(response.getTakerBuyQuoteAssetVolume());
-            updateCandlestick.setTakerBuyBaseAssetVolume(response.getTakerBuyQuoteAssetVolume());
-
-            // Store the updated candlestick in the cache
-            cachLinkMap.put(openTime, updateCandlestick);
-        });
-    }
 
     /**
      * @return a klines/candlestick cache, containing the open/start time of the candlestick as the key,
      * and the candlestick data as the value.
      */
-    public Map<Long, Candlestick> getCandlesticksCache() {
+    public Map<Long, CandlestickDto> getBianaceBTCCandlesticksCache() {
+        if(cachLinkMap.isEmpty())
+        {
+           return cacheBtcOneMinu();
+        }
+        else return cachLinkMap;
+    }
+
+    private synchronized Map<Long, CandlestickDto> cacheBtcOneMinu() {
+        List<CandlestickDto> list=   getCandlestickDtoFromBinance(defaulSymbol, CandlestickInterval.ONE_MINUTE,maximumSize);
+        for (CandlestickDto candlestickDto:list) {
+            cachLinkMap.put(candlestickDto.getOpenTime(),candlestickDto);
+        }
         return cachLinkMap;
     }
 
     public static void main(String[] args) {
-        CandlesticksCache.getInstance().getCandlestickBars(null);
+        CandlesticksCache.getInstance().getBianaceBTCCandlesticksCache();
     }
 
 }

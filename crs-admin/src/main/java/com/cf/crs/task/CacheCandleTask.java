@@ -26,6 +26,6 @@ public class CacheCandleTask  implements ITask {
      * @param params
      */
     private void cacheCandlesticks(String params) {
-        CandlesticksCache.getInstance().cache();
+        CandlesticksCache.getInstance().getBianaceBTCCandlesticksCache();
     }
 }

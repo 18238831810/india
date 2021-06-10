@@ -4,13 +4,12 @@ package com.cf.crs.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.binance.api.client.constant.OrderErrorEnum;
+import com.cf.crs.common.constant.OrderErrorEnum;
 import com.cf.crs.entity.AccountBalanceEntity;
 import com.cf.crs.entity.OrderEntity;
 import com.cf.crs.mapper.AccountBalanceMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
 /**

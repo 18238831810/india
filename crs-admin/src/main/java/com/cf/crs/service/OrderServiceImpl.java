@@ -7,7 +7,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.binance.api.client.CandlesticksCache;
-import com.binance.api.client.constant.OrderErrorEnum;
+import com.binance.api.client.constant.CandlestickDto;
+import com.cf.crs.common.constant.OrderErrorEnum;
 import com.binance.api.client.domain.market.Candlestick;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import com.cf.crs.common.entity.PagingBase;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
@@ -130,8 +132,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
      * @param timeKey
      * @return
      */
-    private Candlestick getCandlestick(Long timeKey) {
-        return CandlesticksCache.getInstance().getCandlesticksCache().get(timeKey);
+    private CandlestickDto getCandlestick(Long timeKey) {
+        return CandlesticksCache.getInstance().getBianaceBTCCandlesticksCache().get(timeKey);
     }
 
 
@@ -167,7 +169,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     }
 
     public int updateOrder(OrderEntity orderEntity, double lever) {
-        Candlestick earlyStage = getCandlestick(orderEntity.getEarlyStageTime());
+        CandlestickDto earlyStage = getCandlestick(orderEntity.getEarlyStageTime());
         if (earlyStage == null) {
             //log.warn("获取earlyStage行情时获取不到->{} id->{}", orderEntity.getEarlyStageTime(), orderEntity.getId());
             return 0;
@@ -175,7 +177,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         orderEntity.setEarlyStagePrice(getPointPrize(earlyStage.getOpen()));
         orderEntity.setEarlyStageTime(earlyStage.getOpenTime());
 
-        Candlestick nextStage = getCandlestick(orderEntity.getNextStageTime());
+        CandlestickDto nextStage = getCandlestick(orderEntity.getNextStageTime());
         if (nextStage == null) {
            // log.warn("获取nextStage行情时获取不到->{},id->{}", orderEntity.getNextStageTime(), orderEntity.getId());
             return 0;
@@ -292,23 +294,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
      *
      * @return
      */
-    public List<CandlestickDto> getCandlestickList(String symbol, String interval, int size) {
-        List<Candlestick> list = CandlesticksCache.getInstance().getCandlestickBars(symbol, interval, size);
-        List<CandlestickDto> result = new ArrayList<>();
-        for (Candlestick candlestick : list) {
-            result.add(CandlestickDto.builder().close(candlestick.getClose())
-                    .closeTime(candlestick.getCloseTime())
-                    .high(candlestick.getHigh())
-                    .low(candlestick.getLow())
-                    .numberOfTrades(candlestick.getNumberOfTrades())
-                    .open(candlestick.getOpen())
-                    .openTime(candlestick.getOpenTime())
-                    .quoteAssetVolume(candlestick.getQuoteAssetVolume())
-                    .takerBuyBaseAssetVolume(candlestick.getTakerBuyBaseAssetVolume())
-                    .takerBuyQuoteAssetVolume(candlestick.getTakerBuyQuoteAssetVolume())
-                    .volume(candlestick.getVolume()).build());
-        }
-        return result;
+    public Collection<CandlestickDto> getCandlestickList(String symbol, String interval, int size) {
+        return CandlesticksCache.getInstance().getCandlestickDto(symbol, interval, size);
+
+    }
+
+    @PostConstruct
+    public  void initCacheCandlestick()
+    {
+        log.info("===============init  binance candlestick cache stary ================");
+        Map<Long, CandlestickDto> cachLinkMap= CandlesticksCache.getInstance().getBianaceBTCCandlesticksCache();
+        log.info("cache.binance.candlestick.size->{}",cachLinkMap==null?0:cachLinkMap.size());
+        log.info("===============init  binance candlestick cache  end ================");
     }
 
 

@@ -1,4 +1,4 @@
-package com.cf.crs.entity;
+package com.binance.api.client.constant;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

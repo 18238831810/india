@@ -1,14 +1,13 @@
 package com.cf.crs.controller;
 
 import com.binance.api.client.CandlesticksCache;
-import com.binance.api.client.constant.OrderErrorEnum;
+import com.binance.api.client.constant.CandlestickDto;
+import com.cf.crs.common.constant.OrderErrorEnum;
 import com.binance.api.client.domain.market.Candlestick;
 import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.common.entity.QueryPage;
 import com.cf.crs.common.utils.Result;
-import com.cf.crs.entity.CandlestickDto;
 import com.cf.crs.entity.OrderEntity;
-import com.cf.crs.entity.OrderLeverEntity;
 import com.cf.crs.service.OrderCommissionServiceImpl;
 import com.cf.crs.service.OrderLeverServiceImpl;
 import com.cf.crs.service.OrderServiceImpl;
@@ -23,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -98,16 +98,9 @@ public class OrderController extends BaseController {
             @ApiImplicitParam(name = "interval", allowableValues = "1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d", value = "行情周期,默认1m", dataType = "String", defaultValue = "1m"),
             @ApiImplicitParam(name = "size", value = "行情条数,默认240条", dataType = "int", defaultValue = "240"),
     })
-    public Result<List<CandlestickDto>> getCandlestick(String symbol, String interval, Integer size) {
-        List<CandlestickDto> result = orderService.getCandlestickList(StringUtil.isBlank(symbol) ? "btcusdt" : symbol, StringUtil.isBlank(interval) ? "1m" : interval, size == null ? 240 : size);
-        return new Result<List<CandlestickDto>>().ok(result);
-    }
-
-    @GetMapping("/cacheCandlestick")
-    public Result<Map<Long, Candlestick>> cacheCandlestick() {
-        CandlesticksCache.getInstance().cache();
-        Map<Long, Candlestick>  map =CandlesticksCache.getInstance().getCandlesticksCache();
-        return new Result<Map<Long, Candlestick>>().ok(map);
+    public Result<Collection<CandlestickDto>> getCandlestick(String symbol, String interval, Integer size) {
+        Collection<CandlestickDto> result = orderService.getCandlestickList(StringUtil.isBlank(symbol) ? "btcusdt" : symbol, StringUtil.isBlank(interval) ? "1m" : interval, size == null ? 240 : size);
+        return new Result<Collection<CandlestickDto>>().ok(result);
     }
 
     @GetMapping("/dayprofit")
