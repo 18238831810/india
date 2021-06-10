@@ -183,7 +183,7 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
             //更新用户余额
             updateAccountBalance(orderCashinEntity);
             //新增资金明细记录
-            addFinancialDetails(callbackParamm, orderCashinEntity);
+            //addFinancialDetails(callbackParamm, orderCashinEntity);
         }
         return "success";
     }

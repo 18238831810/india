@@ -20,8 +20,15 @@ import org.springframework.stereotype.Service;
 public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, AccountBalanceEntity> implements IService<AccountBalanceEntity> {
 
 
+    /**
+     * 用户余额变动统一入口
+     * @param accountBalanceEntity
+     * @return
+     */
     public Integer updateBalance(AccountBalanceEntity accountBalanceEntity) {
-        return baseMapper.updateBalance(accountBalanceEntity);
+        if (accountBalanceEntity.getAmount() == null) return 0;
+        if (accountBalanceEntity.getAmount() < 0) return baseMapper.updateSubBalance(accountBalanceEntity);
+        else return baseMapper.updateAddBalance(accountBalanceEntity);
     }
 
     public AccountBalanceEntity getAccountBalanceByUId(long uid) {
@@ -36,7 +43,7 @@ public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, Acc
      * @throws Exception
      */
     public OrderErrorEnum updateAmountFromOrder(OrderEntity orderEntity) {
-        int row = this.updateBalanceForCashout(AccountBalanceEntity.builder()
+        int row = this.updateBalance(AccountBalanceEntity.builder()
                 .amount((float) -orderEntity.getPayment())
                 .updateTime(System.currentTimeMillis())
                 .uid(orderEntity.getUid()).build());
@@ -46,16 +53,6 @@ public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, Acc
             return OrderErrorEnum.ERROR_NOT_ENOUGH;
         }
         return null;
-    }
-
-    /**
-     * 提现更新余额
-     *
-     * @param accountBalanceEntity
-     * @return
-     */
-    public int updateBalanceForCashout(AccountBalanceEntity accountBalanceEntity) {
-        return baseMapper.updateForCashin(accountBalanceEntity);
     }
 
 }

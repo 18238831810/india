@@ -9,17 +9,17 @@ import org.apache.ibatis.annotations.Param;
 public interface AccountBalanceMapper extends BaseDao<AccountBalanceEntity> {
 
     /**
-     * 更新用户余额
+     * 用户余额加钱
      * @param accountBalanceEntity
      * @return
      */
-    Integer updateBalance(@Param("item") AccountBalanceEntity accountBalanceEntity);
+    Integer updateAddBalance(@Param("item") AccountBalanceEntity accountBalanceEntity);
 
     /**
-     * 提现更新余额
+     * 用户余额扣钱
      * @param accountBalanceEntity
      * @return
      */
-    Integer updateForCashin(@Param("item") AccountBalanceEntity accountBalanceEntity);
+    Integer updateSubBalance(@Param("item") AccountBalanceEntity accountBalanceEntity);
 
 }

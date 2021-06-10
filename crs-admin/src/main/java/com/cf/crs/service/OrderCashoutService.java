@@ -110,7 +110,7 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
         String orderSn = new StringBuilder("T").append(DateUtil.timesToDate(orderCashoutEntity.getOrderTime(),DateUtil.DEFAULT)).append("G").append(orderCashoutEntity.getId()).toString();
         orderCashoutEntity.setOrderSn(orderSn);
         //添加资金明细
-        addFinancialDetails(orderCashoutEntity);
+        //addFinancialDetails(orderCashoutEntity);
         //第三方提现
         JSONObject result = goCashout(orderCashoutEntity);
         if (result == null) throw new RenException("提现失败");
@@ -171,7 +171,7 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
         accountBalanceEntity.setUid(orderCashoutEntity.getUid());
         accountBalanceEntity.setAmount(orderCashoutEntity.getAmount());
         accountBalanceEntity.setUpdateTime(System.currentTimeMillis());
-        return accountBalanceService.updateBalanceForCashout(accountBalanceEntity);
+        return accountBalanceService.updateBalance(accountBalanceEntity);
     }
 
     private CollectionParam getCollectionParam(OrderCashoutEntity orderCashoutEntity) {
