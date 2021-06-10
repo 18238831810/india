@@ -169,7 +169,7 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
     private int updateAcountBalanceForCashout(OrderCashoutEntity orderCashoutEntity) {
         AccountBalanceEntity accountBalanceEntity = new AccountBalanceEntity();
         accountBalanceEntity.setUid(orderCashoutEntity.getUid());
-        accountBalanceEntity.setAmount(orderCashoutEntity.getAmount());
+        accountBalanceEntity.setAmount(-orderCashoutEntity.getAmount());
         accountBalanceEntity.setUpdateTime(System.currentTimeMillis());
         return accountBalanceService.updateBalance(accountBalanceEntity);
     }
