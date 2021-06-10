@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -64,9 +65,10 @@ public class CandlesticksCache {
         BinanceApiRestClient client = factory.newRestClient();
         List<Candlestick> list = client.getCandlestickBars(symbol.toUpperCase(), interval);
         if(size==null) return null;
+        int min =Math.min(maximumSize,size==null?0:size);
         List<CandlestickDto> result = new ArrayList<>();
         for (int i=0;i< list.size();i++) {
-            if(i==maximumSize) break;
+            if(i==min) break;
             CandlestickDto candlestickDto = toCandlestickDto(list.get(i));
             result.add(candlestickDto);
         }
@@ -75,11 +77,30 @@ public class CandlesticksCache {
 
 
     public Collection<CandlestickDto> getCandlestickDto(String symbol, CandlestickInterval interval, Integer size) {
+        if(size==null || size==0) return null;
         if(defaulSymbol.equalsIgnoreCase(symbol) && "1m".equalsIgnoreCase(interval.getIntervalId()))
         {
-             getBianaceBTCCandlesticksCache().values();
+            Collection<CandlestickDto> collection= getBianaceBTCCandlesticksCache().values();
+            if(size>=collection.size()) return collection;
+            else {
+               return getCandlestickDtoLimit(collection,size);
+            }
         }
         return   getCandlestickDtoFromBinance( symbol,  interval, size);
+    }
+
+    private List<CandlestickDto> getCandlestickDtoLimit(Collection<CandlestickDto> collection,int size)
+    {
+        List<CandlestickDto> list =  new ArrayList<>();
+        Iterator<CandlestickDto> iterator= collection.iterator();
+        int index=0;
+        while (iterator.hasNext())
+        {
+            list.add(iterator.next());
+            index++;
+            if(index>=size) break;
+        }
+        return list;
     }
 
     public Collection<CandlestickDto> getCandlestickDto(String symbol, String interval, Integer size) {
