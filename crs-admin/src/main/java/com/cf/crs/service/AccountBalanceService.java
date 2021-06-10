@@ -26,6 +26,7 @@ public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, Acc
      * @return
      */
     public Integer updateBalance(AccountBalanceEntity accountBalanceEntity) {
+        if (accountBalanceEntity.getUid() == null) return 0;
         if (accountBalanceEntity.getAmount() == null) return 0;
         if (accountBalanceEntity.getAmount() < 0) return baseMapper.updateSubBalance(accountBalanceEntity);
         else return baseMapper.updateAddBalance(accountBalanceEntity);
