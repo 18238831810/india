@@ -8,6 +8,7 @@ import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.common.entity.QueryPage;
 import com.cf.crs.common.utils.Result;
 import com.cf.crs.entity.OrderEntity;
+import com.cf.crs.service.CandlestickService;
 import com.cf.crs.service.OrderCommissionServiceImpl;
 import com.cf.crs.service.OrderLeverServiceImpl;
 import com.cf.crs.service.OrderServiceImpl;
@@ -38,6 +39,8 @@ public class OrderController extends BaseController {
     OrderCommissionServiceImpl orderCommissionService;
     @Autowired
     OrderLeverServiceImpl orderLeverService;
+    @Autowired
+    CandlestickService candlestickService;
 
     @PostMapping("/save")
     @ApiOperation("保存订单")
@@ -100,7 +103,7 @@ public class OrderController extends BaseController {
             @ApiImplicitParam(name = "size", value = "行情条数,默认240条", dataType = "int", defaultValue = "240"),
     })
     public Result<Collection<CandlestickDto>> getCandlestick(String symbol, String interval, Integer size) {
-        Collection<CandlestickDto> result = orderService.getCandlestickList(StringUtil.isBlank(symbol) ? "btcusdt" : symbol, StringUtil.isBlank(interval) ? "1m" : interval, size == null ? 240 : size);
+        Collection<CandlestickDto> result = candlestickService.getCandlestickList(StringUtil.isBlank(symbol) ? "btcusdt" : symbol, StringUtil.isBlank(interval) ? "1m" : interval, size == null ? 240 : size);
         return new Result<Collection<CandlestickDto>>().ok(result);
     }
 

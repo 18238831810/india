@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.binance.api.client.CandlesticksCache;
 import com.binance.api.client.constant.CandlestickDto;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import com.cf.crs.common.constant.OrderErrorEnum;
@@ -46,6 +45,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
 
     @Autowired
     AccountBalanceService accountBalanceService;
+
+    @Autowired
+    CandlestickService candlestickService;
     /**
      * 下单的三个方向常量
      */
@@ -127,15 +129,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         return df.format(BigDecimal.valueOf(Double.valueOf(number)));
     }
 
-    /**
-     * 根据实时获取当时的行情
-     *
-     * @param timeKey
-     * @return
-     */
-    private CandlestickDto getCandlestick(Long timeKey) {
-        return CandlesticksCache.getInstance().getBianaceBTCCandlesticksCache().get(timeKey);
-    }
+
 
 
     @Transactional
@@ -170,7 +164,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     }
 
     public int updateOrder(OrderEntity orderEntity, double lever) {
-        CandlestickDto earlyStage = getCandlestick(orderEntity.getEarlyStageTime());
+        CandlestickDto earlyStage = candlestickService.getCandlestick(orderEntity.getEarlyStageTime());
         if (earlyStage == null) {
             //log.warn("获取earlyStage行情时获取不到->{} id->{}", orderEntity.getEarlyStageTime(), orderEntity.getId());
             return 0;
@@ -178,7 +172,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         orderEntity.setEarlyStagePrice(getPointPrize(earlyStage.getOpen()));
         orderEntity.setEarlyStageTime(earlyStage.getOpenTime());
 
-        CandlestickDto nextStage = getCandlestick(orderEntity.getNextStageTime());
+        CandlestickDto nextStage = candlestickService.getCandlestick(orderEntity.getNextStageTime());
         if (nextStage == null) {
            // log.warn("获取nextStage行情时获取不到->{},id->{}", orderEntity.getNextStageTime(), orderEntity.getId());
             return 0;
@@ -295,24 +289,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         return new PagingBase<>(pageList.getRecords(), pageList.getTotal());
     }
 
-    /**
-     * 从币安拉取行情
-     *
-     * @return
-     */
-    public Collection<CandlestickDto> getCandlestickList(String symbol, String interval, int size) {
-        return CandlesticksCache.getInstance().getCandlestickDto(symbol, interval, size);
 
-    }
 
     @PostConstruct
     public  void initCacheCandlestick()
     {
-        log.info("===============init  binance candlestick cache stary ================");
-        Map<Long, CandlestickDto> cachLinkMap= CandlesticksCache.getInstance().getBianaceBTCCandlesticksCache();
-        log.info("cache.binance.candlestick.size->{}",cachLinkMap==null?0:cachLinkMap.size());
-        log.info("===============init  binance candlestick cache  end ================");
+        log.info("===============init  binance candlestick cache  ================");
+        candlestickService.cache();
     }
+
+
 
 
     /**

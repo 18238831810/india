@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 @Slf4j
-@Component("cacheCandleTask")
+
 public class CacheCandleTask  implements ITask {
     @Override
     public void run(String params){
