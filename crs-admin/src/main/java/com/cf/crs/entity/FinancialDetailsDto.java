@@ -25,7 +25,7 @@ public class FinancialDetailsDto extends QueryPage implements Serializable {
     /**
      * 用户ID
      */
-    @ApiModelProperty(value = "用户id",required = true)
+    @ApiModelProperty(value = "用户id",hidden = true)
     private Long uid;
 
     /**

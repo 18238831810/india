@@ -18,7 +18,7 @@ import java.io.Serializable;
 public class OrderCashoutDto extends QueryPage implements Serializable {
 
 
-    @ApiModelProperty(value = "用户ID",required = true)
+    @ApiModelProperty(value = "用户ID",hidden = true)
     private Long uid;
 
     @ApiModelProperty(value = "开始时间",required = false)

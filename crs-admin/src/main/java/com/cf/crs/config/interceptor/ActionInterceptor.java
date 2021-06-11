@@ -80,6 +80,8 @@ public class ActionInterceptor implements HandlerInterceptor {
         String uid =request.getHeader(Const.UID);
         log.info("token:{},uid:{}",token,uid);
         //此行只做测试使用
+        String uidParam = request.getParameter("uid");
+        if (StringUtils.isNotEmpty(uidParam) && !uid.equals(uidParam)) return false;
         if (TOKEN_TEMP.equalsIgnoreCase(token)) return true;
         if(StringUtils.isEmpty(token) || StringUtils.isBlank(uid)) return false;
         //获取用户缓存信息

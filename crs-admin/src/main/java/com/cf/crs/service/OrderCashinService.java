@@ -184,7 +184,7 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
             //更新用户余额
             updateAccountBalance(orderCashinEntity);
             //新增资金明细记录
-            //addFinancialDetails(callbackParamm, orderCashinEntity);
+            addFinancialDetails(callbackParamm, orderCashinEntity);
         }
         return "success";
     }
@@ -195,8 +195,8 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
      * @param orderCashinEntity
      */
     private void addFinancialDetails(OrderCallbackParam callbackParamm, OrderCashinEntity orderCashinEntity) {
-        AccountBalanceEntity accountBalanceEntity = accountBalanceService.getAccountBalanceByUId(orderCashinEntity.getUid());
-        FinancialDetailsEntity financialDetailsEntity = FinancialDetailsEntity.builder().amount(new BigDecimal(Float.toString(callbackParamm.getAmount()))).balance(accountBalanceEntity.getAmount()).
+        //AccountBalanceEntity accountBalanceEntity = accountBalanceService.getAccountBalanceByUId(orderCashinEntity.getUid());
+        FinancialDetailsEntity financialDetailsEntity = FinancialDetailsEntity.builder().amount(new BigDecimal(Float.toString(callbackParamm.getAmount()))).
                 orderSn(callbackParamm.getOrder_sn()).type(1).uid(orderCashinEntity.getUid()).orderTime(callbackParamm.getTime() * 1000).build();
         financialDetailsService.save(financialDetailsEntity);
     }

@@ -111,7 +111,7 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
         String orderSn = new StringBuilder("T").append(DateUtil.timesToDate(orderCashoutEntity.getOrderTime(),DateUtil.DEFAULT)).append("G").append(orderCashoutEntity.getId()).toString();
         orderCashoutEntity.setOrderSn(orderSn);
         //添加资金明细
-        //addFinancialDetails(orderCashoutEntity);
+        addFinancialDetails(orderCashoutEntity);
         //第三方提现
         JSONObject result = goCashout(orderCashoutEntity);
         if (result == null) throw new RenException("提现失败");
@@ -141,9 +141,9 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
      * @param orderCashoutEntity
      */
     private void addFinancialDetails(OrderCashoutEntity orderCashoutEntity) {
-        AccountBalanceEntity accountBalanceEntity = accountBalanceService.getAccountBalanceByUId(orderCashoutEntity.getUid());
+        //AccountBalanceEntity accountBalanceEntity = accountBalanceService.getAccountBalanceByUId(orderCashoutEntity.getUid());
         FinancialDetailsEntity financialDetailsEntity = FinancialDetailsEntity.builder().orderTime(System.currentTimeMillis()).orderSn(orderCashoutEntity.getOrderSn()).uid(orderCashoutEntity.getUid()).type(2).
-                balance(accountBalanceEntity.getAmount()).amount(new BigDecimal(Float.toString(orderCashoutEntity.getAmount())).negate()).build();
+                amount(new BigDecimal(Float.toString(orderCashoutEntity.getAmount())).negate()).build();
         financialDetailsService.save(financialDetailsEntity);
     }
 

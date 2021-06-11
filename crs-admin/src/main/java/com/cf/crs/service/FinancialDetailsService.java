@@ -13,6 +13,8 @@ import com.cf.crs.mapper.FinancialDetailsMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 /**
  * 资金明细
@@ -23,6 +25,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class FinancialDetailsService extends ServiceImpl<FinancialDetailsMapper, FinancialDetailsEntity> implements IService<FinancialDetailsEntity> {
 
+
+    /**
+     * 批量保存用户资金明细记录
+     * @param list
+     */
+    public void myInsertBatch(List<FinancialDetailsEntity> list){
+        baseMapper.myInsertBatch(list);
+    }
 
     /**
      * 查询用户的资金明细列表

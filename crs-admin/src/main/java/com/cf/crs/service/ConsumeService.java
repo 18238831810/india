@@ -1,11 +1,14 @@
 package com.cf.crs.service;
 
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.crs.common.exception.RenException;
 import com.cf.crs.entity.*;
+import com.cf.crs.mapper.ConsumeMapper;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
-import com.cf.util.utils.WalletDetail;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,12 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.Timestamp;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
-public class ConsumeService {
+public class ConsumeService extends ServiceImpl<ConsumeMapper, ConsumeEntity> implements IService<ConsumeEntity> {
 
 
     @Autowired
@@ -40,6 +43,9 @@ public class ConsumeService {
     @Autowired
     PlatformIncomeService platformIncomeService;
 
+    @Autowired
+    FinancialDetailsService financialDetailsService;
+
     /**
      * 赠送礼物
      * @param giveGiftDto
@@ -48,39 +54,45 @@ public class ConsumeService {
     @Transactional(rollbackFor=Exception.class)
     public ResultJson<String> userGiveGift(GiveGiftDto giveGiftDto){
         if (giveGiftDto.getCoverConsumeUserId() == null || giveGiftDto.getGiftId() == null || giveGiftDto.getGiftNum() == null) return HttpWebResult.getMonoError("请求参数异常");
-
         //加redis分布锁，防止重复点击
         String key = "userGiveGift_" + giveGiftDto.getUid() + "_" + giveGiftDto.getCoverConsumeUserId();
         String value = "userGiveGift_" + giveGiftDto.getUid();
         if(!redisTemplate.boundValueOps(key).setIfAbsent(value, 5, TimeUnit.SECONDS)) return HttpWebResult.getMonoError("请勿过于频繁操作");
-        log.info("发送礼物:{}->{}",giveGiftDto.getUid(),giveGiftDto.getCoverConsumeUserId());
+        log.info("giveGift:{}->{}",giveGiftDto.getUid(),giveGiftDto.getCoverConsumeUserId());
         try {
+            long time = System.currentTimeMillis();
             //获取打赏金额
             GiftEntity giftEntity = giftService.getById(giveGiftDto.getGiftId());
-            BigDecimal totalGold = new BigDecimal(giftEntity.getTGiftGold().toString())
-                    .multiply(new BigDecimal(giveGiftDto.getGiftNum())).setScale(2, BigDecimal.ROUND_DOWN);
+            //计算消费金额
+            BigDecimal totalGold = new BigDecimal(giftEntity.getTGiftGold().toString()).multiply(new BigDecimal(giveGiftDto.getGiftNum())).setScale(2, BigDecimal.ROUND_DOWN);
+
             //扣除用户打赏金额
-            long time = System.currentTimeMillis();
             AccountBalanceEntity userAccountBalanceEntity = AccountBalanceEntity.builder().amount(totalGold.negate()).uid(giveGiftDto.getUid()).updateTime(time).build();
             Integer integer = accountBalanceService.updateBalance(userAccountBalanceEntity);
             if (integer <= 0)  return HttpWebResult.getMonoError("余额不足!请充值");
 
             //主播增加打赏
             ExtractEntity extractEntity = extractService.getExtractEntityByType(Extract.PROJECT_TYPE_PLATFORM);
-            BigDecimal copy = totalGold.divide(new BigDecimal(100), 3, RoundingMode.HALF_UP);
-            BigDecimal fallInto = new BigDecimal("100");
-            fallInto = fallInto.subtract(new BigDecimal(extractEntity.getTExtractRatio()));
-            BigDecimal coverGold = copy.multiply(fallInto).setScale(2, BigDecimal.ROUND_DOWN);
+            //计算收益金额
+            BigDecimal coverGold = getCoverAmount(totalGold, extractEntity);
             AccountBalanceEntity coverCcountBalanceEntity = AccountBalanceEntity.builder().amount(coverGold).uid(giveGiftDto.getCoverConsumeUserId()).updateTime(time).build();
             accountBalanceService.updateBalance(coverCcountBalanceEntity);
 
+            //新增消费记录记录
+            String giftRemark = new StringBuffer(giftEntity.getTGiftName()).append("_" + giftEntity.getTGiftId() + "*").append(giveGiftDto.getGiftNum()).toString();
+            ConsumeEntity consumeEntity = ConsumeEntity.builder().uid(giveGiftDto.getUid()).coverId(giveGiftDto.getCoverConsumeUserId()).totalAmount(totalGold).coverAmount(coverGold).
+                    remark(giftRemark).type(1).createTime(time).build();
+            this.save(consumeEntity);
+
+            //新增资金明细记录
+            addFinancialDetails(giveGiftDto,totalGold,coverGold);
             //更新平台收益记录
-            BigDecimal systemGold = copy.multiply(new BigDecimal(extractEntity.getTExtractRatio()).setScale(2, BigDecimal.ROUND_DOWN));
+            /*BigDecimal systemGold = copy.multiply(new BigDecimal(extractEntity.getTExtractRatio()).setScale(2, BigDecimal.ROUND_DOWN));
             ProfitDetailEntity profitDetailEntity = ProfitDetailEntity.builder().tProfitType(WalletDetail.CHANGE_CATEGOR_GIFT).tProfitGold(systemGold).tCreateTime(new Timestamp(System.currentTimeMillis())).build();
-            profitDetailService.save(profitDetailEntity);
+            profitDetailService.save(profitDetailEntity);*/
             //更新平台总收益
-            PlatformIncomeEntity platformIncomeEntity = PlatformIncomeEntity.builder().tGold(systemGold).build();
-            platformIncomeService.updatePlatfoamIncome(platformIncomeEntity);
+           /* PlatformIncomeEntity platformIncomeEntity = PlatformIncomeEntity.builder().tGold(systemGold).build();
+            platformIncomeService.updatePlatfoamIncome(platformIncomeEntity);*/
         } catch (Exception e) {
             log.error(e.getMessage(),e);
             //发送礼物报错，则回滚
@@ -92,14 +104,28 @@ public class ConsumeService {
         return HttpWebResult.getMonoSucStr();
     }
 
-    public static void main(String[] args) {
-        BigDecimal copy = new BigDecimal("40").divide(new BigDecimal(100), 3, RoundingMode.HALF_UP);
-        System.out.println(copy);
+    private BigDecimal getCoverAmount(BigDecimal totalGold, ExtractEntity extractEntity) {
+        BigDecimal copy = totalGold.divide(new BigDecimal(100), 3, RoundingMode.HALF_UP);
         BigDecimal fallInto = new BigDecimal("100");
-        fallInto = fallInto.subtract(new BigDecimal(30));
-        System.out.println(fallInto);
-        BigDecimal coverGold = copy.multiply(fallInto).setScale(2, BigDecimal.ROUND_DOWN);
-        System.out.println(coverGold);
+        fallInto = fallInto.subtract(new BigDecimal(extractEntity.getTExtractRatio()));
+        return copy.multiply(fallInto).setScale(2, BigDecimal.ROUND_DOWN);
+    }
+
+
+    /**
+     * 新增资金明细
+     * @param giveGiftDto
+     * @param totalGold   用户赠送金币
+     * @param coverGold   主播收益金币
+     */
+    private void addFinancialDetails(GiveGiftDto giveGiftDto,BigDecimal totalGold,BigDecimal coverGold) {
+        FinancialDetailsEntity userFinancialDetailsEntity = FinancialDetailsEntity.builder().orderTime(System.currentTimeMillis()).orderSn(giveGiftDto.getUid()+"-"+giveGiftDto.getCoverConsumeUserId()).uid(giveGiftDto.getUid()).type(4).
+                amount(totalGold.negate()).build();
+        FinancialDetailsEntity coverFinancialDetailsEntity = FinancialDetailsEntity.builder().orderTime(System.currentTimeMillis()).orderSn(giveGiftDto.getUid()+"-"+giveGiftDto.getCoverConsumeUserId()).uid(giveGiftDto.getCoverConsumeUserId()).type(4).
+                amount(coverGold).build();
+        List<FinancialDetailsEntity> list = Lists.newArrayList(userFinancialDetailsEntity, coverFinancialDetailsEntity);
+        financialDetailsService.myInsertBatch(list);
+
     }
 
 }

@@ -20,7 +20,7 @@ public class OrderCashoutParam implements Serializable {
     /**
      * 用户ID
      */
-    @ApiModelProperty(value = "用户ID",required = true)
+    @ApiModelProperty(value = "用户ID",hidden = true)
     private Long uid;
 
     /**
