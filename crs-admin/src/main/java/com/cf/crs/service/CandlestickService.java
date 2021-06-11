@@ -45,7 +45,7 @@ public class CandlestickService {
         {
             sleep(4000);
         }
-        else sleep(1500);
+        else sleep(15000);
     }
     private void sleep( long time)
     {
