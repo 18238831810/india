@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -15,6 +16,7 @@ import java.util.*;
  * Illustrates how to use the klines/candlesticks event stream to create a local cache of bids/asks for a symbol.
  */
 
+@Slf4j
 public class CandlesticksCache {
     /**
      * Key is the start/open time of the candle, and the value contains candlestick date.
@@ -64,7 +66,8 @@ public class CandlesticksCache {
         BinanceApiClientFactory factory = BinanceApiClientFactory.newInstance();
         BinanceApiRestClient client = factory.newRestClient();
         List<Candlestick> list = client.getCandlestickBars(symbol.toUpperCase(), interval);
-        if(size==null) return null;
+        if(size==null  || (list==null || list.size()<=0)) return null;
+
         List<CandlestickDto> result = new ArrayList<>();
         int start =list.size()-size;
         start=start<=0?0:start;
@@ -153,9 +156,12 @@ public class CandlesticksCache {
 
     public synchronized Map<Long, CandlestickDto> cacheBtcOneMinu() {
         List<CandlestickDto> list=   getCandlestickDtoFromBinance(defaulSymbol, CandlestickInterval.ONE_MINUTE,maximumSize);
+        long time=0;
         for (CandlestickDto candlestickDto:list) {
             cachLinkMap.put(candlestickDto.getOpenTime(),candlestickDto);
+            time=candlestickDto.getOpenTime();
         }
+        log.info("最新的行情时间 ->{}",time);
         return cachLinkMap;
     }
 
