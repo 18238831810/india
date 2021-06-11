@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Service
@@ -34,10 +35,18 @@ public class CandlestickService {
             log.error(e.getMessage());
             sleep(2000);
         }finally {
-            sleep(5000);
+            sleepBySecond();
         }
     }
 
+    private void sleepBySecond()
+    {
+        if(LocalDateTime.now().getSecond()<=10)
+        {
+            sleep(3000);
+        }
+        else sleep(1000);
+    }
     private void sleep( long time)
     {
         try {
