@@ -143,7 +143,7 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
     private void addFinancialDetails(OrderCashoutEntity orderCashoutEntity) {
         AccountBalanceEntity accountBalanceEntity = accountBalanceService.getAccountBalanceByUId(orderCashoutEntity.getUid());
         FinancialDetailsEntity financialDetailsEntity = FinancialDetailsEntity.builder().orderTime(System.currentTimeMillis()).orderSn(orderCashoutEntity.getOrderSn()).uid(orderCashoutEntity.getUid()).type(2).
-                balance(accountBalanceEntity.getAmount()).amount(-orderCashoutEntity.getAmount()).build();
+                balance(accountBalanceEntity.getAmount()).amount(new BigDecimal(Float.toString(orderCashoutEntity.getAmount())).negate()).build();
         financialDetailsService.save(financialDetailsEntity);
     }
 

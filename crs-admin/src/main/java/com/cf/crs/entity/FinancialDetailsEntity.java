@@ -51,7 +51,7 @@ public class FinancialDetailsEntity implements Serializable {
      * 订单金额（金额的变化） 最多保留两位小数点
      */
     @ApiModelProperty(value = "订单金额（金额的变化） 最多保留两位小数点")
-    private Float amount;
+    private BigDecimal amount;
 
     /**
      * 订单时间
