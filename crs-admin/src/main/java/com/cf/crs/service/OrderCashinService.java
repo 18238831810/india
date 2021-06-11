@@ -31,6 +31,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -195,7 +196,7 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
      */
     private void addFinancialDetails(OrderCallbackParam callbackParamm, OrderCashinEntity orderCashinEntity) {
         AccountBalanceEntity accountBalanceEntity = accountBalanceService.getAccountBalanceByUId(orderCashinEntity.getUid());
-        FinancialDetailsEntity financialDetailsEntity = FinancialDetailsEntity.builder().amount(callbackParamm.getAmount()).balance(accountBalanceEntity.getAmount()).
+        FinancialDetailsEntity financialDetailsEntity = FinancialDetailsEntity.builder().amount(new BigDecimal(Float.toString(callbackParamm.getAmount()))).balance(accountBalanceEntity.getAmount()).
                 orderSn(callbackParamm.getOrder_sn()).type(1).uid(orderCashinEntity.getUid()).orderTime(callbackParamm.getTime() * 1000).build();
         financialDetailsService.save(financialDetailsEntity);
     }
@@ -206,7 +207,7 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
      */
     private void updateAccountBalance(OrderCashinEntity orderCashinEntity) {
         AccountBalanceEntity accountBalanceEntity = new AccountBalanceEntity();
-        accountBalanceEntity.setAmount(orderCashinEntity.getRealAmount());
+        accountBalanceEntity.setAmount(new BigDecimal(Float.toString(orderCashinEntity.getRealAmount())));
         accountBalanceEntity.setUid(orderCashinEntity.getUid());
         accountBalanceEntity.setUpdateTime(System.currentTimeMillis());
         accountBalanceService.updateBalance(accountBalanceEntity);

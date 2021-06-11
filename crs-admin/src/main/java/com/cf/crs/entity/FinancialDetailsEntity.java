@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * 资金明细
@@ -50,7 +51,7 @@ public class FinancialDetailsEntity implements Serializable {
      * 订单金额（金额的变化） 最多保留两位小数点
      */
     @ApiModelProperty(value = "订单金额（金额的变化） 最多保留两位小数点")
-    private Float amount;
+    private BigDecimal amount;
 
     /**
      * 订单时间
@@ -62,7 +63,7 @@ public class FinancialDetailsEntity implements Serializable {
      * 操作后用户余额
      */
     @ApiModelProperty(value = "订单完成后用户余额")
-    private Float balance;
+    private BigDecimal balance;
 
     /**
      * 备注

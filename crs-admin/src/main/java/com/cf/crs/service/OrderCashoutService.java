@@ -31,6 +31,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -142,7 +143,7 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
     private void addFinancialDetails(OrderCashoutEntity orderCashoutEntity) {
         AccountBalanceEntity accountBalanceEntity = accountBalanceService.getAccountBalanceByUId(orderCashoutEntity.getUid());
         FinancialDetailsEntity financialDetailsEntity = FinancialDetailsEntity.builder().orderTime(System.currentTimeMillis()).orderSn(orderCashoutEntity.getOrderSn()).uid(orderCashoutEntity.getUid()).type(2).
-                balance(accountBalanceEntity.getAmount()).amount(-orderCashoutEntity.getAmount()).build();
+                balance(accountBalanceEntity.getAmount()).amount(new BigDecimal(Float.toString(orderCashoutEntity.getAmount())).negate()).build();
         financialDetailsService.save(financialDetailsEntity);
     }
 
@@ -169,7 +170,7 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
     private int updateAcountBalanceForCashout(OrderCashoutEntity orderCashoutEntity) {
         AccountBalanceEntity accountBalanceEntity = new AccountBalanceEntity();
         accountBalanceEntity.setUid(orderCashoutEntity.getUid());
-        accountBalanceEntity.setAmount(orderCashoutEntity.getAmount());
+        accountBalanceEntity.setAmount(new BigDecimal(Float.toString(orderCashoutEntity.getAmount())).negate());
         accountBalanceEntity.setUpdateTime(System.currentTimeMillis());
         return accountBalanceService.updateBalance(accountBalanceEntity);
     }
