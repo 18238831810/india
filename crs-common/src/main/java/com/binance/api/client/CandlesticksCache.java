@@ -65,10 +65,10 @@ public class CandlesticksCache {
         BinanceApiRestClient client = factory.newRestClient();
         List<Candlestick> list = client.getCandlestickBars(symbol.toUpperCase(), interval);
         if(size==null) return null;
-        int min =Math.min(maximumSize,size==null?0:size);
         List<CandlestickDto> result = new ArrayList<>();
-        for (int i=0;i< list.size();i++) {
-            if(i==min) break;
+        int start =list.size()-maximumSize;
+        start=start<=0?0:size;
+        for (int i=start;i< list.size();i++) {
             CandlestickDto candlestickDto = toCandlestickDto(list.get(i));
             result.add(candlestickDto);
         }
