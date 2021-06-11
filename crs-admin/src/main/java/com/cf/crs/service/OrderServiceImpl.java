@@ -18,6 +18,7 @@ import com.cf.crs.entity.AccountBalanceEntity;
 import com.cf.crs.entity.OrderEntity;
 import com.cf.crs.entity.OrderLeverEntity;
 import com.cf.crs.mapper.OrderMapper;
+import com.cf.util.utils.NumberUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -195,7 +196,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         //如果是盈利了，则给总账户加钱
         if (orderEntity.getProfit() > 0) {
             AccountBalanceEntity accountBalanceEntity = accountBalanceService.getAccountBalanceByUId(orderEntity.getUid());
-            accountBalanceEntity.setAmount((float) (orderEntity.getProfit() + orderEntity.getPayment()));
+            accountBalanceEntity.setAmount(NumberUtils.add(orderEntity.getProfit(),orderEntity.getPayment()));
             accountBalanceEntity.setUpdateTime(System.currentTimeMillis());
             log.info("uid->{} profit->{}", orderEntity.getUid(), orderEntity.getProfit());
             accountBalanceService.updateBalance(accountBalanceEntity);
@@ -273,7 +274,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
             return OrderErrorEnum.ERROR_NOT_MATCH;
         }
         this.getBaseMapper().update(null, new UpdateWrapper<OrderEntity>().eq("id", orderEntity.getId()).set("status", -1));
-        accountBalanceService.updateBalance(AccountBalanceEntity.builder().amount((float) order.getPayment()).updateTime(System.currentTimeMillis()).build());
+        accountBalanceService.updateBalance(AccountBalanceEntity.builder().amount(new BigDecimal(Double.toString(order.getPayment()))).updateTime(System.currentTimeMillis()).build());
         return null;
     }
 

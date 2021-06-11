@@ -69,4 +69,28 @@ public class NumberUtils {
 		NumberFormat formatter = new DecimalFormat("#"+strDcFormat);
 		return formatter.format(srcData);
 	}
+
+	public static BigDecimal add(Object value1, Object value2){
+		//boolean result = validateParam(value1, value2);
+		BigDecimal b1 = new BigDecimal(String.valueOf(value1));
+		BigDecimal b2 = new BigDecimal(String.valueOf(value2));
+		return b1.add(b2);
+	}
+
+	private static boolean validateParam(Object value1, Object value2){
+		System.out.println("参与计算参数：value1="+value1+",value2="+value2);
+		boolean validateResult = false;
+		if(value1==null||value2==null){
+			System.out.println("参与计算参数有空值!");
+			return false;
+		}
+
+		if((value1 instanceof Integer||value1 instanceof Double
+				||value1 instanceof Float||value1 instanceof Long)&&
+				(value2 instanceof Integer||value2 instanceof Double
+						||value2 instanceof Float||value2 instanceof Long)){
+			validateResult = true;
+		}
+		return validateResult;
+	}
 }

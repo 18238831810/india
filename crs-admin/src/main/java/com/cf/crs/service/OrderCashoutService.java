@@ -31,6 +31,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -169,7 +170,7 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
     private int updateAcountBalanceForCashout(OrderCashoutEntity orderCashoutEntity) {
         AccountBalanceEntity accountBalanceEntity = new AccountBalanceEntity();
         accountBalanceEntity.setUid(orderCashoutEntity.getUid());
-        accountBalanceEntity.setAmount(-orderCashoutEntity.getAmount());
+        accountBalanceEntity.setAmount(new BigDecimal(Float.toString(orderCashoutEntity.getAmount())).negate());
         accountBalanceEntity.setUpdateTime(System.currentTimeMillis());
         return accountBalanceService.updateBalance(accountBalanceEntity);
     }

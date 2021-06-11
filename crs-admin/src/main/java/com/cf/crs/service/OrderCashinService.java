@@ -31,6 +31,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -206,7 +207,7 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
      */
     private void updateAccountBalance(OrderCashinEntity orderCashinEntity) {
         AccountBalanceEntity accountBalanceEntity = new AccountBalanceEntity();
-        accountBalanceEntity.setAmount(orderCashinEntity.getRealAmount());
+        accountBalanceEntity.setAmount(new BigDecimal(Float.toString(orderCashinEntity.getRealAmount())));
         accountBalanceEntity.setUid(orderCashinEntity.getUid());
         accountBalanceEntity.setUpdateTime(System.currentTimeMillis());
         accountBalanceService.updateBalance(accountBalanceEntity);

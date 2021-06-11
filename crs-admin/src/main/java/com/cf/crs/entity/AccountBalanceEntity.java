@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 /**
  * 用户余额表
  */
@@ -34,7 +36,7 @@ public class AccountBalanceEntity {
      * 用户总金额
      */
     @ApiModelProperty(value = "用户总金额")
-    private Float amount;
+    private BigDecimal amount;
 
     /**
      * 更新时间

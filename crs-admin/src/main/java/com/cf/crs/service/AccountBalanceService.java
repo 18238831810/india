@@ -11,6 +11,8 @@ import com.cf.crs.mapper.AccountBalanceMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 
 /**
  * 用户余额表
@@ -28,8 +30,8 @@ public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, Acc
     public Integer updateBalance(AccountBalanceEntity accountBalanceEntity) {
         if (accountBalanceEntity.getUid() == null) return 0;
         if (accountBalanceEntity.getAmount() == null) return 0;
-        if (accountBalanceEntity.getAmount() < 0) {
-            accountBalanceEntity.setAmount(-accountBalanceEntity.getAmount());
+        if (accountBalanceEntity.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            accountBalanceEntity.setAmount(accountBalanceEntity.getAmount().negate());
             return baseMapper.updateSubBalance(accountBalanceEntity);
         }
         else return baseMapper.updateAddBalance(accountBalanceEntity);
@@ -48,7 +50,7 @@ public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, Acc
      */
     public OrderErrorEnum updateAmountFromOrder(OrderEntity orderEntity) {
         int row = this.updateBalance(AccountBalanceEntity.builder()
-                .amount((float) -orderEntity.getPayment())
+                .amount(new BigDecimal(Double.toString(orderEntity.getPayment())).negate())
                 .updateTime(System.currentTimeMillis())
                 .uid(orderEntity.getUid()).build());
         if (row <= 0)
