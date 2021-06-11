@@ -66,8 +66,8 @@ public class CandlesticksCache {
         List<Candlestick> list = client.getCandlestickBars(symbol.toUpperCase(), interval);
         if(size==null) return null;
         List<CandlestickDto> result = new ArrayList<>();
-        int start =list.size()-maximumSize;
-        start=start<=0?0:size;
+        int start =list.size()-size;
+        start=start<=0?0:start;
         for (int i=start;i< list.size();i++) {
             CandlestickDto candlestickDto = toCandlestickDto(list.get(i));
             result.add(candlestickDto);
