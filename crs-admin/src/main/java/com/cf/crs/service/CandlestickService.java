@@ -41,11 +41,11 @@ public class CandlestickService {
 
     private void sleepBySecond()
     {
-        if(LocalDateTime.now().getSecond()<=15)
+        if(LocalDateTime.now().getSecond()<=10)
         {
-            sleep(4000);
+            sleep(3000);
         }
-        else sleep(15000);
+        else sleep(10000);
     }
     private void sleep( long time)
     {
