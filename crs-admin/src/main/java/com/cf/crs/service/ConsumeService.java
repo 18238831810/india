@@ -5,17 +5,16 @@ import com.cf.crs.common.exception.RenException;
 import com.cf.crs.entity.*;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
-import com.cf.util.utils.DataChange;
+import com.cf.util.utils.WalletDetail;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.sound.midi.Soundbank;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Timestamp;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -34,6 +33,12 @@ public class ConsumeService {
 
     @Autowired
     AccountBalanceService accountBalanceService;
+
+    @Autowired
+    ProfitDetailService profitDetailService;
+
+    @Autowired
+    PlatformIncomeService platformIncomeService;
 
     /**
      * 赠送礼物
@@ -68,6 +73,14 @@ public class ConsumeService {
             BigDecimal coverGold = copy.multiply(fallInto).setScale(2, BigDecimal.ROUND_DOWN);
             AccountBalanceEntity coverCcountBalanceEntity = AccountBalanceEntity.builder().amount(coverGold).uid(giveGiftDto.getCoverConsumeUserId()).updateTime(time).build();
             accountBalanceService.updateBalance(coverCcountBalanceEntity);
+
+            //更新平台收益记录
+            BigDecimal systemGold = copy.multiply(new BigDecimal(extractEntity.getTExtractRatio()).setScale(2, BigDecimal.ROUND_DOWN));
+            ProfitDetailEntity profitDetailEntity = ProfitDetailEntity.builder().tProfitType(WalletDetail.CHANGE_CATEGOR_GIFT).tProfitGold(systemGold).tCreateTime(new Timestamp(System.currentTimeMillis())).build();
+            profitDetailService.save(profitDetailEntity);
+            //更新平台总收益
+            PlatformIncomeEntity platformIncomeEntity = PlatformIncomeEntity.builder().tGold(systemGold).build();
+            platformIncomeService.updatePlatfoamIncome(platformIncomeEntity);
         } catch (Exception e) {
             log.error(e.getMessage(),e);
             //发送礼物报错，则回滚
@@ -77,6 +90,16 @@ public class ConsumeService {
             redisTemplate.expire(key, -1, TimeUnit.MICROSECONDS);
         }
         return HttpWebResult.getMonoSucStr();
+    }
+
+    public static void main(String[] args) {
+        BigDecimal copy = new BigDecimal("40").divide(new BigDecimal(100), 3, RoundingMode.HALF_UP);
+        System.out.println(copy);
+        BigDecimal fallInto = new BigDecimal("100");
+        fallInto = fallInto.subtract(new BigDecimal(30));
+        System.out.println(fallInto);
+        BigDecimal coverGold = copy.multiply(fallInto).setScale(2, BigDecimal.ROUND_DOWN);
+        System.out.println(coverGold);
     }
 
 }

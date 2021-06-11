@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cf.crs.mapper.PlatformIncomeMapper">
+
+   <insert id="updatePlatfoamIncome">
+       INSERT INTO `t_platform_income`(`t_id`,`t_gold`)
+       VALUES (1,#{item.tGold})
+       ON DUPLICATE KEY UPDATE
+       `t_gold` = (`t_gold` + VALUES(t_gold))
+   </insert>
+
+
+</mapper>
