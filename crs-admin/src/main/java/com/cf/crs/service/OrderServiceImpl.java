@@ -17,6 +17,7 @@ import com.cf.crs.entity.AccountBalanceEntity;
 import com.cf.crs.entity.OrderEntity;
 import com.cf.crs.entity.OrderLeverEntity;
 import com.cf.crs.mapper.OrderMapper;
+import com.cf.util.utils.Const;
 import com.cf.util.utils.NumberUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
      * 下单的三个方向常量
      */
     private final static List<String> buyDirect = Arrays.asList("rise", "fall", "equal");
-    /**
-     * 多久之内可以下单
-     */
-    private final static long LIMIT_TIME = 40;
+
 
     @Transactional
     public OrderErrorEnum saveUserOrder(OrderEntity orderEntity) throws RenException {
@@ -70,7 +68,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
 
     private OrderErrorEnum filterParam(OrderEntity orderEntity) {
         int second = LocalDateTime.now().getSecond();
-        if (second >= LIMIT_TIME) {
+        if (second >= Const.LIMIT_TIME) {
             log.warn("已经过时了 second->{},uid->{}", second, orderEntity.getUid());
             return OrderErrorEnum.ERROR_OVER_TIME;
         }

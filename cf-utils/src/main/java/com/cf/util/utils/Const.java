@@ -26,6 +26,11 @@ public class Const {
 	 */
 	public static  final  String UID ="uid";
 
+	/**
+	 * 多久之内可以下单
+	 */
+	public final static long LIMIT_TIME = 40;
+
 
 
 }

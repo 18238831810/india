@@ -12,6 +12,7 @@ import com.cf.crs.service.CandlestickService;
 import com.cf.crs.service.OrderCommissionServiceImpl;
 import com.cf.crs.service.OrderLeverServiceImpl;
 import com.cf.crs.service.OrderServiceImpl;
+import com.cf.util.utils.Const;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -117,5 +119,15 @@ public class OrderController extends BaseController {
         List<Map<String, Object>> result = orderService.getProfitByDay(start,end,getUid());
         return new Result<>().ok(result);
     }
+
+    @GetMapping("/systime")
+    @ApiOperation("系统时间")
+    public Result<Map<String,Object>> systemTimeSetting() {
+        Map<String,Object> map = new HashMap();
+        map.put("time",System.currentTimeMillis());
+        map.put("limit_second", Const.LIMIT_TIME);
+        return new Result<Map<String, Object>>().ok(map);
+    }
+
 
 }
