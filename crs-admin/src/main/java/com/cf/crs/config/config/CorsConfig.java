@@ -16,20 +16,16 @@ import org.springframework.web.util.pattern.PathPatternParser;
 @Configuration
 public class CorsConfig {
 
-    public CorsConfiguration buildConfig() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.addAllowedOrigin("*");
-        corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.addAllowedMethod("*");
-        corsConfiguration.setMaxAge(36000L);
-        return corsConfiguration;
-    }
 
     @Bean
-    public CorsWebFilter corsFilter() {
-        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource(new PathPatternParser());
-        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", buildConfig());
-        return new CorsWebFilter(urlBasedCorsConfigurationSource);
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("*");
+        config.setAllowCredentials(true);
+        config.addAllowedMethod("*");
+        config.addAllowedHeader("*");
+        org.springframework.web.cors.UrlBasedCorsConfigurationSource configSource = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        configSource.registerCorsConfiguration("/**", config);
+        return new CorsFilter(configSource);
     }
 }
