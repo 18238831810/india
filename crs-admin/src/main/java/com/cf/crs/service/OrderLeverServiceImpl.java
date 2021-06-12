@@ -35,6 +35,7 @@ public class OrderLeverServiceImpl extends ServiceImpl<OrderLeverMapper, OrderLe
         return getOrderLeverMap(0);
     }
 
+
     public Map<String, OrderLeverEntity> getOrderCommission() {
         return getOrderLeverMap(2);
     }

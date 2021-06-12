@@ -24,10 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Api(tags = "订单操作")
 @RestController
@@ -92,9 +89,13 @@ public class OrderController extends BaseController {
     }
 
     @GetMapping("/buyDirectLever")
-    @ApiOperation("赔率列表")
+    @ApiOperation("赔率+系统时间")
     public Result getSetting() {
-        return new Result<>().ok(orderLeverService.getBuyDirectLever());
+        Map map1 = orderLeverService.getBuyDirectLever();
+        Map<String,Object> map2 = new HashMap<>();
+        map2.put("time",System.currentTimeMillis());
+        map2.put("limit_second", Const.LIMIT_TIME);
+        return new Result<>().ok(Arrays.asList(map1,map2));
     }
 
     @GetMapping("/candlestick")
@@ -120,14 +121,6 @@ public class OrderController extends BaseController {
         return new Result<>().ok(result);
     }
 
-    @GetMapping("/systime")
-    @ApiOperation("系统时间")
-    public Result<Map<String,Object>> systemTimeSetting() {
-        Map<String,Object> map = new HashMap();
-        map.put("time",System.currentTimeMillis());
-        map.put("limit_second", Const.LIMIT_TIME);
-        return new Result<Map<String, Object>>().ok(map);
-    }
 
 
 }
