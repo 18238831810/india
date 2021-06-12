@@ -91,11 +91,24 @@ public class OrderController extends BaseController {
     @GetMapping("/buyDirectLever")
     @ApiOperation("赔率+系统时间")
     public Result getSetting() {
+        return new Result<>().ok(concatMap());
+    }
+
+
+    private Map<String,Object> concatMap()
+    {
         Map map1 = orderLeverService.getBuyDirectLever();
-        Map<String,Object> map2 = new HashMap<>();
-        map2.put("time",System.currentTimeMillis());
-        map2.put("limit_second", Const.LIMIT_TIME);
-        return new Result<>().ok(Arrays.asList(map1,map2));
+        Map<String,Object> map2 = new HashMap<String,Object>()
+        {{
+                put("time",System.currentTimeMillis());
+                put("limit_second", Const.LIMIT_TIME);
+        }};
+        return new HashMap<String,Object>()
+        {{
+            putAll(map1);
+            put("system",map2);
+        }};
+
     }
 
     @GetMapping("/candlestick")
