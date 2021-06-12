@@ -29,9 +29,9 @@ public class OrderCashoutController {
     @Autowired
     AccountBalanceService accountBalanceService;
 
-    @PostMapping("/getAccountBalanceByUId")
+    @GetMapping("/getAccountBalanceByUId")
     @ApiOperation("获取用户余额")
-    public ResultJson<AccountBalanceEntity> getAccountBalanceByUId(long uid){
+    public ResultJson<AccountBalanceEntity> getAccountBalanceByUId(Long uid){
         return HttpWebResult.getMonoSucResult(accountBalanceService.getAccountBalanceByUId(uid));
     }
 
