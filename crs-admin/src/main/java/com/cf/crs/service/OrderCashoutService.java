@@ -88,10 +88,26 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
      * @return
      */
     public ResultJson<String> order(OrderCashoutParam orderCashoutParam){
+        ResultJson<String> vaResult = vaOrderCashoutParam(orderCashoutParam);
+        if (vaResult != null) return vaResult;
         OrderCashoutEntity orderCashoutEntity = getOrderCashinEntity(orderCashoutParam);
         //保存订单数据
         baseMapper.insert(orderCashoutEntity);
         return HttpWebResult.getMonoSucStr();
+    }
+
+    /**
+     * 验证提现参数
+     * @param orderCashoutParam
+     * @return
+     */
+    private ResultJson<String> vaOrderCashoutParam(OrderCashoutParam orderCashoutParam) {
+        if (orderCashoutParam.getAmount() == null) return HttpWebResult.getMonoError("请输入提现金额");
+        if (StringUtils.isEmpty(orderCashoutParam.getPayerAccount())) return HttpWebResult.getMonoError("请输入收款人账号");
+        if (StringUtils.isEmpty(orderCashoutParam.getPayerMobile())) return HttpWebResult.getMonoError("请输入收款人手机号");
+        if (StringUtils.isEmpty(orderCashoutParam.getPayerName())) return HttpWebResult.getMonoError("请输入收款人名称");
+        if (orderCashoutParam.getPaymentId() == 3 && StringUtils.isEmpty(orderCashoutParam.getPayerIfsc())) return HttpWebResult.getMonoError("请输入IFSC编码");
+        return null;
     }
 
     /**

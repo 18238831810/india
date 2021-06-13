@@ -89,6 +89,8 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
      */
     @Transactional(rollbackFor = Exception.class)
     public ResultJson<String> order(OrderCashinParam orderCashinParam){
+        if (orderCashinParam.getAmount() == null) return HttpWebResult.getMonoError("请输入存款金额");
+
         long now = System.currentTimeMillis();
         //获取订单数据
         OrderCashinEntity orderCashinEntity = getOrderCashinEntity(orderCashinParam, now);
