@@ -187,7 +187,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     private void updateBalance(OrderEntity orderEntity) {
         //如果是盈利了，则给总账户加钱
         if (orderEntity.getProfit() > 0) {
-            AccountBalanceEntity accountBalanceEntity = accountBalanceService.getAccountBalanceByUId(orderEntity.getUid());
+            AccountBalanceEntity accountBalanceEntity = accountBalanceService.getById(orderEntity.getUid());
             accountBalanceEntity.setAmount(NumberUtils.add(orderEntity.getProfit(),orderEntity.getPayment()));
             accountBalanceEntity.setUpdateTime(System.currentTimeMillis());
             log.info("uid->{} profit->{}", orderEntity.getUid(), orderEntity.getProfit());

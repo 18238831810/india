@@ -8,6 +8,8 @@ import com.cf.crs.common.constant.OrderErrorEnum;
 import com.cf.crs.entity.AccountBalanceEntity;
 import com.cf.crs.entity.OrderEntity;
 import com.cf.crs.mapper.AccountBalanceMapper;
+import com.cf.util.http.HttpWebResult;
+import com.cf.util.http.ResultJson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -37,8 +39,10 @@ public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, Acc
         else return baseMapper.updateAddBalance(accountBalanceEntity);
     }
 
-    public AccountBalanceEntity getAccountBalanceByUId(long uid) {
-        return baseMapper.selectOne(new QueryWrapper<AccountBalanceEntity>().eq("uid", uid));
+    public ResultJson<AccountBalanceEntity> getAccountBalanceByUId(long uid) {
+        AccountBalanceEntity accountBalanceEntity = baseMapper.selectOne(new QueryWrapper<AccountBalanceEntity>().eq("uid", uid));
+        if (accountBalanceEntity != null) return HttpWebResult.getMonoSucResult(accountBalanceEntity);
+        return HttpWebResult.getMonoSucResult(AccountBalanceEntity.builder().amount(BigDecimal.ZERO).build());
     }
 
     /**

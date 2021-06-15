@@ -31,7 +31,7 @@ public class OrderCashoutController {
     @ApiOperation("获取用户余额")
     public ResultJson<AccountBalanceEntity> getAccountBalanceByUId(Long uid){
         //return HttpWebResult.getMonoError(MsgError.AUTH_FAIL);
-        return HttpWebResult.getMonoSucResult(accountBalanceService.getAccountBalanceByUId(uid));
+        return accountBalanceService.getAccountBalanceByUId(uid);
     }
 
     @PostMapping("/order")
