@@ -55,8 +55,7 @@ public class MessageUtil {
      */
     public static String get(String pvsKey) {
         try {
-            String message = messageSource.getMessage(pvsKey, null,  LocaleContextHolder.getLocale());
-            return message;
+            return messageSource.getMessage(pvsKey, null,  LocaleContextHolder.getLocale());
         } catch (Exception e) {
             return pvsKey;
         }

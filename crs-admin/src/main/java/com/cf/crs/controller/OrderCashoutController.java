@@ -1,6 +1,7 @@
 package com.cf.crs.controller;
 
 
+import com.cf.crs.common.constant.MsgError;
 import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.common.utils.Result;
 import com.cf.crs.entity.*;
@@ -29,7 +30,8 @@ public class OrderCashoutController {
     @GetMapping("/getAccountBalanceByUId")
     @ApiOperation("获取用户余额")
     public ResultJson<AccountBalanceEntity> getAccountBalanceByUId(Long uid){
-        return HttpWebResult.getMonoSucResult(accountBalanceService.getAccountBalanceByUId(uid));
+        return HttpWebResult.getMonoError(MsgError.AUTH_FAIL);
+        //return HttpWebResult.getMonoSucResult(accountBalanceService.getAccountBalanceByUId(uid));
     }
 
     @PostMapping("/order")

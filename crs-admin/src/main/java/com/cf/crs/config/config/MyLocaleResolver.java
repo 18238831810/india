@@ -1,5 +1,6 @@
 package com.cf.crs.config.config;
 
+import com.cf.util.utils.LocalEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -14,6 +15,7 @@ public class MyLocaleResolver implements LocaleResolver {
         String newLocale = request.getParameter("lang");
         if (StringUtils.isEmpty(newLocale)) newLocale = request.getHeader("lang");
         if (StringUtils.isEmpty(newLocale)) newLocale = "en_IN";
+        newLocale = LocalEnum.get(newLocale).getLocal();
         return org.springframework.util.StringUtils.parseLocaleString(newLocale);
     }
 
