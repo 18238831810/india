@@ -3,6 +3,7 @@ package com.cf.crs.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cf.crs.common.constant.MsgError;
 import com.cf.crs.common.exception.RenException;
 import com.cf.crs.entity.*;
 import com.cf.crs.mapper.ConsumeMapper;
@@ -15,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.crypto.MacSpi;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -53,11 +55,11 @@ public class ConsumeService extends ServiceImpl<ConsumeMapper, ConsumeEntity> im
      */
     @Transactional(rollbackFor=Exception.class)
     public ResultJson<String> userGiveGift(GiveGiftDto giveGiftDto){
-        if (giveGiftDto.getCoverConsumeUserId() == null || giveGiftDto.getGiftId() == null || giveGiftDto.getGiftNum() == null) return HttpWebResult.getMonoError("请求参数异常");
+        if (giveGiftDto.getCoverConsumeUserId() == null || giveGiftDto.getGiftId() == null || giveGiftDto.getGiftNum() == null) return HttpWebResult.getMonoError(MsgError.PARAM_ERROR);
         //加redis分布锁，防止重复点击
         String key = "userGiveGift_" + giveGiftDto.getUid() + "_" + giveGiftDto.getCoverConsumeUserId();
         String value = "userGiveGift_" + giveGiftDto.getUid();
-        if(!redisTemplate.boundValueOps(key).setIfAbsent(value, 5, TimeUnit.SECONDS)) return HttpWebResult.getMonoError("请勿过于频繁操作");
+        if(!redisTemplate.boundValueOps(key).setIfAbsent(value, 5, TimeUnit.SECONDS)) return HttpWebResult.getMonoError(MsgError.REQUEST_FREQUENTLY);
         log.info("giveGift:{}->{}",giveGiftDto.getUid(),giveGiftDto.getCoverConsumeUserId());
         try {
             long time = System.currentTimeMillis();
@@ -69,7 +71,7 @@ public class ConsumeService extends ServiceImpl<ConsumeMapper, ConsumeEntity> im
             //扣除用户打赏金额
             AccountBalanceEntity userAccountBalanceEntity = AccountBalanceEntity.builder().amount(totalGold.negate()).uid(giveGiftDto.getUid()).updateTime(time).build();
             Integer integer = accountBalanceService.updateBalance(userAccountBalanceEntity);
-            if (integer <= 0)  return HttpWebResult.getMonoError("余额不足!请充值");
+            if (integer <= 0)  return HttpWebResult.getMonoError(MsgError.BALANCE_NOT_ENOUGH);
 
             //主播增加打赏
             ExtractEntity extractEntity = extractService.getExtractEntityByType(Extract.PROJECT_TYPE_PLATFORM);
@@ -96,7 +98,7 @@ public class ConsumeService extends ServiceImpl<ConsumeMapper, ConsumeEntity> im
         } catch (Exception e) {
             log.error(e.getMessage(),e);
             //发送礼物报错，则回滚
-            throw new RenException("发送礼物失败");
+            throw new RenException(MsgError.SEND_FAIL);
         }finally {
             //释放锁
             redisTemplate.expire(key, -1, TimeUnit.MICROSECONDS);

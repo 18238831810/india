@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cf.crs.common.constant.MsgError;
 import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.common.exception.RenException;
 import com.cf.crs.common.utils.BeanMapUtils;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import javax.crypto.MacSpi;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.List;
@@ -102,11 +104,11 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
      * @return
      */
     private ResultJson<String> vaOrderCashoutParam(OrderCashoutParam orderCashoutParam) {
-        if (orderCashoutParam.getAmount() == null) return HttpWebResult.getMonoError("请输入提现金额");
-        if (StringUtils.isEmpty(orderCashoutParam.getPayerAccount())) return HttpWebResult.getMonoError("请输入收款人账号");
-        if (StringUtils.isEmpty(orderCashoutParam.getPayerMobile())) return HttpWebResult.getMonoError("请输入收款人手机号");
-        if (StringUtils.isEmpty(orderCashoutParam.getPayerName())) return HttpWebResult.getMonoError("请输入收款人名称");
-        if (orderCashoutParam.getPaymentId() == 3 && StringUtils.isEmpty(orderCashoutParam.getPayerIfsc())) return HttpWebResult.getMonoError("请输入IFSC编码");
+        if (orderCashoutParam.getAmount() == null) return HttpWebResult.getMonoError(MsgError.CASHOUT_AMOUNT_EMPTY);
+        if (StringUtils.isEmpty(orderCashoutParam.getPayerAccount())) return HttpWebResult.getMonoError(MsgError.CASHOUT_ACCOUNT_EMPTY);
+        if (StringUtils.isEmpty(orderCashoutParam.getPayerMobile())) return HttpWebResult.getMonoError(MsgError.CASHOUT_PHONE_EMPTY);
+        if (StringUtils.isEmpty(orderCashoutParam.getPayerName())) return HttpWebResult.getMonoError(MsgError.CASHOUT_NAME_EMPTY);
+        if (orderCashoutParam.getPaymentId() == 3 && StringUtils.isEmpty(orderCashoutParam.getPayerIfsc())) return HttpWebResult.getMonoError(MsgError.CASHOUT_IFSC_EMPTY);
         return null;
     }
 
@@ -118,11 +120,11 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
     public ResultJson<String> approve(Long id){
         //更新审批状态
         int update = baseMapper.update(null, new UpdateWrapper<OrderCashoutEntity>().eq("id", id).eq("approve_status", 0).set("approve_status", 1));
-        if (update == 0) throw new RenException("此提案不存在或者已审批");
+        if (update == 0) throw new RenException(MsgError.CASHOUT_APPROVE_EXIST);
         OrderCashoutEntity orderCashoutEntity = baseMapper.selectById(id);
         //更改余额
         int i = updateAcountBalanceForCashout(orderCashoutEntity);
-        if (i == 0) throw new RenException("用户提款金额不足,审批失败");
+        if (i == 0) throw new RenException(MsgError.CASHOUT_APPROVE_AMOUNT_FAIL);
         //获取组装订单号
         String orderSn = new StringBuilder("T").append(DateUtil.timesToDate(orderCashoutEntity.getOrderTime(),DateUtil.DEFAULT)).append("G").append(orderCashoutEntity.getId()).toString();
         orderCashoutEntity.setOrderSn(orderSn);
@@ -130,7 +132,7 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
         addFinancialDetails(orderCashoutEntity);
         //第三方提现
         JSONObject result = goCashout(orderCashoutEntity);
-        if (result == null) throw new RenException("提现失败");
+        if (result == null) throw new RenException(MsgError.CASHOUT_APPROVE_FAIL);
         if (result.getInteger("code") == 1) return HttpWebResult.getMonoSucStr();
         throw new RenException(result.getString("msg"));
     }

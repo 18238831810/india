@@ -8,12 +8,14 @@
 
 package com.cf.crs.config.exception;
 
+import com.cf.crs.common.constant.MsgError;
 import com.cf.crs.common.exception.AuthException;
 import com.cf.crs.common.exception.ErrorCode;
 import com.cf.crs.common.exception.RenException;
 import com.cf.crs.common.utils.Result;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
+import com.cf.util.utils.MessageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -37,7 +39,7 @@ public class RenExceptionHandler {
 	 */
 	@ExceptionHandler(AuthException.class)
 	public ResultJson handleRenException(AuthException ex){
-		return HttpWebResult.getMonoError(ErrorCode.FORBIDDEN,"权限不足");
+		return HttpWebResult.getMonoError(ErrorCode.FORBIDDEN, MsgError.AUTH_FAIL);
 	}
 
 
@@ -46,7 +48,9 @@ public class RenExceptionHandler {
 	 */
 	@ExceptionHandler(RenException.class)
 	public ResultJson handleRenException(RenException ex){
-		return HttpWebResult.getMonoError(ex.getCode(),ex.getMsg());
+		String msg = ex.getMsg();
+		if (msg.startsWith("msg_")) msg = MessageUtil.get(msg);
+		return HttpWebResult.getMonoError(ex.getCode(),msg);
 	}
 
 	/**

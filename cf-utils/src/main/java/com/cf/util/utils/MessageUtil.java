@@ -2,6 +2,7 @@ package com.cf.util.utils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +13,17 @@ import java.util.Map;
  * 2019/3/29
  **/
 public class MessageUtil {
+
+    private static MessageSource messageSource;
+
+    public static void setMessageSource(MessageSource source) {
+        messageSource = source;
+    }
+
+    public MessageUtil() {
+        super();
+        //this.messageSource = messageSource;
+    }
 
     private static final ThreadLocal<Map<String,String>> threadLocal = new ThreadLocal<>();
 
@@ -36,6 +48,18 @@ public class MessageUtil {
 	 */
     public static String getMessage(MessageSource messageSource,String message,Object[] args){
         return messageSource.getMessage(message,args, org.springframework.util.StringUtils.parseLocale(getLang()));
+    }
+
+    /**
+     * 获取单个国际化翻译值
+     */
+    public static String get(String pvsKey) {
+        try {
+            String message = messageSource.getMessage(pvsKey, null,  LocaleContextHolder.getLocale());
+            return message;
+        } catch (Exception e) {
+            return pvsKey;
+        }
     }
 
     /**
