@@ -1,19 +1,24 @@
 package com.cf.crs.controller;
 
 
-import com.cf.crs.common.constant.MsgError;
 import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.common.utils.Result;
-import com.cf.crs.entity.*;
+import com.cf.crs.entity.AccountBalanceEntity;
+import com.cf.crs.entity.OrderCashoutDto;
+import com.cf.crs.entity.OrderCashoutEntity;
+import com.cf.crs.entity.OrderCashoutParam;
 import com.cf.crs.service.AccountBalanceService;
 import com.cf.crs.service.OrderCashoutService;
-import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Slf4j
 @Api(tags="提现")
@@ -29,8 +34,7 @@ public class OrderCashoutController {
 
     @GetMapping("/getAccountBalanceByUId")
     @ApiOperation("获取用户余额")
-    public ResultJson<AccountBalanceEntity> getAccountBalanceByUId(Long uid){
-        //return HttpWebResult.getMonoError(MsgError.AUTH_FAIL);
+    public ResultJson<AccountBalanceEntity> getAccountBalanceByUId(@ApiIgnore Long uid){
         return accountBalanceService.getAccountBalanceByUId(uid);
     }
 
