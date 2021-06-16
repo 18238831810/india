@@ -26,11 +26,11 @@ public class HttpWebResult {
 
 
     public static ResultJson getMonoSucResult(String msg, Object data) {
-        return getMonoResult(200, msg, data);
+        return getMonoResult(0, msg, data);
     }
 
     public static ResultJson getMonoSucResult(Object data) {
-        return getMonoResult(200, "success", data);
+        return getMonoResult(0, "success", data);
     }
 
     public static ResultJson getMonoError(int code,String errorMsg)
@@ -44,7 +44,7 @@ public class HttpWebResult {
     }
     public static ResultJson getMonoSucStr()
     {
-        return getMonoResult(200, "success", null);
+        return getMonoResult(0, "success", null);
     }
 
     /****
