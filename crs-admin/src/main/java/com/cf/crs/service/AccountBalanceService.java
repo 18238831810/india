@@ -39,10 +39,14 @@ public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, Acc
         else return baseMapper.updateAddBalance(accountBalanceEntity);
     }
 
-    public ResultJson<AccountBalanceEntity> getAccountBalanceByUId(long uid) {
-        AccountBalanceEntity accountBalanceEntity = baseMapper.selectOne(new QueryWrapper<AccountBalanceEntity>().eq("uid", uid));
+    public ResultJson<AccountBalanceEntity> getAccountBalanceByUId(Long uid) {
+        AccountBalanceEntity accountBalanceEntity = getAccountBalanceByUid(uid);
         if (accountBalanceEntity != null) return HttpWebResult.getMonoSucResult(accountBalanceEntity);
         return HttpWebResult.getMonoSucResult(AccountBalanceEntity.builder().amount(BigDecimal.ZERO).build());
+    }
+
+    public AccountBalanceEntity getAccountBalanceByUid(Long uid) {
+        return baseMapper.selectOne(new QueryWrapper<AccountBalanceEntity>().eq("uid", uid));
     }
 
     /**
