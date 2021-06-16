@@ -42,7 +42,7 @@ public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, Acc
     public ResultJson<AccountBalanceEntity> getAccountBalanceByUId(Long uid) {
         AccountBalanceEntity accountBalanceEntity = getAccountBalanceByUid(uid);
         if (accountBalanceEntity != null) return HttpWebResult.getMonoSucResult(accountBalanceEntity);
-        return HttpWebResult.getMonoSucResult(AccountBalanceEntity.builder().amount(BigDecimal.ZERO).build());
+        return HttpWebResult.getMonoSucResult(AccountBalanceEntity.builder().amount(BigDecimal.ZERO).uid(uid).updateTime(System.currentTimeMillis()).build());
     }
 
     public AccountBalanceEntity getAccountBalanceByUid(Long uid) {
