@@ -28,7 +28,7 @@ public class CandlestickService {
             {
                 log.error(e.getMessage());
             }finally {
-                sleep(10000);
+                sleep(1000);
              }
         }
     }
