@@ -44,6 +44,7 @@ public class CandlestickService {
                 if(candlestickDto==null)
                 {
                     CandlesticksCache.getInstance().cacheBtcOneMinu();
+                    sleep(500);
                     doCache(now);
                 }
                 return candlestickDto;
