@@ -154,6 +154,11 @@ public class CandlesticksCache {
         else return cachLinkMap;
     }
 
+    public CandlestickDto getCandlestickDto(Long key)
+    {
+        return cachLinkMap.get(key);
+    }
+
     public synchronized Map<Long, CandlestickDto> cacheBtcOneMinu() {
         List<CandlestickDto> list=   getCandlestickDtoFromBinance(defaulSymbol, CandlestickInterval.ONE_MINUTE,maximumSize);
         long time=0;

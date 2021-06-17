@@ -2,6 +2,8 @@ package com.cf.crs.service;
 
 import com.binance.api.client.CandlesticksCache;
 import com.binance.api.client.constant.CandlestickDto;
+import com.cf.crs.common.utils.DateUtils;
+import com.cf.util.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -18,25 +20,35 @@ public class CandlestickService {
     {
         while(true)
         {
-            doCache();
+            long now =DateUtils.getZeroSecondMils(System.currentTimeMillis());
+            try {
+                doCache(now);
+            }
+            catch (Exception e)
+            {
+                log.error(e.getMessage());
+            }finally {
+                sleep(10000);
+             }
         }
     }
 
     /**
      * 开始缓存处理
      */
-    private void  doCache()
+    private CandlestickDto  doCache(long now)
     {
-        try
-        {
-            CandlesticksCache.getInstance().cacheBtcOneMinu();
-        }catch (Exception e)
-        {
-            log.error(e.getMessage());
-            sleep(2000);
-        }finally {
-            sleepBySecond();
-        }
+            if(LocalDateTime.now().getSecond()<=45)
+            {
+                CandlestickDto candlestickDto= CandlesticksCache.getInstance().getCandlestickDto(now);
+                if(candlestickDto==null)
+                {
+                    CandlesticksCache.getInstance().cacheBtcOneMinu();
+                    doCache(now);
+                }
+                return candlestickDto;
+            }
+            return null;
     }
 
     private void sleepBySecond()
@@ -47,6 +59,7 @@ public class CandlestickService {
         }
         else sleep(10000);
     }
+
     private void sleep( long time)
     {
         try {
