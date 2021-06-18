@@ -34,6 +34,11 @@ public class MsgError {
     //发送礼物失败
     public static  final  String  SEND_FAIL= "msg_1011";
 
+    //发送礼物失败
+    public static  final  String  CASHOUT_BALANCE_NOT_ENOUGH= "msg_1015";
+
+
+
 
 
 

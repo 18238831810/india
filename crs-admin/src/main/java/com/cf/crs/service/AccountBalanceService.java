@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, AccountBalanceEntity> implements IService<AccountBalanceEntity> {
 
 
+
     /**
      * 用户余额变动统一入口
      * @param accountBalanceEntity
@@ -41,7 +42,10 @@ public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, Acc
 
     public ResultJson<AccountBalanceEntity> getAccountBalanceByUId(Long uid) {
         AccountBalanceEntity accountBalanceEntity = getAccountBalanceByUid(uid);
-        if (accountBalanceEntity != null) return HttpWebResult.getMonoSucResult(accountBalanceEntity);
+        if (accountBalanceEntity != null) {
+            accountBalanceEntity.setAmount(accountBalanceEntity.getAmount().setScale(0, BigDecimal.ROUND_DOWN));
+            return HttpWebResult.getMonoSucResult(accountBalanceEntity);
+        }
         return HttpWebResult.getMonoSucResult(AccountBalanceEntity.builder().amount(BigDecimal.ZERO).uid(uid).updateTime(System.currentTimeMillis()).build());
     }
 

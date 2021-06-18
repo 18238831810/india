@@ -92,6 +92,8 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
     public ResultJson<String> order(OrderCashoutParam orderCashoutParam){
         ResultJson<String> vaResult = vaOrderCashoutParam(orderCashoutParam);
         if (vaResult != null) return vaResult;
+        AccountBalanceEntity accountBalanceByUid = accountBalanceService.getAccountBalanceByUid(orderCashoutParam.getUid());
+        if (accountBalanceByUid.getAmount().compareTo(new BigDecimal(Float.toString(orderCashoutParam.getAmount()))) < 0) return HttpWebResult.getMonoError(MsgError.CASHOUT_BALANCE_NOT_ENOUGH);
         OrderCashoutEntity orderCashoutEntity = getOrderCashinEntity(orderCashoutParam);
         //保存订单数据
         baseMapper.insert(orderCashoutEntity);
