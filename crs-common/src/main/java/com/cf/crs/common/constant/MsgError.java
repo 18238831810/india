@@ -35,4 +35,6 @@ public class MsgError {
     public static  final  String  SEND_FAIL= "msg_1011";
 
 
+
+
 }
