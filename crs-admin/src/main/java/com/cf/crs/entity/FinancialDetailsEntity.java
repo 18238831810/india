@@ -38,7 +38,7 @@ public class FinancialDetailsEntity implements Serializable {
     /**
      * 订单类型（1:存款，2:提现 3:下单）
      */
-    @ApiModelProperty(value = "订单类型（1:存款，2:提现 3:下单 4:赠送礼物）")
+    @ApiModelProperty(value = "订单类型（1:存款，2:提现 3:下单 4:赠送礼物 5:交易流水分层）")
     private Integer type;
 
     /**
