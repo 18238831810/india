@@ -4,11 +4,13 @@
 <mapper namespace="com.cf.crs.mapper.AccountBalanceMapper">
 
    <insert id="updateAddBalance">
-       INSERT INTO `u_account_balance`(`uid`,`amount`,`update_time`)
-       VALUES (#{item.uid},#{item.amount},#{item.updateTime})
+       INSERT INTO `u_account_balance`(`uid`,`amount`,`update_time`,`consume_count`,`order_count`)
+       VALUES (#{item.uid},#{item.amount},#{item.updateTime},#{item.consumeCount},#{item.orderCount})
        ON DUPLICATE KEY UPDATE
        `update_time` = VALUES(update_time),
-       `amount` = (`amount` + VALUES(amount))
+       `amount` = (`amount` + VALUES(amount)),
+       `consume_count` = (`consume_count` + VALUES(consume_count)),
+       `order_count` = (`order_count` + VALUES(order_count)),
    </insert>
 
     <update id="updateSubBalance">

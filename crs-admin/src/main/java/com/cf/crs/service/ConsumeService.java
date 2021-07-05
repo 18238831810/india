@@ -77,7 +77,7 @@ public class ConsumeService extends ServiceImpl<ConsumeMapper, ConsumeEntity> im
             ExtractEntity extractEntity = extractService.getExtractEntityByType(Extract.PROJECT_TYPE_PLATFORM);
             //计算收益金额
             BigDecimal coverGold = getCoverAmount(totalGold, extractEntity);
-            AccountBalanceEntity coverCcountBalanceEntity = AccountBalanceEntity.builder().amount(coverGold).uid(giveGiftDto.getCoverConsumeUserId()).updateTime(time).build();
+            AccountBalanceEntity coverCcountBalanceEntity = AccountBalanceEntity.builder().amount(coverGold).uid(giveGiftDto.getCoverConsumeUserId()).updateTime(time).consumeCount(coverGold).build();
             accountBalanceService.updateBalance(coverCcountBalanceEntity);
 
             //新增消费记录记录
