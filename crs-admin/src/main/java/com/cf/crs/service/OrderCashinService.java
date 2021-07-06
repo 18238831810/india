@@ -68,6 +68,27 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
      * @param dto
      * @return
      */
+    public PagingBase<OrderCashinEntity> queryList(OrderCashinDto dto) {
+        Page<OrderCashinEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
+        IPage<OrderCashinEntity> pageList = this.page(iPage, new QueryWrapper<OrderCashinEntity>().eq(dto.getUid() != null,"uid", dto.getUid())
+                .ge(dto.getStartTime() != null,"order_time",dto.getStartTime())
+                .le(dto.getEndTime() != null,"order_time",dto.getEndTime()).orderByDesc("order_time"));
+        List<OrderCashinEntity> records = pageList.getRecords();
+        records.forEach(record->{
+            if (StringUtils.isEmpty(record.getOrderSn())) {
+                String orderSn = new StringBuilder("T").append(DateUtil.timesToDate(record.getOrderTime(), DateUtil.DEFAULT)).append("G").append(record.getId()).toString();
+                record.setOrderSn(orderSn);
+            }
+        });
+        return new PagingBase<OrderCashinEntity>(records, pageList.getTotal());
+    }
+
+    /**
+     * 查询用户的资金明细列表
+     *
+     * @param dto
+     * @return
+     */
     public PagingBase<OrderCashinEntity> list(OrderCashinDto dto) {
         Page<OrderCashinEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
         IPage<OrderCashinEntity> pageList = this.page(iPage, new QueryWrapper<OrderCashinEntity>().eq("uid", dto.getUid())
