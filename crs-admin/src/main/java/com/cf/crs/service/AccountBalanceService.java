@@ -10,11 +10,13 @@ import com.cf.crs.common.constant.OrderErrorEnum;
 import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.entity.*;
 import com.cf.crs.mapper.AccountBalanceMapper;
+import com.cf.crs.mapper.AccountMapper;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
 import com.cf.util.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,6 +30,8 @@ import java.util.List;
 @Service
 public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, AccountBalanceEntity> implements IService<AccountBalanceEntity> {
 
+    @Autowired
+    AccountMapper accountMapper;
 
 
     /**
@@ -54,6 +58,8 @@ public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, Acc
     public Integer updateBalance(AccountBalanceEntity accountBalanceEntity) {
         if (accountBalanceEntity.getUid() == null) return 0;
         if (accountBalanceEntity.getAmount() == null) return 0;
+        AccountEntity accountEntity = accountMapper.selectById(accountBalanceEntity.getUid());
+        if (accountEntity != null) accountBalanceEntity.setPhone(accountEntity.getTPhone());
         if (accountBalanceEntity.getAmount().compareTo(BigDecimal.ZERO) < 0) {
             accountBalanceEntity.setAmount(accountBalanceEntity.getAmount().negate());
             return baseMapper.updateSubBalance(accountBalanceEntity);

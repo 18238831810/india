@@ -10,8 +10,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Timestamp;
 
 /**
  * 用户列表
@@ -20,31 +18,20 @@ import java.sql.Timestamp;
  *
  **/
 @Data
-@TableName("t_admin")
+@TableName("t_user")
 @Builder
-@ApiModel("管理用户列表")
+@ApiModel("用户列表")
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity implements Serializable {
+public class AccountEntity implements Serializable {
 
     @TableId
-    @JsonProperty("tId")
     private Integer tId;
 
-    @JsonProperty("tUserName")
-    private String tUserName;
+    @JsonProperty("tPhone")
+    private String tPhone;
 
-    @JsonProperty("tPassWord")
-    private String tPassWord;
 
-    @JsonProperty("tRoleId")
-    private String tRoleId;
-
-    @JsonProperty("tIsDisable")
-    private BigDecimal tIsDisable;
-
-    @JsonProperty("tCreateTime")
-    private Timestamp tCreateTime;
 
 
 

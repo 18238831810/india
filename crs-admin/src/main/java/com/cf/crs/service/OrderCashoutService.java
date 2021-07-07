@@ -73,7 +73,8 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
         Page<OrderCashoutEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
         IPage<OrderCashoutEntity> pageList = this.page(iPage, new QueryWrapper<OrderCashoutEntity>().eq(dto.getUid() != null,"uid", dto.getUid())
                 .ge(dto.getStartTime() != null,"order_time",dto.getStartTime())
-                .le(dto.getEndTime() != null,"order_time",dto.getEndTime()).orderByDesc("order_time"));
+                .le(dto.getEndTime() != null,"order_time",dto.getEndTime())
+                .eq(dto.getStatus() != null,"status",dto.getStatus()).orderByDesc("order_time"));
         List<OrderCashoutEntity> records = pageList.getRecords();
         records.forEach(record->{
             if (StringUtils.isEmpty(record.getOrderSn())) {

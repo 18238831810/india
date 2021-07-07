@@ -27,7 +27,8 @@ public class OrderCashinDto extends QueryPage implements Serializable {
     @ApiModelProperty(value = "结束时间",required = false)
     private Long endTime;
 
-
+    @ApiModelProperty(value = "状态",hidden = true)
+    private Integer status;
 
 
 }

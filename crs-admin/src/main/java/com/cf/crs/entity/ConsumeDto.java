@@ -3,6 +3,7 @@ package com.cf.crs.entity;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.cf.crs.common.entity.QueryPage;
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -36,6 +37,12 @@ public class ConsumeDto extends QueryPage implements Serializable {
      * 消费类型（1:赠送礼物，即打赏主播）
      */
     private Integer type;
+
+    @ApiModelProperty(value = "开始时间",required = false)
+    private Long startTime;
+
+    @ApiModelProperty(value = "结束时间",required = false)
+    private Long endTime;
 
 
 

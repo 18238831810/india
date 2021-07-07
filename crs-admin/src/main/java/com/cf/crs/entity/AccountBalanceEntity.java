@@ -31,6 +31,12 @@ public class AccountBalanceEntity {
     private Long uid;
 
     /**
+     * 用户手机号
+     */
+    @ApiModelProperty(value = "用户手机号")
+    private String phone;
+
+    /**
      * 用户总金额
      */
     @ApiModelProperty(value = "用户总金额")

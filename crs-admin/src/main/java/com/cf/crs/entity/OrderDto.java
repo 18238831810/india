@@ -1,6 +1,7 @@
 package com.cf.crs.entity;
 
 import com.cf.crs.common.entity.QueryPage;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiParam;
 import lombok.Data;
 
@@ -84,5 +85,13 @@ public class OrderDto extends QueryPage implements Serializable {
      */
     @ApiParam(hidden = true)
     private int status;
+
+    @ApiModelProperty(value = "开始时间",required = false)
+    private Long startTime;
+
+    @ApiModelProperty(value = "结束时间",required = false)
+    private Long endTime;
+
+
 
 }

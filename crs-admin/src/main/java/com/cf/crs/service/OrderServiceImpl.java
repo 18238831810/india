@@ -321,7 +321,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
      */
     public PagingBase<OrderEntity> queryList(OrderDto dto) {
         Page<OrderEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
-        QueryWrapper<OrderEntity> queryWrapper = new QueryWrapper<OrderEntity>().eq(dto.getUid() != null,"uid", dto.getUid()).orderByDesc("utime");
+        QueryWrapper<OrderEntity> queryWrapper = new QueryWrapper<OrderEntity>().eq(dto.getUid() != null,"uid", dto.getUid())
+                 .ge(dto.getStartTime() != null,"ctime",dto.getStartTime())
+                .le(dto.getEndTime() != null,"ctime",dto.getEndTime()).orderByDesc("ctime");
         IPage<OrderEntity> pageList = this.page(iPage, queryWrapper);
         List<OrderEntity> records = pageList.getRecords();
         return new PagingBase<OrderEntity>(records, pageList.getTotal());
