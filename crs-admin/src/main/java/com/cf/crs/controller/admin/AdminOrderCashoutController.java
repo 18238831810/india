@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags="提现")
 @RestController
 @RequestMapping("/admin/cashout")
-public class CashoutController {
+public class AdminOrderCashoutController {
 
     @Autowired
     OrderCashoutService orderCashoutService;

@@ -2,18 +2,23 @@ package com.cf.crs.service;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.crs.common.constant.OrderErrorEnum;
-import com.cf.crs.entity.AccountBalanceEntity;
-import com.cf.crs.entity.OrderEntity;
+import com.cf.crs.common.entity.PagingBase;
+import com.cf.crs.entity.*;
 import com.cf.crs.mapper.AccountBalanceMapper;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
+import com.cf.util.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 
 /**
@@ -24,6 +29,22 @@ import java.math.BigDecimal;
 public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, AccountBalanceEntity> implements IService<AccountBalanceEntity> {
 
 
+
+    /**
+     * 分页查询用户的资金列表
+     *
+     * @param dto
+     * @return
+     */
+    public PagingBase<AccountBalanceEntity> queryList(AccountBalanceDto dto) {
+        Page<AccountBalanceEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
+        QueryWrapper<AccountBalanceEntity> queryWrapper = new QueryWrapper<AccountBalanceEntity>().eq(dto.getUid() != null,"uid", dto.getUid());
+        if (dto.getType() == 1) queryWrapper.gt("consume_count",0);
+        else queryWrapper.and(wrapper -> wrapper.eq("consume_count", 0).or().isNull("consume_count"));
+        IPage<AccountBalanceEntity> pageList = this.page(iPage, queryWrapper);
+        List<AccountBalanceEntity> records = pageList.getRecords();
+        return new PagingBase<AccountBalanceEntity>(records, pageList.getTotal());
+    }
 
     /**
      * 用户余额变动统一入口

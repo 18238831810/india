@@ -1,9 +1,13 @@
 package com.cf.crs.service;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.crs.common.constant.MsgError;
+import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.common.exception.RenException;
 import com.cf.crs.entity.*;
 import com.cf.crs.mapper.ConsumeMapper;
@@ -48,6 +52,22 @@ public class ConsumeService extends ServiceImpl<ConsumeMapper, ConsumeEntity> im
     @Autowired
     FinancialDetailsService financialDetailsService;
 
+
+    /**
+     * 分页查询用户的资金列表
+     *
+     * @param dto
+     * @return
+     */
+    public PagingBase<ConsumeEntity> queryList(ConsumeDto dto) {
+        Page<ConsumeEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
+        QueryWrapper<ConsumeEntity> queryWrapper = new QueryWrapper<ConsumeEntity>().eq(dto.getUid() != null,"uid", dto.getUid()).eq(dto.getCoverId() != null,"cover_id",dto.getCoverId())
+                .orderByDesc("create_time");
+        IPage<ConsumeEntity> pageList = this.page(iPage, queryWrapper);
+        List<ConsumeEntity> records = pageList.getRecords();
+        return new PagingBase<ConsumeEntity>(records, pageList.getTotal());
+    }
+
     /**
      * 赠送礼物
      * @param giveGiftDto
@@ -80,7 +100,7 @@ public class ConsumeService extends ServiceImpl<ConsumeMapper, ConsumeEntity> im
             AccountBalanceEntity coverCcountBalanceEntity = AccountBalanceEntity.builder().amount(coverGold).uid(giveGiftDto.getCoverConsumeUserId()).updateTime(time).consumeCount(coverGold).build();
             accountBalanceService.updateBalance(coverCcountBalanceEntity);
 
-            //新增消费记录记录
+            //新增消费记录
             String giftRemark = new StringBuffer(giftEntity.getTGiftName()).append("_" + giftEntity.getTGiftId() + "*").append(giveGiftDto.getGiftNum()).toString();
             ConsumeEntity consumeEntity = ConsumeEntity.builder().uid(giveGiftDto.getUid()).coverId(giveGiftDto.getCoverConsumeUserId()).totalAmount(totalGold).coverAmount(coverGold).
                     remark(giftRemark).type(1).createTime(time).build();

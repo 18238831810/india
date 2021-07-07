@@ -39,7 +39,7 @@ public class ParamsRequestWrapper extends HttpServletRequestWrapper {
 
     @Override
     public String[] getParameterValues(String name) {
-        if (Const.UID.equals(name)){
+        if (getServletPath().startsWith(Const.API) && Const.UID.equals(name)){
             return new String[]{getHeader(Const.UID)};
         }
         return super.getParameterValues(name);

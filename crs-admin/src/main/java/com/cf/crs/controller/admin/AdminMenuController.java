@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/admin/menu")
-public class MenuController {
+public class AdminMenuController {
 
     @Autowired
     MenuService menuService;
