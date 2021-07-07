@@ -1,20 +1,13 @@
 package com.cf.crs.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.cf.crs.common.entity.QueryPage;
 import io.swagger.annotations.ApiParam;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@TableName("u_order")
-public class OrderEntity {
-    @ApiParam(hidden = true)
-    private int id;
+public class OrderDto extends QueryPage implements Serializable {
     /**
      * 创建时间
      */
@@ -33,7 +26,7 @@ public class OrderEntity {
      * 下注当事人ID
      */
     @ApiParam(hidden = true)
-    private long uid;
+    private Long uid;
     /**
      * 下单总值
      */

@@ -54,7 +54,7 @@ public class ConsumeService extends ServiceImpl<ConsumeMapper, ConsumeEntity> im
 
 
     /**
-     * 分页查询用户的资金列表
+     * 分页查询用户的消费记录（打赏主播）
      *
      * @param dto
      * @return

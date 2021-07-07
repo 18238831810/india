@@ -14,6 +14,7 @@ import com.cf.crs.common.entity.QueryPage;
 import com.cf.crs.common.exception.RenException;
 import com.cf.crs.common.utils.DateUtils;
 import com.cf.crs.entity.AccountBalanceEntity;
+import com.cf.crs.entity.OrderDto;
 import com.cf.crs.entity.OrderEntity;
 import com.cf.crs.entity.OrderLeverEntity;
 import com.cf.crs.mapper.OrderMapper;
@@ -310,5 +311,19 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
                 .lt("ctime",end).eq("uid",uid)
         .select("sum(profit) as profit","uid","from_unixtime(ctime/1000,'%Y-%m-%d') as time")
         .groupBy("uid","from_unixtime(ctime/1000,'%Y-%m-%d')"));
+    }
+
+    /**
+     * 分页查询用户的资金列表
+     *
+     * @param dto
+     * @return
+     */
+    public PagingBase<OrderEntity> queryList(OrderDto dto) {
+        Page<OrderEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
+        QueryWrapper<OrderEntity> queryWrapper = new QueryWrapper<OrderEntity>().eq(dto.getUid() != null,"uid", dto.getUid()).orderByDesc("utime");
+        IPage<OrderEntity> pageList = this.page(iPage, queryWrapper);
+        List<OrderEntity> records = pageList.getRecords();
+        return new PagingBase<OrderEntity>(records, pageList.getTotal());
     }
 }
