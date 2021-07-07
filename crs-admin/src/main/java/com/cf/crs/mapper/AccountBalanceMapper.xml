@@ -10,7 +10,7 @@
        `update_time` = VALUES(update_time),
        `amount` = (`amount` + VALUES(amount)),
        `consume_count` = (`consume_count` + VALUES(consume_count)),
-       `order_count` = (`order_count` + VALUES(order_count)),
+       `order_count` = (`order_count` + VALUES(order_count))
    </insert>
 
     <update id="updateSubBalance">

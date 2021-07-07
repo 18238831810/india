@@ -63,6 +63,27 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
     FinancialDetailsService financialDetailsService;
 
 
+    /**
+     * 查询用户的资金明细列表
+     *
+     * @param dto
+     * @return
+     */
+    public PagingBase<OrderCashoutEntity> queryList(OrderCashoutDto dto) {
+        Page<OrderCashoutEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
+        IPage<OrderCashoutEntity> pageList = this.page(iPage, new QueryWrapper<OrderCashoutEntity>().eq(dto.getUid() != null,"uid", dto.getUid())
+                .ge(dto.getStartTime() != null,"order_time",dto.getStartTime())
+                .le(dto.getEndTime() != null,"order_time",dto.getEndTime()).orderByDesc("order_time"));
+        List<OrderCashoutEntity> records = pageList.getRecords();
+        records.forEach(record->{
+            if (StringUtils.isEmpty(record.getOrderSn())) {
+                String orderSn = new StringBuilder("T").append(DateUtil.timesToDate(record.getOrderTime(), DateUtil.DEFAULT)).append("G").append(record.getId()).toString();
+                record.setOrderSn(orderSn);
+            }
+        });
+        return new PagingBase<OrderCashoutEntity>(records, pageList.getTotal());
+    }
+
 
     /**
      * 查询用户的资金明细列表

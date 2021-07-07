@@ -1,6 +1,12 @@
 package com.cf.crs.controller.admin;
 
 
+import com.cf.crs.common.entity.PagingBase;
+import com.cf.crs.common.utils.Result;
+import com.cf.crs.entity.OrderCashinDto;
+import com.cf.crs.entity.OrderCashinEntity;
+import com.cf.crs.entity.OrderCashoutDto;
+import com.cf.crs.entity.OrderCashoutEntity;
 import com.cf.crs.service.OrderCashoutService;
 import com.cf.util.http.ResultJson;
 import io.swagger.annotations.Api;
@@ -25,5 +31,11 @@ public class CashoutController {
     @ApiOperation("提现审批")
     public ResultJson<String> approve(Long id){
         return orderCashoutService.approve(id);
+    }
+
+    @PostMapping("/queryList")
+    public Result<PagingBase<OrderCashoutEntity>> list(OrderCashoutDto dto){
+        PagingBase<OrderCashoutEntity> pagingBase = orderCashoutService.queryList(dto);
+        return new Result<PagingBase<OrderCashoutEntity>>().ok(pagingBase);
     }
 }
