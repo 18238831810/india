@@ -3,6 +3,7 @@ package com.cf.crs.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -61,7 +62,18 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
     @Autowired
     FinancialDetailsService financialDetailsService;
 
-
+    /**
+     * 统计存款总额
+     *
+     * @param dto
+     * @return
+     */
+    public ResultJson<BigDecimal> queryTotalAmount(OrderCashinDto dto) {
+        QueryWrapper<OrderCashinEntity> queryWrapper = getQueryWrapper(dto);
+        queryWrapper.select(" sum(real_amount) as real_amount");
+        OrderCashinEntity orderCashinEntity = baseMapper.selectOne(queryWrapper);
+        return HttpWebResult.getMonoSucResult(orderCashinEntity.getRealAmount());
+    }
     /**
      * 查询用户的资金明细列表
      *
@@ -70,10 +82,9 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
      */
     public PagingBase<OrderCashinEntity> queryList(OrderCashinDto dto) {
         Page<OrderCashinEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
-        IPage<OrderCashinEntity> pageList = this.page(iPage, new QueryWrapper<OrderCashinEntity>().eq(dto.getUid() != null,"uid", dto.getUid())
-                .ge(dto.getStartTime() != null,"order_time",dto.getStartTime())
-                .le(dto.getEndTime() != null,"order_time",dto.getEndTime()).
-                 eq(dto.getStatus() != null,"status",dto.getStatus()).orderByDesc("order_time"));
+        QueryWrapper<OrderCashinEntity> queryWrapper = getQueryWrapper(dto);
+        queryWrapper.orderByDesc("order_time");
+        IPage<OrderCashinEntity> pageList = this.page(iPage, queryWrapper);
         List<OrderCashinEntity> records = pageList.getRecords();
         records.forEach(record->{
             if (StringUtils.isEmpty(record.getOrderSn())) {
@@ -82,6 +93,13 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
             }
         });
         return new PagingBase<OrderCashinEntity>(records, pageList.getTotal());
+    }
+
+    private QueryWrapper<OrderCashinEntity> getQueryWrapper(OrderCashinDto dto) {
+        return new QueryWrapper<OrderCashinEntity>().eq(dto.getUid() != null, "uid", dto.getUid())
+                    .ge(dto.getStartTime() != null, "order_time", dto.getStartTime())
+                    .le(dto.getEndTime() != null, "order_time", dto.getEndTime()).
+                            eq(dto.getStatus() != null, "status", dto.getStatus());
     }
 
     /**

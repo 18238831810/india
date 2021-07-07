@@ -64,6 +64,19 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
 
 
     /**
+     * 统计提现总额
+     *
+     * @param dto
+     * @return
+     */
+    public ResultJson<BigDecimal> queryTotalAmount(OrderCashoutDto dto) {
+        QueryWrapper<OrderCashoutEntity> queryWrapper = getQueryWrapper(dto);
+        queryWrapper.select(" sum(real_amount) as real_amount");
+        OrderCashoutEntity orderCashoutEntity = baseMapper.selectOne(queryWrapper);
+        return HttpWebResult.getMonoSucResult(orderCashoutEntity.getRealAmount());
+    }
+
+    /**
      * 查询用户的资金明细列表
      *
      * @param dto
@@ -71,10 +84,9 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
      */
     public PagingBase<OrderCashoutEntity> queryList(OrderCashoutDto dto) {
         Page<OrderCashoutEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
-        IPage<OrderCashoutEntity> pageList = this.page(iPage, new QueryWrapper<OrderCashoutEntity>().eq(dto.getUid() != null,"uid", dto.getUid())
-                .ge(dto.getStartTime() != null,"order_time",dto.getStartTime())
-                .le(dto.getEndTime() != null,"order_time",dto.getEndTime())
-                .eq(dto.getStatus() != null,"status",dto.getStatus()).orderByDesc("order_time"));
+        QueryWrapper<OrderCashoutEntity> queryWrapper = getQueryWrapper(dto);
+        queryWrapper.orderByDesc("order_time");
+        IPage<OrderCashoutEntity> pageList = this.page(iPage, queryWrapper);
         List<OrderCashoutEntity> records = pageList.getRecords();
         records.forEach(record->{
             if (StringUtils.isEmpty(record.getOrderSn())) {
@@ -83,6 +95,13 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
             }
         });
         return new PagingBase<OrderCashoutEntity>(records, pageList.getTotal());
+    }
+
+    private QueryWrapper<OrderCashoutEntity> getQueryWrapper(OrderCashoutDto dto) {
+        return new QueryWrapper<OrderCashoutEntity>().eq(dto.getUid() != null, "uid", dto.getUid())
+                    .ge(dto.getStartTime() != null, "order_time", dto.getStartTime())
+                    .le(dto.getEndTime() != null, "order_time", dto.getEndTime())
+                    .eq(dto.getStatus() != null, "status", dto.getStatus());
     }
 
 

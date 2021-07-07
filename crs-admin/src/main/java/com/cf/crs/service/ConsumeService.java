@@ -54,6 +54,19 @@ public class ConsumeService extends ServiceImpl<ConsumeMapper, ConsumeEntity> im
 
 
     /**
+     * 统计打赏收益总额
+     *
+     * @param dto
+     * @return
+     */
+    public ResultJson<BigDecimal> queryTotalAmount(ConsumeDto dto) {
+        QueryWrapper<ConsumeEntity> queryWrapper = getQueryWrapper(dto);
+        queryWrapper.select(" sum(cover_amount) as cover_amount");
+        ConsumeEntity consumeEntity = baseMapper.selectOne(queryWrapper);
+        return HttpWebResult.getMonoSucResult(consumeEntity.getCoverAmount());
+    }
+
+    /**
      * 分页查询用户的消费记录（打赏主播）
      *
      * @param dto
@@ -61,13 +74,17 @@ public class ConsumeService extends ServiceImpl<ConsumeMapper, ConsumeEntity> im
      */
     public PagingBase<ConsumeEntity> queryList(ConsumeDto dto) {
         Page<ConsumeEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
-        QueryWrapper<ConsumeEntity> queryWrapper = new QueryWrapper<ConsumeEntity>().eq(dto.getUid() != null,"uid", dto.getUid()).eq(dto.getCoverId() != null,"cover_id",dto.getCoverId())
-                .ge(dto.getStartTime() != null,"create_time",dto.getStartTime())
-                .le(dto.getEndTime() != null,"create_time",dto.getEndTime())
-                .orderByDesc("create_time");
+        QueryWrapper<ConsumeEntity> queryWrapper = getQueryWrapper(dto);
+        queryWrapper.orderByDesc("create_time");
         IPage<ConsumeEntity> pageList = this.page(iPage, queryWrapper);
         List<ConsumeEntity> records = pageList.getRecords();
         return new PagingBase<ConsumeEntity>(records, pageList.getTotal());
+    }
+
+    private QueryWrapper<ConsumeEntity> getQueryWrapper(ConsumeDto dto) {
+        return new QueryWrapper<ConsumeEntity>().eq(dto.getUid() != null,"uid", dto.getUid()).eq(dto.getCoverId() != null,"cover_id",dto.getCoverId())
+                    .ge(dto.getStartTime() != null,"create_time",dto.getStartTime())
+                    .le(dto.getEndTime() != null,"create_time",dto.getEndTime());
     }
 
     /**

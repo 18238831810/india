@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+
 @Slf4j
 @Api(tags="提现")
 @RestController
@@ -37,5 +39,11 @@ public class AdminOrderCashoutController {
     public Result<PagingBase<OrderCashoutEntity>> list(OrderCashoutDto dto){
         PagingBase<OrderCashoutEntity> pagingBase = orderCashoutService.queryList(dto);
         return new Result<PagingBase<OrderCashoutEntity>>().ok(pagingBase);
+    }
+
+
+    @PostMapping("/queryTotalAmount")
+    public ResultJson<BigDecimal> queryTotalAmount(OrderCashoutDto dto){
+        return orderCashoutService.queryTotalAmount(dto);
     }
 }
