@@ -37,4 +37,9 @@ public class AdminOrderCashinController {
     public ResultJson<BigDecimal> queryTotalAmount(OrderCashinDto dto){
         return orderCashinService.queryTotalAmount(dto);
     }
+
+    @GetMapping("/export")
+    public void export(OrderCashinDto dto) {
+        orderCashinService.export(dto);
+    }
 }

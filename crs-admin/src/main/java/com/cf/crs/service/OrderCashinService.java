@@ -21,6 +21,7 @@ import com.cf.crs.properties.OrderParam;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
 import com.cf.util.utils.DateUtil;
+import com.cf.util.utils.ExcelUtils;
 import com.cf.util.utils.OrderSignUtil;
 import com.cf.util.utils.WebTools;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +64,9 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
     @Autowired
     FinancialDetailsService financialDetailsService;
 
+    @Autowired
+    HttpServletResponse response;
+
     /**
      * 统计存款总额
      *
@@ -74,6 +79,18 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
         OrderCashinEntity orderCashinEntity = baseMapper.selectOne(queryWrapper);
         return HttpWebResult.getMonoSucResult(orderCashinEntity.getRealAmount());
     }
+
+
+    public void export(OrderCashinDto dto) {
+        try {
+            QueryWrapper<OrderCashinEntity> queryWrapper = getQueryWrapper(dto);
+            List<OrderCashinEntity> list = baseMapper.selectList(queryWrapper);
+            ExcelUtils.exportExcelWithDict(response, null, list, OrderCashinEntity.class);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
     /**
      * 查询用户的资金明细列表
      *

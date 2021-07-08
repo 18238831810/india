@@ -14,7 +14,6 @@
         <module>crs-admin</module>
         <module>crs-common</module>
         <module>crs-generator</module>
-        <module>cf-excel-util</module>
         <module>crs-job</module>
     </modules>
 
@@ -25,9 +24,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <properties>
+    <!--<properties>
         <tomcat.version>9.0.34</tomcat.version>
-    </properties>
+    </properties>-->
 
     <dependencies>
         <dependency>

@@ -9,6 +9,7 @@ import com.cf.crs.service.AccountBalanceService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,4 +29,10 @@ public class AdminAccountBalenceController {
         PagingBase<AccountBalanceEntity> pagingBase = accountBalanceService.queryList(dto);
         return new Result<PagingBase<AccountBalanceEntity>>().ok(pagingBase);
     }
+
+    @GetMapping("/export")
+    public void export(AccountBalanceDto dto) {
+        accountBalanceService.export(dto);
+    }
+
 }

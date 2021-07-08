@@ -14,11 +14,13 @@ import com.cf.crs.mapper.AccountMapper;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
 import com.cf.util.utils.DateUtil;
+import com.cf.util.utils.ExcelUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -33,6 +35,9 @@ public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, Acc
     @Autowired
     AccountMapper accountMapper;
 
+    @Autowired
+    HttpServletResponse response;
+
 
     /**
      * 分页查询用户的资金列表
@@ -42,12 +47,27 @@ public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, Acc
      */
     public PagingBase<AccountBalanceEntity> queryList(AccountBalanceDto dto) {
         Page<AccountBalanceEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
-        QueryWrapper<AccountBalanceEntity> queryWrapper = new QueryWrapper<AccountBalanceEntity>().eq(dto.getUid() != null,"uid", dto.getUid());
-        if (dto.getType() == 1) queryWrapper.gt("consume_count",0);
-        else queryWrapper.and(wrapper -> wrapper.eq("consume_count", 0).or().isNull("consume_count"));
+        QueryWrapper<AccountBalanceEntity> queryWrapper = getQueryWrapper(dto);
         IPage<AccountBalanceEntity> pageList = this.page(iPage, queryWrapper);
         List<AccountBalanceEntity> records = pageList.getRecords();
         return new PagingBase<AccountBalanceEntity>(records, pageList.getTotal());
+    }
+
+    private QueryWrapper<AccountBalanceEntity> getQueryWrapper(AccountBalanceDto dto) {
+        QueryWrapper<AccountBalanceEntity> queryWrapper = new QueryWrapper<AccountBalanceEntity>().eq(dto.getUid() != null,"uid", dto.getUid());
+        if (dto.getType() == 1) queryWrapper.gt("consume_count",0);
+        else queryWrapper.and(wrapper -> wrapper.eq("consume_count", 0).or().isNull("consume_count"));
+        return queryWrapper;
+    }
+
+    public void export(AccountBalanceDto dto) {
+        try {
+            QueryWrapper<AccountBalanceEntity> queryWrapper = getQueryWrapper(dto);
+            List<AccountBalanceEntity> list = baseMapper.selectList(queryWrapper);
+            ExcelUtils.exportExcelWithDict(response, null, list, AccountBalanceEntity.class);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     /**

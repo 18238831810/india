@@ -21,6 +21,7 @@ import com.cf.crs.properties.OrderConfigProperties;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
 import com.cf.util.utils.DateUtil;
+import com.cf.util.utils.ExcelUtils;
 import com.cf.util.utils.OrderSignUtil;
 import com.cf.util.utils.WebTools;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.crypto.MacSpi;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +64,8 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
     @Autowired
     FinancialDetailsService financialDetailsService;
 
+    @Autowired
+    HttpServletResponse response;
 
     /**
      * 统计提现总额
@@ -74,6 +78,16 @@ public class OrderCashoutService extends ServiceImpl<OrderCashoutMapper, OrderCa
         queryWrapper.select(" sum(real_amount) as real_amount");
         OrderCashoutEntity orderCashoutEntity = baseMapper.selectOne(queryWrapper);
         return HttpWebResult.getMonoSucResult(orderCashoutEntity.getRealAmount());
+    }
+
+    public void export(OrderCashoutDto dto) {
+        try {
+            QueryWrapper<OrderCashoutEntity> queryWrapper = getQueryWrapper(dto);
+            List<OrderCashoutEntity> list = baseMapper.selectList(queryWrapper);
+            ExcelUtils.exportExcelWithDict(response, null, list, OrderCashoutEntity.class);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     /**

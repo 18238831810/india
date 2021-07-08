@@ -21,6 +21,7 @@ import com.cf.crs.mapper.OrderMapper;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
 import com.cf.util.utils.Const;
+import com.cf.util.utils.ExcelUtils;
 import com.cf.util.utils.NumberUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
@@ -52,6 +54,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
 
     @Autowired
     CandlestickService candlestickService;
+
+    @Autowired
+    HttpServletResponse response;
+
     /**
      * 下单的三个方向常量
      */
@@ -347,5 +353,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         queryWrapper.select(" sum(profit) as profit");
         OrderEntity orderEntity = baseMapper.selectOne(queryWrapper);
         return HttpWebResult.getMonoSucResult(orderEntity.getProfit());
+    }
+
+    public void export(OrderDto dto) {
+        try {
+            QueryWrapper<OrderEntity> queryWrapper = getQueryWrapper(dto);
+            List<OrderEntity> list = baseMapper.selectList(queryWrapper);
+            ExcelUtils.exportExcelWithDict(response, null, list, OrderEntity.class);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }

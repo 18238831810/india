@@ -13,6 +13,7 @@ import com.cf.crs.entity.*;
 import com.cf.crs.mapper.ConsumeMapper;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
+import com.cf.util.utils.ExcelUtils;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.MacSpi;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -53,6 +55,9 @@ public class ConsumeService extends ServiceImpl<ConsumeMapper, ConsumeEntity> im
     FinancialDetailsService financialDetailsService;
 
 
+    @Autowired
+    HttpServletResponse response;
+
     /**
      * 统计打赏收益总额
      *
@@ -79,6 +84,16 @@ public class ConsumeService extends ServiceImpl<ConsumeMapper, ConsumeEntity> im
         IPage<ConsumeEntity> pageList = this.page(iPage, queryWrapper);
         List<ConsumeEntity> records = pageList.getRecords();
         return new PagingBase<ConsumeEntity>(records, pageList.getTotal());
+    }
+
+    public void export(ConsumeDto dto) {
+        try {
+            QueryWrapper<ConsumeEntity> queryWrapper = getQueryWrapper(dto);
+            List<ConsumeEntity> list = baseMapper.selectList(queryWrapper);
+            ExcelUtils.exportExcelWithDict(response, null, list, ConsumeEntity.class);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     private QueryWrapper<ConsumeEntity> getQueryWrapper(ConsumeDto dto) {
