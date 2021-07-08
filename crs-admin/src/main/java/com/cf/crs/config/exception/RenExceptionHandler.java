@@ -12,7 +12,6 @@ import com.cf.crs.common.constant.MsgError;
 import com.cf.crs.common.exception.AuthException;
 import com.cf.crs.common.exception.ErrorCode;
 import com.cf.crs.common.exception.RenException;
-import com.cf.crs.common.utils.Result;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
 import com.cf.util.utils.MessageUtil;
@@ -39,7 +38,7 @@ public class RenExceptionHandler {
 	 */
 	@ExceptionHandler(AuthException.class)
 	public ResultJson handleRenException(AuthException ex){
-		return HttpWebResult.getMonoError(ErrorCode.FORBIDDEN, MsgError.AUTH_FAIL);
+		return HttpWebResult.getMonoError(ErrorCode.UNAUTHORIZED, MsgError.AUTH_FAIL);
 	}
 
 

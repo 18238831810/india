@@ -10,6 +10,7 @@ import com.cf.crs.entity.UserEntity;
 import com.cf.crs.mapper.UserMapper;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
+import com.cf.util.utils.Const;
 import com.cf.util.utils.Md5Util;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -30,6 +32,9 @@ public class UserService extends ServiceImpl<UserMapper, UserEntity> implements 
 
     @Autowired
     RedisTemplate<String,Object> redisTemplate;
+
+    @Autowired
+    HttpServletRequest request;
 
     /**
      * 登录
@@ -46,6 +51,17 @@ public class UserService extends ServiceImpl<UserMapper, UserEntity> implements 
         redisTemplate.opsForValue().set(token, JSON.toJSONString(userEntity),2, TimeUnit.HOURS);
         log.info("user:{}",JSON.toJSONString(userEntity));
         return HttpWebResult.getMonoSucResult(userEntity);
+    }
+
+
+    /**
+     * 退出登录
+     * @return
+     */
+    public ResultJson<String> logout(){
+        String authorization = request.getHeader(Const.AUTHORIZATION);
+        redisTemplate.delete(authorization);
+        return HttpWebResult.getMonoSucStr();
     }
 
 

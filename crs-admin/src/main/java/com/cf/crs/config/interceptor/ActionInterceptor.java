@@ -3,6 +3,7 @@ package com.cf.crs.config.interceptor;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cf.crs.common.exception.AuthException;
+import com.cf.crs.entity.UserEntity;
 import com.cf.util.utils.Const;
 import com.cf.util.utils.DataChange;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +67,12 @@ public class ActionInterceptor implements HandlerInterceptor {
      */
     private boolean checkLoinForAdmin(HttpServletRequest request)
     {
+        String authorization = request.getHeader(Const.AUTHORIZATION);
+        if (!authorization.startsWith(Const.AUTHORIZATION_PREFIX)) return false;
+        Object user = redisTemplate.opsForValue().get(authorization);
+        UserEntity userEntity = JSON.parseObject(DataChange.obToString(user), UserEntity.class);
+        if (userEntity == null || !authorization.equalsIgnoreCase(userEntity.getTPassWord())) return false;
+        redisTemplate.expire(authorization,2,TimeUnit.HOURS);
         return true;
     }
 

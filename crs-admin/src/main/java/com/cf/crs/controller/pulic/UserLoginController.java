@@ -7,8 +7,8 @@ import com.cf.crs.service.UserService;
 import com.cf.util.http.ResultJson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequestMapping("/public/user")
 public class UserLoginController {
 
     @Autowired
@@ -26,14 +25,23 @@ public class UserLoginController {
     OrderCashoutService orderCashoutService;
 
     /**
-     * 存款回调
+     * 登录
      * @param userName
      * @param password
      * @return
      */
-    @PostMapping("/login")
+    @PostMapping("/public/user/login")
     public ResultJson<UserEntity> login(String userName, String password){
         return userService.login(userName,password);
+    }
+
+    /**
+     * 退出登录
+     * @return
+     */
+    @GetMapping("/admin/user/logout")
+    public ResultJson<String> logout(){
+        return userService.logout();
     }
 
 }

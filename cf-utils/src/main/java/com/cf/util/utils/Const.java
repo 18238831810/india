@@ -1,5 +1,7 @@
 package com.cf.util.utils;
 
+import org.omg.CORBA.PUBLIC_MEMBER;
+
 /**
  * 常用变量
  * @author frank
@@ -15,6 +17,11 @@ public class Const {
 
 	public static  final  String ADMIN ="/admin/";
 	public static  final  String ADMIN_URL ="/admin/**";
+
+	public static  final String AUTHORIZATION = "Authorization";
+
+	public static  final String AUTHORIZATION_PREFIX = "authorization_";
+
 
 	/**
 	 * 用户token
