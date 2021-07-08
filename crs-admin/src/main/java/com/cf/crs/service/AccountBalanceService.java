@@ -16,6 +16,7 @@ import com.cf.util.http.ResultJson;
 import com.cf.util.utils.DateUtil;
 import com.cf.util.utils.ExcelUtils;
 import lombok.extern.slf4j.Slf4j;
+import ma.glasnost.orika.MapperFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,9 @@ public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, Acc
     HttpServletResponse response;
 
 
+    @Autowired
+    MapperFacade mapperFacade;
+
     /**
      * 分页查询用户的资金列表
      *
@@ -60,11 +64,19 @@ public class AccountBalanceService extends ServiceImpl<AccountBalanceMapper, Acc
         return queryWrapper;
     }
 
+
     public void export(AccountBalanceDto dto) {
         try {
             QueryWrapper<AccountBalanceEntity> queryWrapper = getQueryWrapper(dto);
             List<AccountBalanceEntity> list = baseMapper.selectList(queryWrapper);
-            ExcelUtils.exportExcelWithDict(response, null, list, AccountBalanceEntity.class);
+            if (dto.getType() == 0) {
+                //普通用户导出
+                ExcelUtils.exportExcelWithDict(response, null, list, AccountBalanceEntity.class);
+            }else{
+                //主播导出
+                List<AnchorBalanceEntity> anchorList = mapperFacade.mapAsList(list, AnchorBalanceEntity.class);
+                ExcelUtils.exportExcelWithDict(response, null, anchorList, AnchorBalanceEntity.class);
+            }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

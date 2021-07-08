@@ -70,6 +70,14 @@
             <version>3.1.0</version>
         </dependency>
 
+
+        <!-- 实体集合转换 -->
+        <dependency>
+            <groupId>ma.glasnost.orika</groupId>
+            <artifactId>orika-core</artifactId>
+            <version>1.5.4</version>
+        </dependency>
+
     </dependencies>
 
 

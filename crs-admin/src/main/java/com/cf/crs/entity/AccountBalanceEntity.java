@@ -53,11 +53,11 @@ public class AccountBalanceEntity {
     @ApiModelProperty(value = "更新时间")
     private Long updateTime;
 
-    @Excel(name = "打赏收益")
+    //@Excel(name = "打赏收益")
     @ApiModelProperty(value = "打赏收益")
     private BigDecimal consumeCount = BigDecimal.ZERO;
 
-    @Excel(name = "交易流水分层")
+    //@Excel(name = "交易流水分层")
     @ApiModelProperty(value = "交易流水分层")
     private BigDecimal orderCount = BigDecimal.ZERO;
 
