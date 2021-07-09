@@ -22,6 +22,8 @@ public class Const {
 
 	public static  final String AUTHORIZATION_PREFIX = "authorization_";
 
+	public static  final String AGORA_TOKEN = "agora_token_";
+
 
 	/**
 	 * 用户token

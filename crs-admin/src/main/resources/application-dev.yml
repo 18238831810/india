@@ -67,6 +67,15 @@ order:
     orderCallbackUrl: http://frank.cn.utools.club/public/orderCallback/order
     collectionUrl: http://47.241.170.206/api/payTest/collection
     collectionCallbackUrl: http://frank.cn.utools.club/public/orderCallback/collection
+#声网配制
+agora:
+  config:
+    appId: c600202c72484e6d8f29e6c053500734
+    appCertificate: 3fccaa040ea9432c91e59ab9c9208672
+    expirationTimeInSeconds: 3600
+    cacheTimeInSeconds: 3500
+
+
 
 
 
