@@ -66,5 +66,15 @@ public class AccountService extends ServiceImpl<AccountMapper, AccountEntity> im
         return HttpWebResult.getMonoSucStr();
     }
 
+    /**
+     * 更改主播每分钟收费标准
+     * @param dto
+     * @return
+     */
+    public ResultJson<String> updateFee(AccountDto dto) {
+        baseMapper.update(null,new UpdateWrapper<AccountEntity>().eq("t_id",dto.getTId()).set("t_fee_standard",dto.getTFeeStandard()));
+        return HttpWebResult.getMonoSucStr();
+    }
+
 
 }

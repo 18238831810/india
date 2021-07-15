@@ -45,5 +45,12 @@ public class AccountDto extends QueryPage implements Serializable  {
     @JsonProperty("tRecord")
     private Integer tRecord;
 
+    /**
+     * 直播收费标准（每分钟）
+     */
+    @JsonProperty("tFeeStandard")
+    private Integer tFeeStandard;
+
+
 
 }

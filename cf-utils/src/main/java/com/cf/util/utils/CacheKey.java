@@ -12,11 +12,7 @@ package com.cf.util.utils;
 public class CacheKey {
 
 
-	public static  final  String USER_TOKEN ="user:token";
+	public static  final  String PROMOTION_REBATE_SETTING ="promotion_rebate_setting";
 
-
-	public static  final  String CHECK_PLAN ="check:plan";
-
-	public static  final  String USER_NAME_TOKEN ="user:name:token";
 }
  

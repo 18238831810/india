@@ -5,7 +5,9 @@ import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.common.utils.Result;
 import com.cf.crs.entity.AccountDto;
 import com.cf.crs.entity.AccountEntity;
+import com.cf.crs.entity.PromotionRebateEntity;
 import com.cf.crs.service.AccountService;
+import com.cf.crs.service.PromotionRebateService;
 import com.cf.util.http.ResultJson;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
@@ -14,30 +16,30 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 推广返利规则设置
+ * @author frank
+ * @date 2021-07-15
+ */
 @Slf4j
-@Api(tags="用户和主播列表")
+@Api(tags="推广返利规则设置")
 @RestController
-@RequestMapping("/admin/account")
-public class AdminAccountController {
+@RequestMapping("/admin/promotionRebate")
+public class AdminPromotionRebateController {
 
     @Autowired
-    AccountService accountService;
+    PromotionRebateService promotionRebateService;
 
 
     @PostMapping("/queryList")
-    public Result<PagingBase<AccountEntity>> list(AccountDto dto){
-        PagingBase<AccountEntity> pagingBase = accountService.queryList(dto);
-        return new Result<PagingBase<AccountEntity>>().ok(pagingBase);
+    public ResultJson<PromotionRebateEntity> queryList(){
+        return promotionRebateService.queryList();
     }
 
-    @PostMapping("/updateRecordStatus")
-    public ResultJson<String> updateRecordStatus(AccountDto dto){
-        return accountService.updateRecordStatus(dto);
+    @PostMapping("/updateSetting")
+    public ResultJson<String> updateSetting(PromotionRebateEntity promotionRebateEntity){
+        return promotionRebateService.updateSetting(promotionRebateEntity);
     }
 
-    @PostMapping("/updateFee")
-    public ResultJson<String> updateFee(AccountDto dto){
-        return accountService.updateFee(dto);
-    }
 
 }
