@@ -1,14 +1,10 @@
 package com.cf.crs.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.cf.crs.common.entity.QueryPage;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import io.swagger.models.auth.In;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -19,12 +15,7 @@ import java.io.Serializable;
  *
  **/
 @Data
-@TableName("t_user")
-@Builder
-@ApiModel("用户列表")
-@NoArgsConstructor
-@AllArgsConstructor
-public class AccountEntity implements Serializable {
+public class AccountDto extends QueryPage implements Serializable  {
 
     @TableId
     @JsonProperty("tId")
@@ -36,7 +27,6 @@ public class AccountEntity implements Serializable {
     @JsonProperty("tIdcard")
     private Integer tIdcard;
 
-    @TableField("t_nickName")
     @JsonProperty("tNickName")
     private String tNickName;
 
@@ -54,7 +44,6 @@ public class AccountEntity implements Serializable {
 
     @JsonProperty("tRecord")
     private Integer tRecord;
-
 
 
 }
