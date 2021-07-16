@@ -55,6 +55,9 @@ public class AccountEntity implements Serializable {
     @JsonProperty("tRecord")
     private Integer tRecord;
 
+    @JsonProperty("tReferee")
+    private Long tReferee;
+
     /**
      * 直播收费标准（每分钟）
      */

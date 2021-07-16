@@ -40,6 +40,14 @@ public class Const {
 	 */
 	public final static long LIMIT_TIME = 40;
 
+	/**
+	 * redis stream 消息队列topic
+	 */
+	public final static String REDIS_STREAM_TOPIC = "redis_stream_topic";
+
+	public final static String CASHIN_TAG = "cashin";
+
+
 
 
 }

@@ -20,10 +20,7 @@ import com.cf.crs.properties.OrderConfigProperties;
 import com.cf.crs.properties.OrderParam;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
-import com.cf.util.utils.DateUtil;
-import com.cf.util.utils.ExcelUtils;
-import com.cf.util.utils.OrderSignUtil;
-import com.cf.util.utils.WebTools;
+import com.cf.util.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +64,10 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
     @Autowired
     HttpServletResponse response;
 
+    @Autowired
+    SendRedisMessage sendRedisMessage;
+
+
     /**
      * 统计存款总额
      *
@@ -89,6 +90,16 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    /**
+     * 统计存款总额
+     *
+     * @param dto
+     * @return
+     */
+    public void sendCashinRebate(OrderCashinDto dto) {
+        sendRedisMessage.send(DataChange.obToString(dto.getUid()),Const.CASHIN_TAG);
     }
 
     /**
@@ -244,6 +255,12 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
             updateAccountBalance(orderCashinEntity);
             //新增资金明细记录
             addFinancialDetails(callbackParamm, orderCashinEntity);
+            try {
+                //发送充值成功到消息队列，处理注册充值推广奖励
+                sendRedisMessage.send(DataChange.obToString(orderCashinEntity.getUid()), Const.CASHIN_TAG);
+            } catch (Exception e) {
+                log.error(e.getMessage(),e);
+            }
         }
         return "success";
     }

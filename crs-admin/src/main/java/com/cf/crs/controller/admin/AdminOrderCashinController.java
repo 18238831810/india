@@ -42,4 +42,13 @@ public class AdminOrderCashinController {
     public void export(OrderCashinDto dto) {
         orderCashinService.export(dto);
     }
+
+    /**
+     * 手动触发推广奖励（作为发生意外时的补救方案）
+     * @param dto
+     */
+    @PostMapping("/sendCashinRebate")
+    public void sendCashinRebate(OrderCashinDto dto){
+        orderCashinService.sendCashinRebate(dto);
+    }
 }

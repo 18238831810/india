@@ -35,7 +35,7 @@ public class OrderCallbackController {
         return orderCashinService.orderCallback(callbackParamm);
     }
     /**
-     * 存款回调
+     * 取款回调
      * @param callbackParamm
      * @return
      */

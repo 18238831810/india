@@ -164,7 +164,7 @@ public class JsonUtils {
      * @return
      * @throws Exception
      */
-    public static <T> Map<String, T> json2map(String jsonString, Class<T> clazz) throws Exception {
+   /* public static <T> Map<String, T> json2map(String jsonString, Class<T> clazz) throws Exception {
         Map<String, Map<String, Object>> map = objectMapper.readValue(jsonString, new TypeReference<Map<String, T>>() {
         });
         Map<String, T> result = new HashMap<String, T>();
@@ -172,7 +172,7 @@ public class JsonUtils {
             result.put(entry.getKey(), map2pojo(entry.getValue(), clazz));
         }
         return result;
-    }
+    }*/
 
 
     /**
