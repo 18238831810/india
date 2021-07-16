@@ -2,18 +2,24 @@ package com.cf.crs.service;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cf.crs.common.entity.PagingBase;
 import com.cf.crs.entity.*;
 import com.cf.crs.mapper.AccountMapper;
 import com.cf.crs.mapper.CashinRebateMapper;
 import com.cf.crs.mapper.OrderCashinMapper;
+import com.cf.util.utils.ExcelUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.util.List;
 
 
 /**
@@ -34,6 +40,37 @@ public class CashinRebateService extends ServiceImpl<CashinRebateMapper, CashinR
 
     @Autowired
     AccountBalanceService accountBalanceService;
+
+    @Autowired
+    HttpServletResponse response;
+
+    /**
+     * 查询用户的资金明细列表
+     *
+     * @param dto
+     * @return
+     */
+    public PagingBase<CashinRebateEntity> queryList(CashinRebateDto dto) {
+        Page<CashinRebateEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
+        QueryWrapper<CashinRebateEntity> queryWrapper = getQueryWrapper(dto);
+        IPage<CashinRebateEntity> pageList = this.page(iPage, queryWrapper);
+        List<CashinRebateEntity> records = pageList.getRecords();
+        return new PagingBase<CashinRebateEntity>(records, pageList.getTotal());
+    }
+
+    private QueryWrapper<CashinRebateEntity> getQueryWrapper(CashinRebateDto dto) {
+        return new QueryWrapper<CashinRebateEntity>().orderByDesc("create_time");
+    }
+
+    public void export(CashinRebateDto dto) {
+        try {
+            QueryWrapper<CashinRebateEntity> queryWrapper = getQueryWrapper(dto);
+            List<CashinRebateEntity> list = baseMapper.selectList(queryWrapper);
+            ExcelUtils.exportExcelWithDict(response, null, list, CashinRebateEntity.class);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 
     /**
      * 发放注册充值奖励
@@ -60,6 +97,10 @@ public class CashinRebateService extends ServiceImpl<CashinRebateMapper, CashinR
         }
 
         AccountEntity accountEntity = accountMapper.selectById(uid);
+        if (accountEntity == null){
+            log.info("saveCashinRebate uid --> {} no uid",uid);
+            return;
+        }
         Long direct = accountEntity.getTReferee();
         if (direct == null || direct <= 0) {
             log.info("saveCashinRebate uid --> {} no direct",uid);
@@ -74,6 +115,8 @@ public class CashinRebateService extends ServiceImpl<CashinRebateMapper, CashinR
 
         //保存奖励发放记录
         baseMapper.insert(cashinRebateEntity);
+
+        //System.out.println(1/0);
     }
 
     /**

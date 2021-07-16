@@ -35,7 +35,7 @@ public class MyRedisConsumer implements StreamListener<String, ObjectRecord<Stri
             String tag = jsonObject.getString("tag");
             if (Const.CASHIN_TAG.equalsIgnoreCase(tag)){
                 //注册充值奖励
-                cashinRebateService.saveCashinRebate(jsonObject.getLong(message));
+                cashinRebateService.saveCashinRebate(jsonObject.getLong("message"));
             }
         } catch (Exception e) {
            log.error(e.getMessage(),e);

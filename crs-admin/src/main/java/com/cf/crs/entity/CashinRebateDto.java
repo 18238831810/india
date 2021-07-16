@@ -2,12 +2,14 @@ package com.cf.crs.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.cf.crs.common.entity.QueryPage;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 
@@ -15,11 +17,7 @@ import java.math.BigDecimal;
  * 注册充值返利记录
  */
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@TableName("u_cashin_rebate")
-public class CashinRebateEntity {
+public class CashinRebateDto extends QueryPage implements Serializable {
 
 
     private Long id;
@@ -47,7 +45,7 @@ public class CashinRebateEntity {
     @ApiModelProperty(value = "间接返利金额")
     private BigDecimal cashinIndirect;
 
-    @Excel(name = "返利时间",dict = "t_yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "返利时间")
     @ApiModelProperty(value = "返利时间")
     private Long createTime;
 
