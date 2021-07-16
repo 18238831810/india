@@ -51,5 +51,9 @@ public class CashinRebateEntity {
     @ApiModelProperty(value = "返利时间")
     private Long createTime;
 
+    @Excel(name = "返利类型")
+    @ApiModelProperty(value = "返利类型（0:注册充值返利,1:交易返利）")
+    private Integer type = 0;
+
 
 }

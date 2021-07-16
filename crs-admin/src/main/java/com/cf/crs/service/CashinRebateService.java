@@ -137,6 +137,7 @@ public class CashinRebateService extends ServiceImpl<CashinRebateMapper, CashinR
         cashinRebateEntity.setDirect(direct);
         cashinRebateEntity.setCashinDirect(cashinDirect);
         cashinRebateEntity.setCreateTime(now);
+        cashinRebateEntity.setType(0);
     }
 
     /**
