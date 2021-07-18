@@ -7,6 +7,7 @@ import io.swagger.models.auth.In;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * 用户列表
@@ -49,7 +50,10 @@ public class AccountDto extends QueryPage implements Serializable  {
      * 直播收费标准（每分钟）
      */
     @JsonProperty("tFeeStandard")
-    private Integer tFeeStandard;
+    private BigDecimal tFeeStandard;
+
+    @JsonProperty("tFeeRadio")
+    private Integer tFeeRadio;
 
 
 

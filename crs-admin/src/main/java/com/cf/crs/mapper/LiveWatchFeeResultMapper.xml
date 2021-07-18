@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cf.crs.mapper.LiveWatchFeeResultMapper">
+
+   <insert id="updateOrInsert">
+       INSERT INTO `u_live_watch_fee_result`(`uid`,`cover_id`,`create_time`,`update_time`,`total_amount`,`cover_amount`,`type`,`fee_type`,`live_id`,`duration`)
+       VALUES (#{item.uid},#{item.coverId},#{item.createTime},#{item.createTime},#{item.totalAmount},#{item.coverAmount},#{item.type},#{item.feeType},#{item.liveId},1)
+       ON DUPLICATE KEY UPDATE
+       `update_time` = VALUES(update_time),
+       `total_amount` = (`total_amount` + VALUES(total_amount)),
+       `cover_amount` = (`cover_amount` + VALUES(cover_amount)),
+       `duration` = (`duration` + 1)
+   </insert>
+
+
+</mapper>

@@ -61,4 +61,12 @@ public class AccountBalanceEntity {
     @ApiModelProperty(value = "交易流水分层")
     private BigDecimal orderCount = BigDecimal.ZERO;
 
+    @Excel(name = "注册充值推广收益")
+    @ApiModelProperty(value = "注册充值推广收益")
+    private BigDecimal cashinRebateCount = BigDecimal.ZERO;
+
+    @Excel(name = "交易下单推广收益")
+    @ApiModelProperty(value = "交易下单推广收益")
+    private BigDecimal orderRebateCount = BigDecimal.ZERO;
+
 }

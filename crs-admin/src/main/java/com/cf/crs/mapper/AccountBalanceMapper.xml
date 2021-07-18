@@ -4,14 +4,16 @@
 <mapper namespace="com.cf.crs.mapper.AccountBalanceMapper">
 
    <insert id="updateAddBalance">
-       INSERT INTO `u_account_balance`(`uid`,`amount`,`update_time`,`consume_count`,`order_count`,`phone`)
-       VALUES (#{item.uid},#{item.amount},#{item.updateTime},#{item.consumeCount},#{item.orderCount},#{item.phone})
+       INSERT INTO `u_account_balance`(`uid`,`amount`,`update_time`,`consume_count`,`order_count`,`phone`,`cashin_rebate_count`,`order_rebate_count`)
+       VALUES (#{item.uid},#{item.amount},#{item.updateTime},#{item.consumeCount},#{item.orderCount},#{item.phone},#{item.cashinRebateCount},#{item.orderRebateCount})
        ON DUPLICATE KEY UPDATE
        `update_time` = VALUES(update_time),
        `phone` = VALUES(phone),
-       `amount` = (`amount` + VALUES(amount)),
-       `consume_count` = (`consume_count` + VALUES(consume_count)),
-       `order_count` = (`order_count` + VALUES(order_count))
+       `amount` = if(`amount` is null,VALUES(amount),`amount` + VALUES(amount)),
+       `consume_count` = if(`consume_count` is null,VALUES(consume_count),`consume_count` + VALUES(consume_count)),
+       `order_count` = if(`order_count` is null,VALUES(order_count),`order_count` + VALUES(order_count)),
+       `cashin_rebate_count` = if(`cashin_rebate_count` is null,VALUES(cashin_rebate_count),`cashin_rebate_count` + VALUES(cashin_rebate_count)),
+       `order_rebate_count` = if(`order_rebate_count` is null,VALUES(order_rebate_count),`order_rebate_count` + VALUES(order_rebate_count))
    </insert>
 
     <update id="updateSubBalance">

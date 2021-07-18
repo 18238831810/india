@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * 用户列表
@@ -62,7 +63,14 @@ public class AccountEntity implements Serializable {
      * 直播收费标准（每分钟）
      */
     @JsonProperty("tFeeStandard")
-    private Integer tFeeStandard;
+    private BigDecimal tFeeStandard;
+
+
+    /**
+     * 直播主播分层比例
+     */
+    @JsonProperty("tFeeRadio")
+    private Integer tFeeRadio;
 
 
 

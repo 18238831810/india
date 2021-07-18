@@ -116,7 +116,6 @@ public class CashinRebateService extends ServiceImpl<CashinRebateMapper, CashinR
         //保存奖励发放记录
         baseMapper.insert(cashinRebateEntity);
 
-        //System.out.println(1/0);
     }
 
     /**
@@ -131,7 +130,7 @@ public class CashinRebateService extends ServiceImpl<CashinRebateMapper, CashinR
     private void updateDirectBlance(Long uid, long now, CashinRebateEntity cashinRebateEntity, PromotionRebateEntity promotionRebateSetting, Long direct, AccountEntity directEntity) {
         //发放直接推荐奖励
         BigDecimal cashinDirect = promotionRebateSetting.getCashinDirect();
-        AccountBalanceEntity directBalanceEntity = AccountBalanceEntity.builder().amount(cashinDirect).uid(direct).phone(directEntity.getTPhone()).updateTime(now).build();
+        AccountBalanceEntity directBalanceEntity = AccountBalanceEntity.builder().amount(cashinDirect).uid(direct).cashinRebateCount(cashinDirect).phone(directEntity.getTPhone()).updateTime(now).build();
         accountBalanceService.updateBalance(directBalanceEntity);
         cashinRebateEntity.setUid(uid);
         cashinRebateEntity.setDirect(direct);
@@ -155,7 +154,7 @@ public class CashinRebateService extends ServiceImpl<CashinRebateMapper, CashinR
         }else {
             //发放间接推荐奖励
             BigDecimal cashinIndirect = promotionRebateSetting.getCashinIndirect();
-            AccountBalanceEntity indirectBalanceEntity = AccountBalanceEntity.builder().amount(cashinIndirect).uid(indirect).updateTime(now).build();
+            AccountBalanceEntity indirectBalanceEntity = AccountBalanceEntity.builder().amount(cashinIndirect).cashinRebateCount(cashinIndirect).uid(indirect).updateTime(now).build();
             accountBalanceService.updateBalance(indirectBalanceEntity);
             cashinRebateEntity.setIndirect(indirect);
             cashinRebateEntity.setCashinIndirect(cashinIndirect);
