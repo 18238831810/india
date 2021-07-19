@@ -1,20 +1,21 @@
 package com.cf.crs.service;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cf.crs.common.constant.MsgError;
-import com.cf.crs.entity.AccountBalanceEntity;
-import com.cf.crs.entity.AccountEntity;
-import com.cf.crs.entity.LiveWatchFeeDto;
-import com.cf.crs.entity.LiveWatchFeeEntity;
+import com.cf.crs.common.entity.PagingBase;
+import com.cf.crs.entity.*;
 import com.cf.crs.mapper.AccountMapper;
 import com.cf.crs.mapper.LiveWatchFeeMapper;
 import com.cf.crs.mapper.LiveWatchFeeResultMapper;
 import com.cf.util.http.HttpWebResult;
 import com.cf.util.http.ResultJson;
-import com.cf.util.utils.DataChange;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -48,6 +50,44 @@ public class LiveWatchFeeService extends ServiceImpl<LiveWatchFeeMapper, LiveWat
 
     @Autowired
     LiveWatchFeeResultMapper liveWatchFeeResultMapper;
+
+
+    /**
+     * 查询用户的充值列表
+     *
+     * @param dto
+     * @return
+     */
+    public PagingBase<LiveWatchFeeResultEntity> queryResultList(LiveWatchFeePage dto) {
+        Page<LiveWatchFeeResultEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
+        QueryWrapper<LiveWatchFeeResultEntity> queryWrapper = getQueryResultWrapper(dto);
+        IPage<LiveWatchFeeResultEntity> pageList = liveWatchFeeResultMapper.selectPage(iPage, queryWrapper);
+        List<LiveWatchFeeResultEntity> records = pageList.getRecords();
+        return new PagingBase<LiveWatchFeeResultEntity>(records, pageList.getTotal());
+    }
+
+    private QueryWrapper<LiveWatchFeeResultEntity> getQueryResultWrapper(LiveWatchFeePage dto) {
+        return new QueryWrapper<LiveWatchFeeResultEntity>().eq(dto.getUid() != null, "uid", dto.getUid()).orderByDesc("create_time");
+    }
+
+
+    /**
+     * 查询用户的充值列表
+     *
+     * @param dto
+     * @return
+     */
+    public PagingBase<LiveWatchFeeEntity> queryList(LiveWatchFeePage dto) {
+        Page<LiveWatchFeeEntity> iPage = new Page(dto.getPageNum(), dto.getPageSize());
+        QueryWrapper<LiveWatchFeeEntity> queryWrapper = getQueryWrapper(dto);
+        IPage<LiveWatchFeeEntity> pageList = this.page(iPage, queryWrapper);
+        List<LiveWatchFeeEntity> records = pageList.getRecords();
+        return new PagingBase<LiveWatchFeeEntity>(records, pageList.getTotal());
+    }
+
+    private QueryWrapper<LiveWatchFeeEntity> getQueryWrapper(LiveWatchFeePage dto) {
+        return new QueryWrapper<LiveWatchFeeEntity>().eq(dto.getUid() != null, "uid", dto.getUid()).eq(StringUtils.isNotEmpty(dto.getLiveId()),"live_id",dto.getLiveId()).orderByDesc("create_time");
+    }
 
     /**
      * 观看直播收费

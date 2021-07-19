@@ -102,7 +102,7 @@ public class OrderCashinService extends ServiceImpl<OrderCashinMapper, OrderCash
     }
 
     /**
-     * 查询用户的资金明细列表
+     * 查询用户的充值列表
      *
      * @param dto
      * @return
