@@ -97,13 +97,12 @@ public class TXSdkService {
         JSONArray msgBody = new JSONArray();
         msgBody.add(msgBodyJson);
 
-        map.put("GroupId","10423");
+        map.put("GroupId",orderEntity.getRoomId().substring(0,orderEntity.getRoomId().length() - 2));
         map.put("Random",""+type+orderEntity.getId());
         map.put("MsgBody",msgBody);
         log.info(JSON.toJSONString(map));
         sendMessage(map);
     }
-
 
     public JSONObject sendMessage(Map<String, Object> map){
         String identifier = TXSdkProperties.getIdentifier();
