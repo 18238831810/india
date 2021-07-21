@@ -61,7 +61,7 @@ public class TXSdkService {
         Map<String, Object> map = new HashMap<String, Object>(2);
         //String content = new StringBuffer("用户").append(orderEntity.getUid()).append("在").append("分时交易玩法中,买入").append(orderEntity.getPayment()).toString();
         JSONObject text = new JSONObject();
-        AccountEntity accountEntity = accountMapper.selectById(orderEntity.getId());
+        AccountEntity accountEntity = accountMapper.selectById(orderEntity.getUid());
         if (accountEntity == null) return;
         text.put("name",accountEntity.getTNickName());
         text.put("type","order");
