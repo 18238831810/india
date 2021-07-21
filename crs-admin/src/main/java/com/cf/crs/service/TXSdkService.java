@@ -4,7 +4,9 @@ package com.cf.crs.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.cf.crs.entity.AccountEntity;
 import com.cf.crs.entity.OrderEntity;
+import com.cf.crs.mapper.AccountMapper;
 import com.cf.crs.properties.TXSdkProperties;
 import com.cf.util.utils.CacheKey;
 import com.cf.util.utils.TLSSigAPIv2;
@@ -38,6 +40,9 @@ public class TXSdkService {
     @Autowired
     RestTemplate restTemplate;
 
+    @Autowired
+    AccountMapper accountMapper;
+
     /*{
         "GroupId": "@TGS#2C5SZEAEF",
         "From_Account": "leckie", // 指定消息发送者（选填）
@@ -54,14 +59,16 @@ public class TXSdkService {
 
     public void sendOrderMessage(OrderEntity orderEntity){
         Map<String, Object> map = new HashMap<String, Object>(2);
-        String content = new StringBuffer("用户").append(orderEntity.getUid()).append("在").append("分时交易玩法中,买入").append(orderEntity.getPayment()).toString();
+        //String content = new StringBuffer("用户").append(orderEntity.getUid()).append("在").append("分时交易玩法中,买入").append(orderEntity.getPayment()).toString();
         JSONObject text = new JSONObject();
+        AccountEntity accountEntity = accountMapper.selectById(orderEntity.getId());
+        if (accountEntity == null) return;
+        text.put("name",accountEntity.getTNickName());
         text.put("type","order");
-        text.put("content",content);
         text.put("button","跟买");
-        //text.put("uid", orderEntity.getUid());
+        text.put("uid", orderEntity.getUid());
+        text.put("payment",orderEntity.getPayment());
         text.put("buyDirection",orderEntity.getBuyDirection());
-
         getMessageBody(orderEntity, map, text,1);
     }
 
