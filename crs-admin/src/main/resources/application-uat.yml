@@ -74,7 +74,13 @@ agora:
     appCertificate: 3fccaa040ea9432c91e59ab9c9208672
     expirationTimeInSeconds: 3600
     cacheTimeInSeconds: 3500
-
+tcsdk:
+  config:
+    sdkappid: 1400526583
+    identifier: administrator
+    key: b18db03c42cd57300ec5ffcfae30d91632b7d7a3ef370438aad10a069d9d3fc7
+    serveName: https://console.tim.qq.com
+    systemNotificationUrl: /v4/group_open_http_svc/send_group_msg
 
 
 
