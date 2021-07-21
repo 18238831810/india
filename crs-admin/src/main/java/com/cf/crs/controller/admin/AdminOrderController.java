@@ -41,4 +41,14 @@ public class AdminOrderController {
     public void export(OrderDto dto) {
         orderService.export(dto);
     }
+
+    @PostMapping("/sendMessage")
+    public void sendMessage(Long id) {
+        orderService.sendMessage(id);
+    }
+
+    @PostMapping("/sendProfitMessage")
+    public void sendProfitMessage(Long id) {
+        orderService.sendProfitMessage(id);
+    }
 }

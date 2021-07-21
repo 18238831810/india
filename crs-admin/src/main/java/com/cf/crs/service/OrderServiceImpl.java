@@ -58,6 +58,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     @Autowired
     HttpServletResponse response;
 
+    @Autowired
+    SendRedisMessage sendRedisMessage;
+
     /**
      * 下单的三个方向常量
      */
@@ -364,4 +367,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
             log.error(e.getMessage(), e);
         }
     }
+
+    public ResultJson<BigDecimal> sendMessage(Long id) {
+        OrderEntity orderEntity = baseMapper.selectById(id);
+        sendRedisMessage.send(orderEntity,Const.ORDER_TAG);
+        return HttpWebResult.getMonoSucStr();
+    }
+
+    public ResultJson<BigDecimal> sendProfitMessage(Long id) {
+        OrderEntity orderEntity = baseMapper.selectById(id);
+        sendRedisMessage.send(orderEntity,Const.ORDER_PROFIT_TAG);
+        return HttpWebResult.getMonoSucStr();
+    }
+
 }

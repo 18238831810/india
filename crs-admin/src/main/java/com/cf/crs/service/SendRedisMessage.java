@@ -4,6 +4,7 @@ package com.cf.crs.service;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.cf.crs.entity.OrderEntity;
 import com.cf.util.utils.Const;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,19 @@ public class SendRedisMessage {
             log.info("消息发送成功{}", recordId);
         } catch (Exception e) {
             throw new RuntimeException(StrUtil.format("消息发送失败[{}]", message));
+        }
+    }
+
+    public void send(OrderEntity orderEntity, String tag) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("tag",tag);
+            jsonObject.put("message",orderEntity);
+            ObjectRecord<String, String> record = StreamRecords.objectBacked(JSON.toJSONString(jsonObject)).withStreamKey(Const.REDIS_STREAM_TOPIC);
+            RecordId recordId = stringRedisTemplate.opsForStream().add(record);
+            log.info("消息发送成功{}", recordId);
+        } catch (Exception e) {
+            throw new RuntimeException(StrUtil.format("消息发送失败[{}]", orderEntity));
         }
     }
 

@@ -45,7 +45,21 @@ public class Const {
 	 */
 	public final static String REDIS_STREAM_TOPIC = "redis_stream_topic";
 
-	public final static String CASHIN_TAG = "cashin";
+	/**
+	 * redis stream 消息队列 存款 tag
+	 */
+	public final static String CASHIN_TAG = "redis_tag_cashin";
+
+	/**
+	 * redis stream 消息队列 交易 tag
+	 */
+	public final static String ORDER_TAG = "redis_tag_order";
+
+
+	/**
+	 * redis stream 消息队列 交易盈利 tag
+	 */
+	public final static String ORDER_PROFIT_TAG = "redis_tag_order_profit";
 
 
 

@@ -3,7 +3,9 @@ package com.cf.crs.listener;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.cf.crs.entity.OrderEntity;
 import com.cf.crs.service.CashinRebateService;
+import com.cf.crs.service.TXSdkService;
 import com.cf.util.utils.Const;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -25,6 +27,9 @@ public class MyRedisConsumer implements StreamListener<String, ObjectRecord<Stri
     @Autowired
     CashinRebateService cashinRebateService;
 
+    @Autowired
+    TXSdkService txSdkService;
+
     @Override
     @SneakyThrows
     public void onMessage(ObjectRecord<String, String> record) {
@@ -36,6 +41,14 @@ public class MyRedisConsumer implements StreamListener<String, ObjectRecord<Stri
             if (Const.CASHIN_TAG.equalsIgnoreCase(tag)){
                 //注册充值奖励
                 cashinRebateService.saveCashinRebate(jsonObject.getLong("message"));
+            }else if (Const.ORDER_TAG.equalsIgnoreCase(tag)){
+                //下单
+                OrderEntity orderEntity = jsonObject.getObject("message", OrderEntity.class);
+                txSdkService.sendOrderMessage(orderEntity);
+            }else if (Const.ORDER_PROFIT_TAG.equalsIgnoreCase(tag)){
+                //下单盈利
+                OrderEntity orderEntity = jsonObject.getObject("message", OrderEntity.class);
+                txSdkService.sendOrderProfitMessage(orderEntity);
             }
         } catch (Exception e) {
            log.error(e.getMessage(),e);

@@ -10,7 +10,14 @@ import java.util.List;
 
 
 public class WebTools {
-    
+
+    public static void main(String[] args) {
+        TLSSigAPIv2 tlsSigAPIv2 = new TLSSigAPIv2(1400526583, "b18db03c42cd57300ec5ffcfae30d91632b7d7a3ef370438aad10a069d9d3fc7");
+        String s = tlsSigAPIv2.genUserSig("administrator", 3600);
+        System.out.println(s);
+
+    }
+
 	private static final String REQUEST_HEADER_USER_AGENT_KEY = "User-Agent";
 	
 	public static String getFirstIpAddress(String ipaddr) {
