@@ -3,10 +3,13 @@ package com.cf.crs.listener;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.cf.crs.entity.OrderEntity;
+import com.cf.crs.entity.SettingOrderEntity;
 import com.cf.crs.service.CashinRebateService;
 import com.cf.crs.service.TXSdkService;
 import com.cf.util.utils.Const;
+import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +18,9 @@ import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -49,6 +55,10 @@ public class MyRedisConsumer implements StreamListener<String, ObjectRecord<Stri
                 //下单盈利
                 OrderEntity orderEntity = jsonObject.getObject("message", OrderEntity.class);
                 txSdkService.sendOrderProfitMessage(orderEntity);
+            }else if (Const.ORDER_SETTING_TAG.equalsIgnoreCase(tag)){
+                //下单
+                List<SettingOrderEntity> list = JSON.parseObject(jsonObject.getString("message"), new TypeReference<List<SettingOrderEntity>>(){});
+                txSdkService.sendSettingOrderMessage(list);
             }
         } catch (Exception e) {
            log.error(e.getMessage(),e);
@@ -56,5 +66,6 @@ public class MyRedisConsumer implements StreamListener<String, ObjectRecord<Stri
             stringRedisTemplate.opsForStream().acknowledge(Const.REDIS_STREAM_TOPIC, record);
         }
     }
+
 
 }

@@ -55,6 +55,11 @@ public class Const {
 	 */
 	public final static String ORDER_TAG = "redis_tag_order";
 
+	/**
+	 * redis stream 消息队列 自定义交易数据 tag
+	 */
+	public final static String ORDER_SETTING_TAG = "redis_tag_setting_order";
+
 
 	/**
 	 * redis stream 消息队列 交易盈利 tag
